@@ -1,0 +1,3 @@
+## 2026-10-24 - Accessible, Multi-Click Copy Alerts
+**Learning:** Native `alert()` calls disrupt user experience by pausing the browser tab context. Styled floating toast notifications are significantly more pleasant, but require proper accessibility attributes (`role="status"`, `aria-live="polite"`) and z-index overrides (e.g. `3000`) to render over overlay/modal backdrops. Additionally, rapid successive clicks on copy buttons require storing and clearing the timeout handle via `clearTimeout` to prevent the toast from flickering or closing prematurely.
+**Action:** Always replace `alert()` with a custom, high-z-index, timeout-debounced accessible floating toast, and add `aria-label` to all icon-only action triggers.
