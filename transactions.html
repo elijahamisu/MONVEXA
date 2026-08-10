@@ -194,9 +194,28 @@
         .empty-state { text-align: center; padding: 60px 20px; }
         .empty-state i { font-size: 50px; color: var(--text-muted); opacity: 0.2; margin-bottom: 20px; }
         .empty-state p { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
+
+        #toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            z-index: 3000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
+
+    <div id="toast" role="status" aria-live="polite">ID Copied!</div>
 
     <header>
         <div class="container header-flex">
@@ -436,11 +455,26 @@
             
             document.getElementById('copyIdBtn').onclick = () => {
                 navigator.clipboard.writeText(t.id);
-                alert('ID Copied!');
+                showToast('ID Copied!');
             };
             
             document.getElementById('txModal').style.display = 'flex';
         };
+
+        let toastTimeout = null;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (msg) {
+                t.innerText = msg;
+            }
+            t.style.display = 'block';
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+            toastTimeout = setTimeout(() => {
+                t.style.display = 'none';
+            }, 2000);
+        }
 
         window.closeModal = () => document.getElementById('txModal').style.display = 'none';
 

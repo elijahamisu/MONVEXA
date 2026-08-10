@@ -159,13 +159,15 @@
         #toast {
             position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
             background: var(--success); color: white; padding: 10px 20px;
-            border-radius: 30px; font-size: 13px; font-weight: 600; display: none; z-index: 2000;
+            border-radius: 30px; font-size: 13px; font-weight: 600; display: none; z-index: 3000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
 
-    <div id="toast">Copied successfully!</div>
+    <div id="toast" role="status" aria-live="polite">Copied successfully!</div>
 
     <header>
         <div class="container header-flex">
@@ -344,10 +346,21 @@
             }
         };
 
-        function showToast() {
+        let toastTimeout = null;
+        function showToast(msg) {
             const t = document.getElementById('toast');
+            if (msg) {
+                t.innerText = msg;
+            } else {
+                t.innerText = 'Copied successfully!';
+            }
             t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+            toastTimeout = setTimeout(() => {
+                t.style.display = 'none';
+            }, 2000);
         }
 
         window.addEventListener('DOMContentLoaded', init);
