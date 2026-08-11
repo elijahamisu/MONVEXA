@@ -392,9 +392,35 @@
             margin-bottom: 15px;
             opacity: 0.5;
         }
+
+        #toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            z-index: 3000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 10px); }
+            15% { opacity: 1; transform: translate(-50%, 0); }
+            85% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -10px); }
+        }
     </style>
 </head>
 <body>
+
+    <div id="toast" role="status" aria-live="polite">Referral code copied!</div>
 
     <header>
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -406,11 +432,11 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a href="notifications.html" class="icon-btn">
+                <a href="notifications.html" class="icon-btn" aria-label="Notifications">
                     <i class="fas fa-bell"></i>
                     <div class="notification-dot" id="notifDot"></div>
                 </a>
-                <button class="icon-btn" onclick="logout()">
+                <button class="icon-btn" onclick="logout()" aria-label="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -510,7 +536,7 @@
                 <h4>Refer & Earn</h4>
                 <p>Referral Code: <b id="refCodeText">...</b></p>
             </div>
-            <button onclick="copyRef()" class="icon-btn" style="background: var(--accent-color); border: none;">
+            <button onclick="copyRef()" class="icon-btn" style="background: var(--accent-color); border: none;" aria-label="Copy referral code">
                 <i class="fas fa-copy"></i>
             </button>
         </section>
@@ -744,10 +770,22 @@
             window.location.href = 'login.html';
         };
 
+        let toastTimeout = null;
         window.copyRef = () => {
             const code = window.userRefCode || '...';
             navigator.clipboard.writeText(code);
-            alert('Referral code copied!');
+
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+
+            toastTimeout = setTimeout(() => {
+                toast.style.display = 'none';
+                toastTimeout = null;
+            }, 2000);
         };
 
         window.addEventListener('DOMContentLoaded', init);
