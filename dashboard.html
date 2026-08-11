@@ -396,6 +396,8 @@
 </head>
 <body>
 
+    <div id="toast" role="status" aria-live="polite" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 600; display: none; z-index: 3000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">Referral code copied!</div>
+
     <header>
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div class="user-info">
@@ -558,6 +560,7 @@
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
         let currentUser = null;
+        let copyTimeout = null;
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -747,7 +750,14 @@
         window.copyRef = () => {
             const code = window.userRefCode || '...';
             navigator.clipboard.writeText(code);
-            alert('Referral code copied!');
+            const t = document.getElementById('toast');
+            if (t) {
+                t.style.display = 'block';
+                if (copyTimeout) clearTimeout(copyTimeout);
+                copyTimeout = setTimeout(() => {
+                    t.style.display = 'none';
+                }, 2000);
+            }
         };
 
         window.addEventListener('DOMContentLoaded', init);
