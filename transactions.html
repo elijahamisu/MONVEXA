@@ -194,9 +194,25 @@
         .empty-state { text-align: center; padding: 60px 20px; }
         .empty-state i { font-size: 50px; color: var(--text-muted); opacity: 0.2; margin-bottom: 20px; }
         .empty-state p { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
+
+        #toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            z-index: 3000;
+        }
     </style>
 </head>
 <body>
+    <div id="toast" role="status" aria-live="polite">Transaction ID copied!</div>
 
     <header>
         <div class="container header-flex">
@@ -298,6 +314,7 @@
         let currentUser = null;
         let allTransactions = [];
         let filteredTransactions = [];
+        let toastTimeout;
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -436,7 +453,12 @@
             
             document.getElementById('copyIdBtn').onclick = () => {
                 navigator.clipboard.writeText(t.id);
-                alert('ID Copied!');
+                const toastEl = document.getElementById('toast');
+                toastEl.style.display = 'block';
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toastEl.style.display = 'none';
+                }, 2000);
             };
             
             document.getElementById('txModal').style.display = 'flex';
