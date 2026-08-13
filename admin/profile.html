@@ -1,395 +1,792 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Admin Profile | EASYPIE Management</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #060b13;
-            --secondary-bg: #0a0f1a;
-            --sidebar-bg: #0d121f;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.4);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
-        }
+      :root {
+        --primary-bg: #060b13;
+        --secondary-bg: #0a0f1a;
+        --sidebar-bg: #0d121f;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.4);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --sidebar-width: 260px;
+      }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
 
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
 
-        /* --- Sidebar --- */
-        aside {
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--glass-border);
-            position: fixed; height: 100vh;
-            left: -260px; transition: 0.3s ease; z-index: 1000;
-            display: flex; flex-direction: column;
-        }
-        aside.active { left: 0; }
+      /* --- Sidebar --- */
+      aside {
+        width: var(--sidebar-width);
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--glass-border);
+        position: fixed;
+        height: 100vh;
+        left: -260px;
+        transition: 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
+      aside.active {
+        left: 0;
+      }
 
-        .nav-item {
-            padding: 12px 25px; display: flex; align-items: center; gap: 15px;
-            color: var(--text-muted); text-decoration: none; font-size: 14px; transition: 0.3s;
-        }
-        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); border-left: 4px solid var(--accent-color); }
+      .nav-item {
+        padding: 12px 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s;
+      }
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        border-left: 4px solid var(--accent-color);
+      }
 
-        /* --- Main Content --- */
-        main { flex: 1; margin-left: 0; transition: 0.3s; width: 100%; }
-        
-        header {
-            height: 70px; background: var(--secondary-bg); border-bottom: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; position: sticky; top: 0; z-index: 900;
-        }
+      /* --- Main Content --- */
+      main {
+        flex: 1;
+        margin-left: 0;
+        transition: 0.3s;
+        width: 100%;
+      }
 
-        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+      header {
+        height: 70px;
+        background: var(--secondary-bg);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
 
-        /* --- Profile Layout Grid --- */
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* --- Profile Layout Grid --- */
+      .profile-grid {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 25px;
+        margin-top: 10px;
+      }
+
+      /* --- Left Column: Profile Card --- */
+      .profile-card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        padding: 30px;
+        text-align: center;
+        height: fit-content;
+      }
+
+      .avatar-box {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 20px;
+      }
+
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--accent-color);
+        background: var(--secondary-bg);
+      }
+
+      .upload-overlay {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: var(--accent-color);
+        width: 36px;
+        height: 32px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 3px solid var(--sidebar-bg);
+        transition: 0.3s;
+      }
+
+      .profile-card h2 {
+        font-size: 20px;
+        margin-bottom: 5px;
+      }
+      .profile-card p {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+      }
+
+      .role-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .card-stats {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid var(--glass-border);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+      .c-stat b {
+        display: block;
+        font-size: 16px;
+        color: var(--text-main);
+      }
+      .c-stat span {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+
+      /* --- Right Column: Sections --- */
+      .settings-section {
+        background: var(--card-bg);
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        padding: 25px;
+        margin-bottom: 25px;
+      }
+      .settings-section h3 {
+        font-size: 16px;
+        margin-bottom: 20px;
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      /* Forms */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+      .form-control {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        padding: 12px;
+        color: white;
+        outline: none;
+        font-size: 14px;
+      }
+      .form-control:focus {
+        border-color: var(--accent-color);
+      }
+      .form-control:read-only {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-prime {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .btn-prime:disabled {
+        opacity: 0.5;
+      }
+
+      /* Session/History Table */
+      .list-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .list-row:last-child {
+        border: none;
+      }
+      .list-info h5 {
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+      .list-info p {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .btn-text-danger {
+        background: none;
+        border: none;
+        color: var(--danger);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* Preferences Toggles */
+      .toggle-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #333;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--success);
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+
+      /* --- Responsive --- */
+      @media (max-width: 900px) {
         .profile-grid {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 25px;
-            margin-top: 10px;
+          grid-template-columns: 1fr;
         }
-
-        /* --- Left Column: Profile Card --- */
-        .profile-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            padding: 30px;
-            text-align: center;
-            height: fit-content;
+      }
+      @media (min-width: 1024px) {
+        aside {
+          left: 0;
         }
-
-        .avatar-box {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
+        main {
+          margin-left: var(--sidebar-width);
         }
+      }
 
-        .avatar-img {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--accent-color);
-            background: var(--secondary-bg);
+      .overlay-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-bg);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .spinner {
+        width: 25px;
+        height: 25px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--accent-color);
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
-
-        .upload-overlay {
-            position: absolute; bottom: 0; right: 0;
-            background: var(--accent-color);
-            width: 36px; height: 32px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; border: 3px solid var(--sidebar-bg);
-            transition: 0.3s;
-        }
-
-        .profile-card h2 { font-size: 20px; margin-bottom: 5px; }
-        .profile-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
-        
-        .role-badge {
-            display: inline-block; padding: 5px 15px; border-radius: 20px;
-            background: rgba(59, 130, 246, 0.1); color: var(--accent-color);
-            font-size: 11px; font-weight: 700; text-transform: uppercase;
-        }
-
-        .card-stats {
-            margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--glass-border);
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        }
-        .c-stat b { display: block; font-size: 16px; color: var(--text-main); }
-        .c-stat span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-
-        /* --- Right Column: Sections --- */
-        .settings-section {
-            background: var(--card-bg);
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-        .settings-section h3 { font-size: 16px; margin-bottom: 20px; color: var(--accent-color); display: flex; align-items: center; gap: 10px; }
-
-        /* Forms */
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-        .form-control { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: white; outline: none; font-size: 14px; }
-        .form-control:focus { border-color: var(--accent-color); }
-        .form-control:read-only { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-prime { background: var(--accent-color); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .btn-prime:disabled { opacity: 0.5; }
-
-        /* Session/History Table */
-        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .list-row:last-child { border: none; }
-        .list-info h5 { font-size: 13px; margin-bottom: 3px; }
-        .list-info p { font-size: 11px; color: var(--text-muted); }
-
-        .btn-text-danger { background: none; border: none; color: var(--danger); font-size: 12px; font-weight: 600; cursor: pointer; }
-
-        /* Preferences Toggles */
-        .toggle-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--success); }
-        input:checked + .slider:before { transform: translateX(20px); }
-
-        /* --- Responsive --- */
-        @media (max-width: 900px) {
-            .profile-grid { grid-template-columns: 1fr; }
-        }
-        @media (min-width: 1024px) { aside { left: 0; } main { margin-left: var(--sidebar-width); } }
-        
-        .overlay-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-bg); z-index: 3000; display: flex; align-items: center; justify-content: center; }
-        .spinner { width: 25px; height: 25px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="loader" class="overlay-loader">
-        <div class="spinner"></div>
+      <div class="spinner"></div>
     </div>
 
     <!-- Sidebar -->
     <aside id="sidebar">
-        <div style="padding: 30px 25px; font-size: 20px; font-weight: 800; color: var(--accent-color);">EASYPIE ADMIN</div>
-        <nav style="flex:1">
-            <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
-            <a href="deposits.html" class="nav-item"><i class="fas fa-arrow-down"></i> Deposits</a>
-            <a href="withdrawals.html" class="nav-item"><i class="fas fa-arrow-up"></i> Withdrawals</a>
-            <a href="investments.html" class="nav-item"><i class="fas fa-rocket"></i> Investments</a>
-            <a href="earnings.html" class="nav-item"><i class="fas fa-chart-line"></i> Earnings</a>
-            <a href="referrals.html" class="nav-item"><i class="fas fa-users-viewfinder"></i> Referrals</a>
-            <a href="giftcodes.html" class="nav-item"><i class="fas fa-gift"></i> Gift Codes</a>
-            <a href="transactions.html" class="nav-item"><i class="fas fa-exchange-alt"></i> Transactions</a>
-            <a href="notifications.html" class="nav-item"><i class="fas fa-bell"></i> Notifications</a>
-            <a href="support.html" class="nav-item"><i class="fas fa-headset"></i> Support Tickets</a>
-            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
-        </nav>
-        <a href="#" onclick="adminLogout()" class="nav-item" style="color: var(--danger); border-top: 1px solid var(--glass-border);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <div
+        style="
+          padding: 30px 25px;
+          font-size: 20px;
+          font-weight: 800;
+          color: var(--accent-color);
+        "
+      >
+        EASYPIE ADMIN
+      </div>
+      <nav style="flex: 1">
+        <a href="index.html" class="nav-item"
+          ><i class="fas fa-th-large"></i> Dashboard</a
+        >
+        <a href="users.html" class="nav-item"
+          ><i class="fas fa-users"></i> Users</a
+        >
+        <a href="deposits.html" class="nav-item"
+          ><i class="fas fa-arrow-down"></i> Deposits</a
+        >
+        <a href="withdrawals.html" class="nav-item"
+          ><i class="fas fa-arrow-up"></i> Withdrawals</a
+        >
+        <a href="investments.html" class="nav-item"
+          ><i class="fas fa-rocket"></i> Investments</a
+        >
+        <a href="earnings.html" class="nav-item"
+          ><i class="fas fa-chart-line"></i> Earnings</a
+        >
+        <a href="referrals.html" class="nav-item"
+          ><i class="fas fa-users-viewfinder"></i> Referrals</a
+        >
+        <a href="giftcodes.html" class="nav-item"
+          ><i class="fas fa-gift"></i> Gift Codes</a
+        >
+        <a href="transactions.html" class="nav-item"
+          ><i class="fas fa-exchange-alt"></i> Transactions</a
+        >
+        <a href="notifications.html" class="nav-item"
+          ><i class="fas fa-bell"></i> Notifications</a
+        >
+        <a href="support.html" class="nav-item"
+          ><i class="fas fa-headset"></i> Support Tickets</a
+        >
+        <a href="settings.html" class="nav-item"
+          ><i class="fas fa-cog"></i> Settings</a
+        >
+      </nav>
+      <a
+        href="#"
+        onclick="adminLogout()"
+        class="nav-item"
+        style="color: var(--danger); border-top: 1px solid var(--glass-border)"
+        ><i class="fas fa-sign-out-alt"></i> Logout</a
+      >
     </aside>
 
     <main>
-        <header>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <i class="fas fa-bars" style="cursor:pointer; color:var(--text-muted)" onclick="document.getElementById('sidebar').classList.toggle('active')"></i>
-                <h2 style="font-size: 18px;">Administrator Profile</h2>
-            </div>
-            <div id="adminHeaderInfo" style="display:flex; align-items:center; gap:10px;">
-                <div id="hName" style="font-size: 12px; font-weight: 600; text-align: right;"></div>
-                <div style="width:30px; height:30px; border-radius:50%; background:var(--accent-color); overflow:hidden;">
-                    <img src="" id="hAvatar" style="width:100%; height:100%; object-fit:cover; display:none;">
-                </div>
-            </div>
-        </header>
-
-        <div class="container">
-            <div class="profile-grid">
-                <!-- Profile Summary Card -->
-                <div class="profile-card">
-                    <div class="avatar-box">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff" id="pAvatar" class="avatar-img">
-                        <label for="avatarInput" class="upload-overlay">
-                            <i class="fas fa-camera"></i>
-                            <input type="file" id="avatarInput" hidden accept="image/*">
-                        </label>
-                    </div>
-                    <h2 id="pFullName">Full Name</h2>
-                    <p id="pUsername">@username</p>
-                    <span class="role-badge">Super Administrator</span>
-                    
-                    <div class="card-stats">
-                        <div class="c-stat"><b id="pJoined">...</b><span>Member Since</span></div>
-                        <div class="c-stat"><b id="pStatus" style="color:var(--success)">Active</b><span>Status</span></div>
-                    </div>
-                </div>
-
-                <!-- Settings Forms -->
-                <div>
-                    <!-- Personal Info -->
-                    <section class="settings-section">
-                        <h3><i class="fas fa-user-edit"></i> Personal Information</h3>
-                        <form id="infoForm">
-                            <div class="form-grid">
-                                <div class="form-group"><label>Full Name</label><input type="text" id="inputName" class="form-control" required></div>
-                                <div class="form-group"><label>Phone Number</label><input type="tel" id="inputPhone" class="form-control"></div>
-                                <div class="form-group"><label>Email (Read-only)</label><input type="email" id="inputEmail" class="form-control" readonly></div>
-                                <div class="form-group"><label>Admin ID</label><input type="text" id="inputId" class="form-control" readonly></div>
-                            </div>
-                            <button type="submit" class="btn-prime" id="saveInfoBtn">Update Profile</button>
-                        </form>
-                    </section>
-
-                    <!-- Security / Change Password -->
-                    <section class="settings-section">
-                        <h3><i class="fas fa-shield-alt"></i> Security & Password</h3>
-                        <form id="passForm">
-                            <div class="form-grid">
-                                <div class="form-group"><label>New Password</label><input type="password" id="newPass" class="form-control" required minlength="6"></div>
-                                <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmPass" class="form-control" required></div>
-                            </div>
-                            <button type="submit" class="btn-prime">Change Password</button>
-                        </form>
-                    </section>
-
-                    <!-- Session Management -->
-                    <section class="settings-section">
-                        <h3><i class="fas fa-key"></i> Active Sessions</h3>
-                        <div id="sessionList">
-                            <div class="list-row">
-                                <div class="list-info"><h5>Chrome on Windows</h5><p>IP: 192.168.1.1 • Last Active: Just Now</p></div>
-                                <button class="btn-text-danger">Sign Out</button>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Preferences -->
-                    <section class="settings-section">
-                        <h3><i class="fas fa-bell"></i> Preferences</h3>
-                        <div class="toggle-item"><span>Login Security Alerts</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-                        <div class="toggle-item"><span>Withdrawal Approval Notifications</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-                        <div class="toggle-item"><span>Daily Report Summary</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
-                    </section>
-                </div>
-            </div>
+      <header>
+        <div style="display: flex; align-items: center; gap: 15px">
+          <i
+            class="fas fa-bars"
+            style="cursor: pointer; color: var(--text-muted)"
+            onclick="
+              document.getElementById('sidebar').classList.toggle('active')
+            "
+          ></i>
+          <h2 style="font-size: 18px">Administrator Profile</h2>
         </div>
+        <div
+          id="adminHeaderInfo"
+          style="display: flex; align-items: center; gap: 10px"
+        >
+          <div
+            id="hName"
+            style="font-size: 12px; font-weight: 600; text-align: right"
+          ></div>
+          <div
+            style="
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              background: var(--accent-color);
+              overflow: hidden;
+            "
+          >
+            <img
+              src=""
+              id="hAvatar"
+              style="
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: none;
+              "
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="container">
+        <div class="profile-grid">
+          <!-- Profile Summary Card -->
+          <div class="profile-card">
+            <div class="avatar-box">
+              <img
+                src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff"
+                id="pAvatar"
+                class="avatar-img"
+              />
+              <label for="avatarInput" class="upload-overlay">
+                <i class="fas fa-camera"></i>
+                <input type="file" id="avatarInput" hidden accept="image/*" />
+              </label>
+            </div>
+            <h2 id="pFullName">Full Name</h2>
+            <p id="pUsername">@username</p>
+            <span class="role-badge">Super Administrator</span>
+
+            <div class="card-stats">
+              <div class="c-stat">
+                <b id="pJoined">...</b><span>Member Since</span>
+              </div>
+              <div class="c-stat">
+                <b id="pStatus" style="color: var(--success)">Active</b
+                ><span>Status</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Forms -->
+          <div>
+            <!-- Personal Info -->
+            <section class="settings-section">
+              <h3><i class="fas fa-user-edit"></i> Personal Information</h3>
+              <form id="infoForm">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Full Name</label
+                    ><input
+                      type="text"
+                      id="inputName"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Phone Number</label
+                    ><input type="tel" id="inputPhone" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label>Email (Read-only)</label
+                    ><input
+                      type="email"
+                      id="inputEmail"
+                      class="form-control"
+                      readonly
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Admin ID</label
+                    ><input
+                      type="text"
+                      id="inputId"
+                      class="form-control"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <button type="submit" class="btn-prime" id="saveInfoBtn">
+                  Update Profile
+                </button>
+              </form>
+            </section>
+
+            <!-- Security / Change Password -->
+            <section class="settings-section">
+              <h3><i class="fas fa-shield-alt"></i> Security & Password</h3>
+              <form id="passForm">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>New Password</label
+                    ><input
+                      type="password"
+                      id="newPass"
+                      class="form-control"
+                      required
+                      minlength="6"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Confirm Password</label
+                    ><input
+                      type="password"
+                      id="confirmPass"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                </div>
+                <button type="submit" class="btn-prime">Change Password</button>
+              </form>
+            </section>
+
+            <!-- Session Management -->
+            <section class="settings-section">
+              <h3><i class="fas fa-key"></i> Active Sessions</h3>
+              <div id="sessionList">
+                <div class="list-row">
+                  <div class="list-info">
+                    <h5>Chrome on Windows</h5>
+                    <p>IP: 192.168.1.1 • Last Active: Just Now</p>
+                  </div>
+                  <button class="btn-text-danger">Sign Out</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- Preferences -->
+            <section class="settings-section">
+              <h3><i class="fas fa-bell"></i> Preferences</h3>
+              <div class="toggle-item">
+                <span>Login Security Alerts</span
+                ><label class="switch"
+                  ><input type="checkbox" checked /><span class="slider"></span
+                ></label>
+              </div>
+              <div class="toggle-item">
+                <span>Withdrawal Approval Notifications</span
+                ><label class="switch"
+                  ><input type="checkbox" checked /><span class="slider"></span
+                ></label>
+              </div>
+              <div class="toggle-item">
+                <span>Daily Report Summary</span
+                ><label class="switch"
+                  ><input type="checkbox" /><span class="slider"></span
+                ></label>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
+      let currentUser = null;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
-
-            await loadProfile();
-            document.getElementById('loader').style.display = 'none';
-            setupEventListeners();
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
         }
+        currentUser = session.user;
 
-        async function loadProfile() {
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-            if (profile) {
-                // UI Cards
-                document.getElementById('pFullName').innerText = profile.full_name;
-                document.getElementById('pUsername').innerText = `@${profile.username}`;
-                document.getElementById('pJoined').innerText = new Date(profile.created_at).toLocaleDateString();
-                document.getElementById('hName').innerText = profile.full_name;
-                
-                if (profile.avatar_url) {
-                    document.getElementById('pAvatar').src = profile.avatar_url;
-                    document.getElementById('hAvatar').src = profile.avatar_url;
-                    document.getElementById('hAvatar').style.display = 'block';
-                }
+        await loadProfile();
+        document.getElementById("loader").style.display = "none";
+        setupEventListeners();
+      }
 
-                // Forms
-                document.getElementById('inputName').value = profile.full_name;
-                document.getElementById('inputPhone').value = profile.phone || '';
-                document.getElementById('inputEmail').value = currentUser.email;
-                document.getElementById('inputId').value = currentUser.id.slice(0, 12).toUpperCase();
-            }
+      async function loadProfile() {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentUser.id)
+          .single();
+        if (profile) {
+          // UI Cards
+          document.getElementById("pFullName").innerText = profile.full_name;
+          document.getElementById("pUsername").innerText =
+            `@${profile.username}`;
+          document.getElementById("pJoined").innerText = new Date(
+            profile.created_at,
+          ).toLocaleDateString();
+          document.getElementById("hName").innerText = profile.full_name;
+
+          if (profile.avatar_url) {
+            document.getElementById("pAvatar").src = profile.avatar_url;
+            document.getElementById("hAvatar").src = profile.avatar_url;
+            document.getElementById("hAvatar").style.display = "block";
+          }
+
+          // Forms
+          document.getElementById("inputName").value = profile.full_name;
+          document.getElementById("inputPhone").value = profile.phone || "";
+          document.getElementById("inputEmail").value = currentUser.email;
+          document.getElementById("inputId").value = currentUser.id
+            .slice(0, 12)
+            .toUpperCase();
         }
+      }
 
-        async function setupEventListeners() {
-            // Update Info
-            document.getElementById('infoForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const btn = document.getElementById('saveInfoBtn');
-                btn.disabled = true;
-                
-                const { error } = await supabase.from('profiles').update({
-                    full_name: document.getElementById('inputName').value,
-                    phone: document.getElementById('inputPhone').value
-                }).eq('id', currentUser.id);
+      async function setupEventListeners() {
+        // Update Info
+        document.getElementById("infoForm").onsubmit = async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("saveInfoBtn");
+          btn.disabled = true;
 
-                if (!error) {
-                    await supabase.from('admin_logs').insert([{ admin_id: currentUser.id, action: "Updated own profile information" }]);
-                    alert("Profile updated successfully!");
-                    loadProfile();
-                } else alert(error.message);
-                btn.disabled = false;
-            };
+          const { error } = await supabase
+            .from("profiles")
+            .update({
+              full_name: document.getElementById("inputName").value,
+              phone: document.getElementById("inputPhone").value,
+            })
+            .eq("id", currentUser.id);
 
-            // Password Change
-            document.getElementById('passForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const newPass = document.getElementById('newPass').value;
-                const confPass = document.getElementById('confirmPass').value;
-
-                if (newPass !== confPass) { alert("Passwords do not match!"); return; }
-
-                const { error } = await supabase.auth.updateUser({ password: newPass });
-                if (!error) {
-                    await supabase.from('admin_logs').insert([{ admin_id: currentUser.id, action: "Changed own account password" }]);
-                    alert("Password updated successfully!");
-                    document.getElementById('passForm').reset();
-                } else alert(error.message);
-            };
-
-            // Avatar Upload
-            document.getElementById('avatarInput').onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const fileName = `${currentUser.id}-${Date.now()}`;
-                const { data, error: uploadError } = await supabase.storage.from('avatars').upload(`admin/${fileName}`, file);
-
-                if (!uploadError) {
-                    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(`admin/${fileName}`);
-                    await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-                    loadProfile();
-                    alert("Avatar updated!");
-                } else alert(uploadError.message);
-            };
-        }
-
-        window.adminLogout = async () => {
-            if(confirm("Sign out of session?")) {
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
-            }
+          if (!error) {
+            await supabase
+              .from("admin_logs")
+              .insert([
+                {
+                  admin_id: currentUser.id,
+                  action: "Updated own profile information",
+                },
+              ]);
+            alert("Profile updated successfully!");
+            loadProfile();
+          } else alert(error.message);
+          btn.disabled = false;
         };
 
-        window.addEventListener('DOMContentLoaded', init);
+        // Password Change
+        document.getElementById("passForm").onsubmit = async (e) => {
+          e.preventDefault();
+          const newPass = document.getElementById("newPass").value;
+          const confPass = document.getElementById("confirmPass").value;
+
+          if (newPass !== confPass) {
+            alert("Passwords do not match!");
+            return;
+          }
+
+          const { error } = await supabase.auth.updateUser({
+            password: newPass,
+          });
+          if (!error) {
+            await supabase
+              .from("admin_logs")
+              .insert([
+                {
+                  admin_id: currentUser.id,
+                  action: "Changed own account password",
+                },
+              ]);
+            alert("Password updated successfully!");
+            document.getElementById("passForm").reset();
+          } else alert(error.message);
+        };
+
+        // Avatar Upload
+        document.getElementById("avatarInput").onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const fileName = `${currentUser.id}-${Date.now()}`;
+          const { data, error: uploadError } = await supabase.storage
+            .from("avatars")
+            .upload(`admin/${fileName}`, file);
+
+          if (!uploadError) {
+            const {
+              data: { publicUrl },
+            } = supabase.storage
+              .from("avatars")
+              .getPublicUrl(`admin/${fileName}`);
+            await supabase
+              .from("profiles")
+              .update({ avatar_url: publicUrl })
+              .eq("id", currentUser.id);
+            loadProfile();
+            alert("Avatar updated!");
+          } else alert(uploadError.message);
+        };
+      }
+
+      window.adminLogout = async () => {
+        if (confirm("Sign out of session?")) {
+          await supabase.auth.signOut();
+          window.location.href = "login.html";
+        }
+      };
+
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

@@ -1,414 +1,779 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Notifications | EASYPIE</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #0a0e17;
-            --secondary-bg: #111827;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.6);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --nav-height: 70px;
+      :root {
+        --primary-bg: #0a0e17;
+        --secondary-bg: #111827;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.6);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --nav-height: 70px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        padding-bottom: calc(var(--nav-height) + 30px);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .container {
+        width: 92%;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      /* --- Header --- */
+      header {
+        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        background: rgba(10, 14, 23, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 100;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .back-btn {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .header-icons {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .mini-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      /* --- Stats Row --- */
+      .stats-row {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 20px 0;
+        scrollbar-width: none;
+      }
+      .stats-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .stat-pill {
+        background: var(--card-bg);
+        padding: 10px 18px;
+        border-radius: 15px;
+        border: 1px solid var(--glass-border);
+        white-space: nowrap;
+        display: flex;
+        flex-direction: column;
+        min-width: 100px;
+      }
+      .stat-pill span {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .stat-pill b {
+        font-size: 14px;
+        color: var(--accent-color);
+      }
+
+      /* --- Tools & Filters --- */
+      .tools {
+        margin-bottom: 20px;
+      }
+
+      .search-bar {
+        background: var(--secondary-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .search-bar input {
+        background: transparent;
+        border: none;
+        color: white;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+      }
+      .search-bar i {
+        color: var(--text-muted);
+      }
+
+      .filter-tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        scrollbar-width: none;
+      }
+      .tab {
+        white-space: nowrap;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: var(--card-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .tab.active {
+        background: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+      }
+
+      /* --- Bulk Actions --- */
+      .bulk-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+      .action-link {
+        font-size: 12px;
+        color: var(--accent-color);
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .action-link.danger {
+        color: var(--danger);
+      }
+
+      /* --- Notification List --- */
+      .notif-item {
+        background: var(--card-bg);
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 12px;
+        display: flex;
+        gap: 15px;
+        position: relative;
+        transition: 0.3s;
+      }
+      .notif-item.unread {
+        border-left: 4px solid var(--accent-color);
+        background: rgba(59, 130, 246, 0.05);
+      }
+
+      .notif-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .notif-body {
+        flex: 1;
+      }
+      .notif-body h4 {
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+      .notif-body p {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.4;
+        margin-bottom: 8px;
+      }
+      .notif-time {
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+
+      .notif-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+      }
+      .btn-mini {
+        background: none;
+        border: none;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+      }
+      .btn-mini.mark {
+        color: var(--accent-color);
+      }
+      .btn-mini.del {
+        color: var(--danger);
+      }
+
+      /* --- Settings Modal --- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+        backdrop-filter: blur(8px);
+      }
+      .modal-content {
+        background: var(--secondary-bg);
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        border-radius: 25px;
+        border: 1px solid var(--glass-border);
+      }
+      .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .setting-item span {
+        font-size: 14px;
+      }
+      /* Toggle Switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #333;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--accent-color);
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+
+      /* --- Empty State --- */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+      }
+      .empty-state i {
+        font-size: 50px;
+        color: var(--text-muted);
+        opacity: 0.1;
+        margin-bottom: 20px;
+      }
+      .empty-state p {
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      /* --- Bottom Nav --- */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(17, 24, 39, 0.95);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid var(--glass-border);
+        z-index: 1000;
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 10px;
+      }
+      .nav-item.active {
+        color: var(--accent-color);
+      }
+      .nav-item i {
+        font-size: 18px;
+      }
+
+      /* --- Skeleton --- */
+      .skeleton {
+        background: #1f2937;
+        border-radius: 20px;
+        animation: pulse 1.5s infinite;
+        height: 100px;
+        margin-bottom: 12px;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
         }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            padding-bottom: calc(var(--nav-height) + 30px);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container { width: 92%; max-width: 700px; margin: 0 auto; }
-
-        /* --- Header --- */
-        header {
-            padding: 20px 0;
-            position: sticky; top: 0;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .header-flex { display: flex; justify-content: space-between; align-items: center; }
-
-        .back-btn {
-            color: white; text-decoration: none; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .header-icons { display: flex; align-items: center; gap: 15px; }
-
-        .mini-avatar {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: var(--accent-color);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px;
-        }
-
-        /* --- Stats Row --- */
-        .stats-row {
-            display: flex; gap: 10px; overflow-x: auto; padding: 20px 0;
-            scrollbar-width: none;
-        }
-        .stats-row::-webkit-scrollbar { display: none; }
-
-        .stat-pill {
-            background: var(--card-bg); padding: 10px 18px; border-radius: 15px;
-            border: 1px solid var(--glass-border); white-space: nowrap;
-            display: flex; flex-direction: column; min-width: 100px;
-        }
-        .stat-pill span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; }
-        .stat-pill b { font-size: 14px; color: var(--accent-color); }
-
-        /* --- Tools & Filters --- */
-        .tools { margin-bottom: 20px; }
-        
-        .search-bar {
-            background: var(--secondary-bg); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; gap: 10px;
-            margin-bottom: 15px;
-        }
-        .search-bar input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-        .search-bar i { color: var(--text-muted); }
-
-        .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .tab {
-            white-space: nowrap; padding: 8px 16px; border-radius: 20px;
-            background: var(--card-bg); border: 1px solid var(--glass-border);
-            color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer;
-        }
-        .tab.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
-
-        /* --- Bulk Actions --- */
-        .bulk-actions {
-            display: flex; justify-content: space-between; margin-bottom: 15px;
-        }
-        .action-link { font-size: 12px; color: var(--accent-color); background: none; border: none; cursor: pointer; text-decoration: none; }
-        .action-link.danger { color: var(--danger); }
-
-        /* --- Notification List --- */
-        .notif-item {
-            background: var(--card-bg); padding: 18px; border-radius: 20px;
-            border: 1px solid var(--glass-border); margin-bottom: 12px;
-            display: flex; gap: 15px; position: relative; transition: 0.3s;
-        }
-        .notif-item.unread { border-left: 4px solid var(--accent-color); background: rgba(59, 130, 246, 0.05); }
-
-        .notif-icon {
-            width: 45px; height: 45px; border-radius: 14px; background: rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
-        }
-        .notif-body { flex: 1; }
-        .notif-body h4 { font-size: 14px; margin-bottom: 5px; }
-        .notif-body p { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
-        .notif-time { font-size: 10px; color: var(--text-muted); }
-
-        .notif-actions { display: flex; gap: 15px; margin-top: 10px; }
-        .btn-mini { background: none; border: none; font-size: 11px; font-weight: 600; cursor: pointer; padding: 0; }
-        .btn-mini.mark { color: var(--accent-color); }
-        .btn-mini.del { color: var(--danger); }
-
-        /* --- Settings Modal --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; align-items: center;
-            justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(8px);
-        }
-        .modal-content {
-            background: var(--secondary-bg); width: 100%; max-width: 400px;
-            padding: 30px; border-radius: 25px; border: 1px solid var(--glass-border);
-        }
-        .setting-item {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px;
-        }
-        .setting-item span { font-size: 14px; }
-        /* Toggle Switch */
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent-color); }
-        input:checked + .slider:before { transform: translateX(20px); }
-
-        /* --- Empty State --- */
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-state i { font-size: 50px; color: var(--text-muted); opacity: 0.1; margin-bottom: 20px; }
-        .empty-state p { font-size: 14px; color: var(--text-muted); }
-
-        /* --- Bottom Nav --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: var(--nav-height); background: rgba(17, 24, 39, 0.95);
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            border-top: 1px solid var(--glass-border); z-index: 1000;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 4px; color: var(--text-muted);
-            text-decoration: none; font-size: 10px;
-        }
-        .nav-item.active { color: var(--accent-color); }
-        .nav-item i { font-size: 18px; }
-
-        /* --- Skeleton --- */
-        .skeleton { background: #1f2937; border-radius: 20px; animation: pulse 1.5s infinite; height: 100px; margin-bottom: 12px; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <div class="container header-flex">
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
-            <div class="header-icons">
-                <button class="action-link" onclick="openSettings()"><i class="fas fa-cog" style="font-size: 18px;"></i></button>
-                <div class="mini-avatar" id="userAvatar">U</div>
-            </div>
+      <div class="container header-flex">
+        <a href="dashboard.html" class="back-btn"
+          ><i class="fas fa-arrow-left"></i> Dashboard</a
+        >
+        <div class="header-icons">
+          <button class="action-link" onclick="openSettings()">
+            <i class="fas fa-cog" style="font-size: 18px"></i>
+          </button>
+          <div class="mini-avatar" id="userAvatar">U</div>
         </div>
+      </div>
     </header>
 
     <main class="container">
-        <!-- Stats -->
-        <div class="stats-row">
-            <div class="stat-pill"><span>Total</span><b id="totalCount">0</b></div>
-            <div class="stat-pill"><span>Unread</span><b id="unreadCount" style="color: var(--warning);">0</b></div>
-            <div class="stat-pill"><span>Today</span><b id="todayCount">0</b></div>
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-pill"><span>Total</span><b id="totalCount">0</b></div>
+        <div class="stat-pill">
+          <span>Unread</span
+          ><b id="unreadCount" style="color: var(--warning)">0</b>
         </div>
+        <div class="stat-pill"><span>Today</span><b id="todayCount">0</b></div>
+      </div>
 
-        <!-- Search & Filter -->
-        <section class="tools">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="notifSearch" placeholder="Search notifications...">
-            </div>
-            <div class="filter-tabs">
-                <button class="tab active" onclick="filterNotifs('all', this)">All</button>
-                <button class="tab" onclick="filterNotifs('unread', this)">Unread</button>
-                <button class="tab" onclick="filterNotifs('deposit', this)">Deposits</button>
-                <button class="tab" onclick="filterNotifs('withdrawal', this)">Withdrawals</button>
-                <button class="tab" onclick="filterNotifs('investment', this)">Investments</button>
-                <button class="tab" onclick="filterNotifs('earning', this)">Earnings</button>
-                <button class="tab" onclick="filterNotifs('referral', this)">Referrals</button>
-            </div>
-        </section>
-
-        <!-- Bulk Actions -->
-        <div class="bulk-actions">
-            <button class="action-link" onclick="markAllRead()">Mark all as read</button>
-            <button class="action-link danger" onclick="deleteAllRead()">Clear read</button>
+      <!-- Search & Filter -->
+      <section class="tools">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            id="notifSearch"
+            placeholder="Search notifications..."
+          />
         </div>
-
-        <!-- List -->
-        <div id="notifList">
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
+        <div class="filter-tabs">
+          <button class="tab active" onclick="filterNotifs('all', this)">
+            All
+          </button>
+          <button class="tab" onclick="filterNotifs('unread', this)">
+            Unread
+          </button>
+          <button class="tab" onclick="filterNotifs('deposit', this)">
+            Deposits
+          </button>
+          <button class="tab" onclick="filterNotifs('withdrawal', this)">
+            Withdrawals
+          </button>
+          <button class="tab" onclick="filterNotifs('investment', this)">
+            Investments
+          </button>
+          <button class="tab" onclick="filterNotifs('earning', this)">
+            Earnings
+          </button>
+          <button class="tab" onclick="filterNotifs('referral', this)">
+            Referrals
+          </button>
         </div>
+      </section>
+
+      <!-- Bulk Actions -->
+      <div class="bulk-actions">
+        <button class="action-link" onclick="markAllRead()">
+          Mark all as read
+        </button>
+        <button class="action-link danger" onclick="deleteAllRead()">
+          Clear read
+        </button>
+      </div>
+
+      <!-- List -->
+      <div id="notifList">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
     </main>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; margin-bottom: 25px;">
-                <h3>Notif Settings</h3>
-                <i class="fas fa-times" onclick="closeSettings()" style="cursor:pointer"></i>
-            </div>
-            <div id="settingsContainer">
-                <div class="setting-item"><span>Deposit Alerts</span><label class="switch"><input type="checkbox" checked onchange="savePref('dep', this.checked)"><span class="slider"></span></label></div>
-                <div class="setting-item"><span>Investment Alerts</span><label class="switch"><input type="checkbox" checked onchange="savePref('inv', this.checked)"><span class="slider"></span></label></div>
-                <div class="setting-item"><span>Daily Earnings</span><label class="switch"><input type="checkbox" checked onchange="savePref('ear', this.checked)"><span class="slider"></span></label></div>
-                <div class="setting-item"><span>Withdrawal Status</span><label class="switch"><input type="checkbox" checked onchange="savePref('wit', this.checked)"><span class="slider"></span></label></div>
-                <div class="setting-item"><span>Referral Rewards</span><label class="switch"><input type="checkbox" checked onchange="savePref('ref', this.checked)"><span class="slider"></span></label></div>
-            </div>
+      <div class="modal-content">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+          "
+        >
+          <h3>Notif Settings</h3>
+          <i
+            class="fas fa-times"
+            onclick="closeSettings()"
+            style="cursor: pointer"
+          ></i>
         </div>
+        <div id="settingsContainer">
+          <div class="setting-item">
+            <span>Deposit Alerts</span
+            ><label class="switch"
+              ><input
+                type="checkbox"
+                checked
+                onchange="savePref('dep', this.checked)" /><span
+                class="slider"
+              ></span
+            ></label>
+          </div>
+          <div class="setting-item">
+            <span>Investment Alerts</span
+            ><label class="switch"
+              ><input
+                type="checkbox"
+                checked
+                onchange="savePref('inv', this.checked)" /><span
+                class="slider"
+              ></span
+            ></label>
+          </div>
+          <div class="setting-item">
+            <span>Daily Earnings</span
+            ><label class="switch"
+              ><input
+                type="checkbox"
+                checked
+                onchange="savePref('ear', this.checked)" /><span
+                class="slider"
+              ></span
+            ></label>
+          </div>
+          <div class="setting-item">
+            <span>Withdrawal Status</span
+            ><label class="switch"
+              ><input
+                type="checkbox"
+                checked
+                onchange="savePref('wit', this.checked)" /><span
+                class="slider"
+              ></span
+            ></label>
+          </div>
+          <div class="setting-item">
+            <span>Referral Rewards</span
+            ><label class="switch"
+              ><input
+                type="checkbox"
+                checked
+                onchange="savePref('ref', this.checked)" /><span
+                class="slider"
+              ></span
+            ></label>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">
-            <i class="fas fa-th-large"></i><span>Home</span>
-        </a>
-        <a href="plans.html" class="nav-item">
-            <i class="fas fa-layer-group"></i><span>Plans</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i><span>Wallet</span>
-        </a>
-        <a href="notifications.html" class="nav-item active">
-            <i class="fas fa-bell"></i><span>Alerts</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user-circle"></i><span>Profile</span>
-        </a>
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-th-large"></i><span>Home</span>
+      </a>
+      <a href="plans.html" class="nav-item">
+        <i class="fas fa-layer-group"></i><span>Plans</span>
+      </a>
+      <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i><span>Wallet</span>
+      </a>
+      <a href="notifications.html" class="nav-item active">
+        <i class="fas fa-bell"></i><span>Alerts</span>
+      </a>
+      <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i><span>Profile</span>
+      </a>
     </nav>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
-        let allNotifs = [];
+      let currentUser = null;
+      let allNotifs = [];
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
+        }
+        currentUser = session.user;
 
-            await loadProfile();
-            await fetchNotifs();
-            setupRealtime();
+        await loadProfile();
+        await fetchNotifs();
+        setupRealtime();
 
-            document.getElementById('notifSearch').addEventListener('input', applyFilters);
+        document
+          .getElementById("notifSearch")
+          .addEventListener("input", applyFilters);
+      }
+
+      async function loadProfile() {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", currentUser.id)
+          .single();
+        if (data)
+          document.getElementById("userAvatar").innerText = data.full_name
+            .charAt(0)
+            .toUpperCase();
+      }
+
+      async function fetchNotifs() {
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (data) {
+          allNotifs = data;
+          updateStats();
+          applyFilters();
+        }
+      }
+
+      function setupRealtime() {
+        supabase
+          .channel("custom-all-channel")
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "notifications",
+              filter: `user_id=eq.${currentUser.id}`,
+            },
+            (payload) => {
+              fetchNotifs();
+            },
+          )
+          .subscribe();
+      }
+
+      function updateStats() {
+        document.getElementById("totalCount").innerText = allNotifs.length;
+        document.getElementById("unreadCount").innerText = allNotifs.filter(
+          (n) => !n.is_read,
+        ).length;
+        const today = new Date().toDateString();
+        document.getElementById("todayCount").innerText = allNotifs.filter(
+          (n) => new Date(n.created_at).toDateString() === today,
+        ).length;
+      }
+
+      function applyFilters() {
+        const query = document
+          .getElementById("notifSearch")
+          .value.toLowerCase();
+        const tab = document
+          .querySelector(".tab.active")
+          .innerText.toLowerCase();
+
+        let filtered = allNotifs.filter((n) => {
+          const matchSearch =
+            n.title.toLowerCase().includes(query) ||
+            n.message.toLowerCase().includes(query);
+          let matchType = true;
+          if (tab === "unread") matchType = !n.is_read;
+          else if (tab !== "all") matchType = n.type === tab.slice(0, -1); // Simple mapping
+          return matchSearch && matchType;
+        });
+
+        renderNotifs(filtered);
+      }
+
+      function renderNotifs(data) {
+        const list = document.getElementById("notifList");
+        list.innerHTML = "";
+
+        if (data.length === 0) {
+          list.innerHTML = `<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications found.</p></div>`;
+          return;
         }
 
-        async function loadProfile() {
-            const { data } = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
-            if (data) document.getElementById('userAvatar').innerText = data.full_name.charAt(0).toUpperCase();
-        }
+        data.forEach((n) => {
+          const date = new Date(n.created_at);
+          const item = document.createElement("div");
+          item.className = `notif-item ${n.is_read ? "" : "unread"}`;
 
-        async function fetchNotifs() {
-            const { data, error } = await supabase
-                .from('notifications')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
+          const iconMap = {
+            deposit: "fa-plus-circle",
+            withdrawal: "fa-arrow-down",
+            investment: "fa-rocket",
+            earning: "fa-chart-line",
+            gift: "fa-gift",
+            referral: "fa-users",
+            system: "fa-info-circle",
+          };
+          const icon = iconMap[n.type] || "fa-bell";
 
-            if (data) {
-                allNotifs = data;
-                updateStats();
-                applyFilters();
-            }
-        }
-
-        function setupRealtime() {
-            supabase.channel('custom-all-channel')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (payload) => {
-                fetchNotifs();
-            })
-            .subscribe();
-        }
-
-        function updateStats() {
-            document.getElementById('totalCount').innerText = allNotifs.length;
-            document.getElementById('unreadCount').innerText = allNotifs.filter(n => !n.is_read).length;
-            const today = new Date().toDateString();
-            document.getElementById('todayCount').innerText = allNotifs.filter(n => new Date(n.created_at).toDateString() === today).length;
-        }
-
-        function applyFilters() {
-            const query = document.getElementById('notifSearch').value.toLowerCase();
-            const tab = document.querySelector('.tab.active').innerText.toLowerCase();
-
-            let filtered = allNotifs.filter(n => {
-                const matchSearch = n.title.toLowerCase().includes(query) || n.message.toLowerCase().includes(query);
-                let matchType = true;
-                if (tab === 'unread') matchType = !n.is_read;
-                else if (tab !== 'all') matchType = n.type === tab.slice(0, -1); // Simple mapping
-                return matchSearch && matchType;
-            });
-
-            renderNotifs(filtered);
-        }
-
-        function renderNotifs(data) {
-            const list = document.getElementById('notifList');
-            list.innerHTML = '';
-
-            if (data.length === 0) {
-                list.innerHTML = `<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications found.</p></div>`;
-                return;
-            }
-
-            data.forEach(n => {
-                const date = new Date(n.created_at);
-                const item = document.createElement('div');
-                item.className = `notif-item ${n.is_read ? '' : 'unread'}`;
-                
-                const iconMap = {
-                    deposit: 'fa-plus-circle', withdrawal: 'fa-arrow-down',
-                    investment: 'fa-rocket', earning: 'fa-chart-line',
-                    gift: 'fa-gift', referral: 'fa-users', system: 'fa-info-circle'
-                };
-                const icon = iconMap[n.type] || 'fa-bell';
-
-                item.innerHTML = `
+          item.innerHTML = `
                     <div class="notif-icon"><i class="fas ${icon}"></i></div>
                     <div class="notif-body">
                         <h4>${n.title}</h4>
                         <p>${n.message}</p>
-                        <div class="notif-time">${date.toLocaleDateString()} at ${date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                        <div class="notif-time">${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
                         <div class="notif-actions">
-                            <button class="btn-mini mark" onclick="toggleRead('${n.id}', ${n.is_read})">${n.is_read ? 'Mark Unread' : 'Mark Read'}</button>
+                            <button class="btn-mini mark" onclick="toggleRead('${n.id}', ${n.is_read})">${n.is_read ? "Mark Unread" : "Mark Read"}</button>
                             <button class="btn-mini del" onclick="deleteNotif('${n.id}')">Delete</button>
                         </div>
                     </div>
                 `;
-                list.appendChild(item);
-            });
+          list.appendChild(item);
+        });
+      }
+
+      window.toggleRead = async (id, currentStatus) => {
+        await supabase
+          .from("notifications")
+          .update({ is_read: !currentStatus })
+          .eq("id", id);
+      };
+
+      window.deleteNotif = async (id) => {
+        await supabase.from("notifications").delete().eq("id", id);
+      };
+
+      window.markAllRead = async () => {
+        await supabase
+          .from("notifications")
+          .update({ is_read: true })
+          .eq("user_id", currentUser.id)
+          .eq("is_read", false);
+      };
+
+      window.deleteAllRead = async () => {
+        if (confirm("Delete all read notifications?")) {
+          await supabase
+            .from("notifications")
+            .delete()
+            .eq("user_id", currentUser.id)
+            .eq("is_read", true);
         }
+      };
 
-        window.toggleRead = async (id, currentStatus) => {
-            await supabase.from('notifications').update({ is_read: !currentStatus }).eq('id', id);
-        };
+      window.filterNotifs = (type, btn) => {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+        applyFilters();
+      };
 
-        window.deleteNotif = async (id) => {
-            await supabase.from('notifications').delete().eq('id', id);
-        };
+      window.openSettings = () =>
+        (document.getElementById("settingsModal").style.display = "flex");
+      window.closeSettings = () =>
+        (document.getElementById("settingsModal").style.display = "none");
 
-        window.markAllRead = async () => {
-            await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false);
-        };
+      window.savePref = (key, val) => {
+        console.log(`Setting ${key} to ${val}`);
+        // Logic to persist in User Metadata or a Settings table
+      };
 
-        window.deleteAllRead = async () => {
-            if(confirm("Delete all read notifications?")) {
-                await supabase.from('notifications').delete().eq('user_id', currentUser.id).eq('is_read', true);
-            }
-        };
-
-        window.filterNotifs = (type, btn) => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            applyFilters();
-        };
-
-        window.openSettings = () => document.getElementById('settingsModal').style.display = 'flex';
-        window.closeSettings = () => document.getElementById('settingsModal').style.display = 'none';
-
-        window.savePref = (key, val) => {
-            console.log(`Setting ${key} to ${val}`);
-            // Logic to persist in User Metadata or a Settings table
-        };
-
-        window.addEventListener('DOMContentLoaded', init);
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

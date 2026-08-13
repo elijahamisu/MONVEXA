@@ -1,480 +1,922 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Investment Management | EASYPIE Admin</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* ==========================================================
+      /* ==========================================================
            MOBILE-FIRST BASE STYLES
            Base rules target small screens; min-width media queries
            further down progressively enhance for larger viewports.
            ========================================================== */
-        :root {
-            --primary-bg: #060b13;
-            --secondary-bg: #0a0f1a;
-            --sidebar-bg: #0d121f;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.4);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
-            --header-height: 60px;
+      :root {
+        --primary-bg: #060b13;
+        --secondary-bg: #0a0f1a;
+        --sidebar-bg: #0d121f;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.4);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --sidebar-width: 260px;
+        --header-height: 60px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        width: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      /* --- Sidebar (mobile: off-canvas drawer) --- */
+      aside {
+        width: min(80vw, var(--sidebar-width));
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--glass-border);
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        height: 100dvh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
+      aside.active {
+        transform: translateX(0);
+      }
+
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .sidebar-backdrop.active {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .sidebar-header {
+        padding: 22px 20px;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--glass-border);
+      }
+      .sidebar-close {
+        font-size: 18px;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 6px;
+      }
+
+      .nav-item {
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.2s;
+        min-height: 48px;
+      }
+      .nav-item i {
+        width: 20px;
+        text-align: center;
+      }
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        border-left: 4px solid var(--accent-color);
+      }
+
+      /* --- Main --- */
+      main {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      header {
+        height: var(--header-height);
+        background: var(--secondary-bg);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 14px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .header-left h2 {
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #mobileMenuBtn {
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 8px;
+        flex-shrink: 0;
+      }
+
+      #adminProfile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      #adminName {
+        display: none;
+      }
+
+      .container {
+        padding: 16px;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+
+      /* --- Stats Row: 2-up on mobile --- */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .stat-card {
+        background: var(--card-bg);
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+      }
+      .stat-card p {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .stat-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        word-break: break-word;
+      }
+
+      /* --- Toolbar: stacked on mobile --- */
+      .toolbar {
+        background: var(--card-bg);
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .search-box {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        padding: 12px 14px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .search-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .toolbar-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .filter-select {
+        flex: 1;
+        background: var(--secondary-bg);
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        font-size: 13px;
+        outline: none;
+      }
+
+      .btn-export {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      /* --- Investments list: cards on mobile, table at >=768px --- */
+      .table-container {
+        background: var(--card-bg);
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+
+      table {
+        display: none;
+      }
+
+      .mobile-inv-list {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .inv-card {
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .inv-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .inv-user-name {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .inv-username {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .inv-plan-name {
+        font-size: 12px;
+        color: var(--accent-color);
+        margin-top: 2px;
+      }
+
+      .inv-card-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        font-size: 13px;
+      }
+      .inv-card-details .label {
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 2px;
+      }
+      .inv-card-details .profit {
+        color: var(--success);
+      }
+
+      .inv-card-action {
+        border-top: 1px solid var(--glass-border);
+        padding-top: 10px;
+      }
+      .btn-view-full {
+        width: 100%;
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--accent-color);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        min-height: 42px;
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+      .status-paused {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+      .status-completed {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+      }
+      .status-cancelled {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+      }
+
+      .action-icon {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 15px;
+        padding: 6px;
+        transition: 0.2s;
+      }
+      .action-icon:hover {
+        color: var(--accent-color);
+      }
+
+      /* --- Modal --- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(10px);
+      }
+      .modal-content {
+        background: var(--sidebar-bg);
+        width: 100%;
+        max-width: 900px;
+        border-radius: 20px 20px 0 0;
+        border: 1px solid var(--glass-border);
+        max-height: 92vh;
+        overflow-y: auto;
+      }
+      .modal-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: var(--sidebar-bg);
+        z-index: 10;
+      }
+      .modal-body {
+        padding: 20px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .info-block {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid var(--glass-border);
+      }
+      .info-block h4 {
+        font-size: 13px;
+        color: var(--accent-color);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 10px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+        font-size: 13px;
+      }
+      .detail-row span {
+        color: var(--text-muted);
+      }
+      .detail-row b {
+        color: white;
+        text-align: right;
+      }
+
+      .action-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--glass-border);
+      }
+      .btn-action {
+        padding: 14px 20px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        flex: 1;
+        min-width: 140px;
+        min-height: 46px;
+      }
+      .btn-pause {
+        background: var(--warning);
+        color: #000;
+      }
+      .btn-resume {
+        background: var(--success);
+        color: #fff;
+      }
+      .btn-complete {
+        background: var(--accent-color);
+        color: #fff;
+      }
+      .btn-cancel {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      .overlay-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-bg);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .skeleton {
+        height: 60px;
+        background: #1f2937;
+        border-radius: 15px;
+        animation: pulse 1.5s infinite;
+        margin-bottom: 10px;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
         }
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            width: 100%;
-            overflow-x: hidden;
-        }
-
-        body { min-height: 100vh; min-height: 100dvh; }
-
-        /* --- Sidebar (mobile: off-canvas drawer) --- */
-        aside {
-            width: min(80vw, var(--sidebar-width));
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--glass-border);
-            position: fixed; top: 0; left: 0;
-            height: 100vh; height: 100dvh;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex; flex-direction: column;
-        }
-        aside.active { transform: translateX(0); }
-
-        .sidebar-backdrop {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .sidebar-backdrop.active { display: block; opacity: 1; pointer-events: auto; }
-
-        .sidebar-header {
-            padding: 22px 20px;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent-color);
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid var(--glass-border);
-        }
-        .sidebar-close { font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 6px; }
-
-        .nav-item {
-            padding: 14px 22px; display: flex; align-items: center; gap: 15px;
-            color: var(--text-muted); text-decoration: none; font-size: 14px; transition: 0.2s;
-            min-height: 48px;
-        }
-        .nav-item i { width: 20px; text-align: center; }
-        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); border-left: 4px solid var(--accent-color); }
-
-        /* --- Main --- */
-        main { width: 100%; min-height: 100vh; min-height: 100dvh; }
-
-        header {
-            height: var(--header-height);
-            background: var(--secondary-bg);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; padding: 0 14px;
-            position: sticky; top: 0; z-index: 900;
-        }
-        .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .header-left h2 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #mobileMenuBtn { font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 8px; flex-shrink: 0; }
-
-        #adminProfile { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        #adminName { display: none; }
-
-        .container { padding: 16px; max-width: 1600px; margin: 0 auto; }
-
-        /* --- Stats Row: 2-up on mobile --- */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 10px; margin-bottom: 18px;
-        }
-        .stat-card {
-            background: var(--card-bg); padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border);
-        }
-        .stat-card p { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
-        .stat-card h3 { font-size: 18px; font-weight: 700; word-break: break-word; }
-
-        /* --- Toolbar: stacked on mobile --- */
-        .toolbar {
-            background: var(--card-bg); padding: 14px; border-radius: 14px;
-            border: 1px solid var(--glass-border); margin-bottom: 16px;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .search-box {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            padding: 12px 14px; border-radius: 10px; display: flex; align-items: center; gap: 10px;
-        }
-        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-
-        .toolbar-row { display: flex; gap: 10px; }
-
-        .filter-select {
-            flex: 1;
-            background: var(--secondary-bg); color: white; padding: 12px; border-radius: 10px;
-            border: 1px solid var(--glass-border); font-size: 13px; outline: none;
-        }
-
-        .btn-export {
-            background: var(--accent-color); color: white; border: none; padding: 12px 16px;
-            border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; white-space: nowrap;
-        }
-
-        /* --- Investments list: cards on mobile, table at >=768px --- */
-        .table-container {
-            background: var(--card-bg); border-radius: 18px; border: 1px solid var(--glass-border);
-        }
-
-        table { display: none; }
-
-        .mobile-inv-list { display: flex; flex-direction: column; padding: 10px; gap: 10px; }
-
-        .inv-card {
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .inv-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .inv-user-name { font-weight: 700; font-size: 14px; }
-        .inv-username { font-size: 11px; color: var(--text-muted); }
-        .inv-plan-name { font-size: 12px; color: var(--accent-color); margin-top: 2px; }
-
-        .inv-card-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; }
-        .inv-card-details .label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; }
-        .inv-card-details .profit { color: var(--success); }
-
-        .inv-card-action { border-top: 1px solid var(--glass-border); padding-top: 10px; }
-        .btn-view-full {
-            width: 100%;
-            background: rgba(59,130,246,0.12);
-            color: var(--accent-color);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            min-height: 42px;
-        }
-
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
-        .status-active { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .status-paused { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .status-completed { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); }
-        .status-cancelled { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
-        .action-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 6px; transition: 0.2s; }
-        .action-icon:hover { color: var(--accent-color); }
-
-        /* --- Modal --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; align-items: flex-end;
-            justify-content: center; z-index: 2000; backdrop-filter: blur(10px);
-        }
-        .modal-content {
-            background: var(--sidebar-bg); width: 100%; max-width: 900px;
-            border-radius: 20px 20px 0 0;
-            border: 1px solid var(--glass-border);
-            max-height: 92vh; overflow-y: auto;
-        }
-        .modal-header { padding: 18px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--sidebar-bg); z-index: 10; }
-        .modal-body { padding: 20px; }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        .info-block { background: rgba(0,0,0,0.2); padding: 18px; border-radius: 16px; border: 1px solid var(--glass-border); }
-        .info-block h4 { font-size: 13px; color: var(--accent-color); margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
-
-        .detail-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; font-size: 13px; }
-        .detail-row span { color: var(--text-muted); }
-        .detail-row b { color: white; text-align: right; }
-
-        .action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border); }
-        .btn-action { padding: 14px 20px; border-radius: 12px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; flex: 1; min-width: 140px; min-height: 46px; }
-        .btn-pause { background: var(--warning); color: #000; }
-        .btn-resume { background: var(--success); color: #fff; }
-        .btn-complete { background: var(--accent-color); color: #fff; }
-        .btn-cancel { background: var(--danger); color: #fff; }
-
-        .overlay-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-bg); z-index: 3000; display: flex; align-items: center; justify-content: center; }
-        .skeleton { height: 60px; background: #1f2937; border-radius: 15px; animation: pulse 1.5s infinite; margin-bottom: 10px; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
-
-        /* ==========================================================
+      /* ==========================================================
            PROGRESSIVE ENHANCEMENT — larger screens
            ========================================================== */
-        @media (min-width: 480px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+      @media (min-width: 480px) {
+        .stats-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      @media (min-width: 640px) {
+        .toolbar {
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+        .search-box {
+          flex: 1;
+          min-width: 220px;
+          width: auto;
+        }
+        .toolbar-row {
+          display: contents;
+        }
+        .filter-select {
+          flex: none;
+          width: auto;
         }
 
-        @media (min-width: 640px) {
-            .toolbar { flex-direction: row; flex-wrap: wrap; align-items: center; }
-            .search-box { flex: 1; min-width: 220px; width: auto; }
-            .toolbar-row { display: contents; }
-            .filter-select { flex: none; width: auto; }
+        .modal-overlay {
+          align-items: center;
+          padding: 20px;
+        }
+        .modal-content {
+          border-radius: 24px;
+          max-height: 90vh;
+        }
+      }
 
-            .modal-overlay { align-items: center; padding: 20px; }
-            .modal-content { border-radius: 24px; max-height: 90vh; }
+      @media (min-width: 700px) {
+        .grid-2 {
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 25px;
+        }
+      }
+
+      @media (min-width: 768px) {
+        table {
+          display: table;
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 700px;
+        }
+        .mobile-inv-list {
+          display: none;
+        }
+        .table-container {
+          overflow-x: auto;
         }
 
-        @media (min-width: 700px) {
-            .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        th {
+          text-align: left;
+          padding: 18px 15px;
+          color: var(--text-muted);
+          font-size: 11px;
+          text-transform: uppercase;
+          border-bottom: 1px solid var(--glass-border);
+          letter-spacing: 1px;
         }
-
-        @media (min-width: 768px) {
-            table { display: table; width: 100%; border-collapse: collapse; min-width: 700px; }
-            .mobile-inv-list { display: none; }
-            .table-container { overflow-x: auto; }
-
-            th { text-align: left; padding: 18px 15px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); letter-spacing: 1px; }
-            td { padding: 15px; font-size: 13px; border-bottom: 1px solid var(--glass-border); vertical-align: middle; }
+        td {
+          padding: 15px;
+          font-size: 13px;
+          border-bottom: 1px solid var(--glass-border);
+          vertical-align: middle;
         }
+      }
 
-        @media (min-width: 1024px) {
-            .sidebar-backdrop { display: none !important; }
-            aside { transform: none; width: var(--sidebar-width); }
-            main { margin-left: var(--sidebar-width); }
-            #mobileMenuBtn { display: none; }
-            #adminName { display: inline; font-size: 12px; font-weight: 600; }
-            .container { padding: 25px; }
-            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+      @media (min-width: 1024px) {
+        .sidebar-backdrop {
+          display: none !important;
         }
+        aside {
+          transform: none;
+          width: var(--sidebar-width);
+        }
+        main {
+          margin-left: var(--sidebar-width);
+        }
+        #mobileMenuBtn {
+          display: none;
+        }
+        #adminName {
+          display: inline;
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .container {
+          padding: 25px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="loader" class="overlay-loader">
-        <i class="fas fa-circle-notch fa-spin" style="font-size: 30px; color: var(--accent-color);"></i>
+      <i
+        class="fas fa-circle-notch fa-spin"
+        style="font-size: 30px; color: var(--accent-color)"
+      ></i>
     </div>
 
-    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+    <div
+      class="sidebar-backdrop"
+      id="sidebarBackdrop"
+      onclick="closeSidebar()"
+    ></div>
 
     <!-- Sidebar -->
     <aside id="sidebar">
-        <div class="sidebar-header">
-            EASYPIE ADMIN
-            <i class="fas fa-times sidebar-close" onclick="closeSidebar()"></i>
-        </div>
-        <nav style="flex:1; overflow-y:auto;">
-            <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
-            <a href="deposits.html" class="nav-item"><i class="fas fa-arrow-down"></i> Deposits</a>
-            <a href="withdrawals.html" class="nav-item"><i class="fas fa-arrow-up"></i> Withdrawals</a>
-            <a href="investments.html" class="nav-item active"><i class="fas fa-rocket"></i> Investments</a>
-            <a href="plans.html" class="nav-item"><i class="fas fa-layer-group"></i> Investment Plans</a>
-            <a href="giftcodes.html" class="nav-item"><i class="fas fa-gift"></i> Gift Codes</a>
-            <a href="support.html" class="nav-item"><i class="fas fa-headset"></i> Support Tickets</a>
-            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
-        </nav>
-        <a href="#" onclick="adminLogout()" class="nav-item" style="color: var(--danger); border-top: 1px solid var(--glass-border);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <div class="sidebar-header">
+        EASYPIE ADMIN
+        <i class="fas fa-times sidebar-close" onclick="closeSidebar()"></i>
+      </div>
+      <nav style="flex: 1; overflow-y: auto">
+        <a href="index.html" class="nav-item"
+          ><i class="fas fa-th-large"></i> Dashboard</a
+        >
+        <a href="users.html" class="nav-item"
+          ><i class="fas fa-users"></i> Users</a
+        >
+        <a href="deposits.html" class="nav-item"
+          ><i class="fas fa-arrow-down"></i> Deposits</a
+        >
+        <a href="withdrawals.html" class="nav-item"
+          ><i class="fas fa-arrow-up"></i> Withdrawals</a
+        >
+        <a href="investments.html" class="nav-item active"
+          ><i class="fas fa-rocket"></i> Investments</a
+        >
+        <a href="plans.html" class="nav-item"
+          ><i class="fas fa-layer-group"></i> Investment Plans</a
+        >
+        <a href="giftcodes.html" class="nav-item"
+          ><i class="fas fa-gift"></i> Gift Codes</a
+        >
+        <a href="support.html" class="nav-item"
+          ><i class="fas fa-headset"></i> Support Tickets</a
+        >
+        <a href="settings.html" class="nav-item"
+          ><i class="fas fa-cog"></i> Settings</a
+        >
+      </nav>
+      <a
+        href="#"
+        onclick="adminLogout()"
+        class="nav-item"
+        style="color: var(--danger); border-top: 1px solid var(--glass-border)"
+        ><i class="fas fa-sign-out-alt"></i> Logout</a
+      >
     </aside>
 
     <main>
-        <header>
-            <div class="header-left">
-                <i class="fas fa-bars" id="mobileMenuBtn"></i>
-                <h2>Investment Management</h2>
-            </div>
-            <div id="adminProfile">
-                <span id="adminName">Admin</span>
-                <div style="width:30px; height:30px; border-radius:50%; background:var(--accent-color);"></div>
-            </div>
-        </header>
-
-        <div class="container">
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card"><p>Total Investments</p><h3 id="statTotal">0</h3></div>
-                <div class="stat-card"><p>Active Value</p><h3 id="statValue" style="color: var(--success);">₦0</h3></div>
-                <div class="stat-card"><p>Total Payouts</p><h3 id="statPayouts">₦0</h3></div>
-                <div class="stat-card"><p>Daily Commit</p><h3 id="statDaily" style="color: var(--warning);">₦0</h3></div>
-            </div>
-
-            <!-- Toolbar -->
-            <div class="toolbar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="invSearch" placeholder="Search investor, plan, or ID...">
-                </div>
-                <div class="toolbar-row">
-                    <select class="filter-select" id="statusFilter">
-                        <option value="all">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="paused">Paused</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <button class="btn-export" onclick="exportInvestments()"><i class="fas fa-file-csv"></i> Export Data</button>
-                </div>
-            </div>
-
-            <!-- List / Table -->
-            <div class="table-container">
-                <!-- Mobile: stacked cards -->
-                <div class="mobile-inv-list" id="invCardList"></div>
-
-                <!-- >=768px: real table -->
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Investor</th>
-                            <th>Plan Name</th>
-                            <th>Amount</th>
-                            <th>Daily Profit</th>
-                            <th>End Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="invTableBody">
-                        <!-- Dynamic Content -->
-                    </tbody>
-                </table>
-            </div>
+      <header>
+        <div class="header-left">
+          <i class="fas fa-bars" id="mobileMenuBtn"></i>
+          <h2>Investment Management</h2>
         </div>
+        <div id="adminProfile">
+          <span id="adminName">Admin</span>
+          <div
+            style="
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              background: var(--accent-color);
+            "
+          ></div>
+        </div>
+      </header>
+
+      <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p>Total Investments</p>
+            <h3 id="statTotal">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Active Value</p>
+            <h3 id="statValue" style="color: var(--success)">₦0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Total Payouts</p>
+            <h3 id="statPayouts">₦0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Daily Commit</p>
+            <h3 id="statDaily" style="color: var(--warning)">₦0</h3>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="invSearch"
+              placeholder="Search investor, plan, or ID..."
+            />
+          </div>
+          <div class="toolbar-row">
+            <select class="filter-select" id="statusFilter">
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button class="btn-export" onclick="exportInvestments()">
+              <i class="fas fa-file-csv"></i> Export Data
+            </button>
+          </div>
+        </div>
+
+        <!-- List / Table -->
+        <div class="table-container">
+          <!-- Mobile: stacked cards -->
+          <div class="mobile-inv-list" id="invCardList"></div>
+
+          <!-- >=768px: real table -->
+          <table>
+            <thead>
+              <tr>
+                <th>Investor</th>
+                <th>Plan Name</th>
+                <th>Amount</th>
+                <th>Daily Profit</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invTableBody">
+              <!-- Dynamic Content -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </main>
 
     <!-- Detail Modal -->
     <div class="modal-overlay" id="invModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modTitle">Investment Details</h3>
-                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer; padding:6px;"></i>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <div class="grid-2">
-                    <div class="info-block">
-                        <h4>Investor Details</h4>
-                        <div id="investorInfo"></div>
-                    </div>
-                    <div class="info-block">
-                        <h4>Financial Summary</h4>
-                        <div id="financialInfo"></div>
-                    </div>
-                </div>
-                <div class="action-bar" id="adminActions">
-                    <!-- Dynamic Action Buttons -->
-                </div>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modTitle">Investment Details</h3>
+          <i
+            class="fas fa-times"
+            onclick="closeModal()"
+            style="cursor: pointer; padding: 6px"
+          ></i>
         </div>
+        <div class="modal-body" id="modalBody">
+          <div class="grid-2">
+            <div class="info-block">
+              <h4>Investor Details</h4>
+              <div id="investorInfo"></div>
+            </div>
+            <div class="info-block">
+              <h4>Financial Summary</h4>
+              <div id="financialInfo"></div>
+            </div>
+          </div>
+          <div class="action-bar" id="adminActions">
+            <!-- Dynamic Action Buttons -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let invData = [];
-        let filteredInv = [];
-        let currentAdmin = null;
+      let invData = [];
+      let filteredInv = [];
+      let currentAdmin = null;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-            if (!profile?.is_admin) { window.location.href = '../login.html'; return; }
-
-            currentAdmin = profile;
-            document.getElementById('adminName').innerText = profile.full_name;
-            document.getElementById('loader').style.display = 'none';
-
-            await fetchInvestments();
-            setupEventListeners();
-            setupRealtime();
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
         }
 
-        async function fetchInvestments() {
-            const { data, error } = await supabase
-                .from('investments')
-                .select('*, profiles(full_name, username, email, phone)')
-                .order('created_at', { ascending: false });
-
-            if (data) {
-                invData = data;
-                applyFilters();
-                updateStats();
-            }
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        if (!profile?.is_admin) {
+          window.location.href = "../login.html";
+          return;
         }
 
-        function updateStats() {
-            const active = invData.filter(i => i.status === 'active');
-            document.getElementById('statTotal').innerText = invData.length;
-            const totalVal = active.reduce((s, i) => s + parseFloat(i.amount), 0);
-            document.getElementById('statValue').innerText = `₦${totalVal.toLocaleString()}`;
-            const daily = active.reduce((s, i) => s + parseFloat(i.daily_profit), 0);
-            document.getElementById('statDaily').innerText = `₦${daily.toLocaleString()}`;
+        currentAdmin = profile;
+        document.getElementById("adminName").innerText = profile.full_name;
+        document.getElementById("loader").style.display = "none";
+
+        await fetchInvestments();
+        setupEventListeners();
+        setupRealtime();
+      }
+
+      async function fetchInvestments() {
+        const { data, error } = await supabase
+          .from("investments")
+          .select("*, profiles(full_name, username, email, phone)")
+          .order("created_at", { ascending: false });
+
+        if (data) {
+          invData = data;
+          applyFilters();
+          updateStats();
+        }
+      }
+
+      function updateStats() {
+        const active = invData.filter((i) => i.status === "active");
+        document.getElementById("statTotal").innerText = invData.length;
+        const totalVal = active.reduce((s, i) => s + parseFloat(i.amount), 0);
+        document.getElementById("statValue").innerText =
+          `₦${totalVal.toLocaleString()}`;
+        const daily = active.reduce(
+          (s, i) => s + parseFloat(i.daily_profit),
+          0,
+        );
+        document.getElementById("statDaily").innerText =
+          `₦${daily.toLocaleString()}`;
+      }
+
+      function applyFilters() {
+        const query = document.getElementById("invSearch").value.toLowerCase();
+        const status = document.getElementById("statusFilter").value;
+
+        filteredInv = invData.filter((i) => {
+          const matchSearch =
+            i.profiles.full_name.toLowerCase().includes(query) ||
+            i.plan_name.toLowerCase().includes(query) ||
+            i.id.includes(query);
+          const matchStatus = status === "all" || i.status === status;
+          return matchSearch && matchStatus;
+        });
+        renderTable();
+      }
+
+      function renderTable() {
+        const tableBody = document.getElementById("invTableBody");
+        const cardList = document.getElementById("invCardList");
+        tableBody.innerHTML = "";
+        cardList.innerHTML = "";
+
+        if (filteredInv.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No investments found.</td></tr>';
+          cardList.innerHTML =
+            '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">No investments found.</div>';
+          return;
         }
 
-        function applyFilters() {
-            const query = document.getElementById('invSearch').value.toLowerCase();
-            const status = document.getElementById('statusFilter').value;
+        filteredInv.forEach((i) => {
+          const amount = parseFloat(i.amount).toLocaleString();
+          const profit = parseFloat(i.daily_profit).toLocaleString();
+          const endDate = new Date(i.end_date).toLocaleDateString();
 
-            filteredInv = invData.filter(i => {
-                const matchSearch = i.profiles.full_name.toLowerCase().includes(query) ||
-                                    i.plan_name.toLowerCase().includes(query) ||
-                                    i.id.includes(query);
-                const matchStatus = status === 'all' || i.status === status;
-                return matchSearch && matchStatus;
-            });
-            renderTable();
-        }
-
-        function renderTable() {
-            const tableBody = document.getElementById('invTableBody');
-            const cardList = document.getElementById('invCardList');
-            tableBody.innerHTML = '';
-            cardList.innerHTML = '';
-
-            if (filteredInv.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No investments found.</td></tr>';
-                cardList.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">No investments found.</div>';
-                return;
-            }
-
-            filteredInv.forEach(i => {
-                const amount = parseFloat(i.amount).toLocaleString();
-                const profit = parseFloat(i.daily_profit).toLocaleString();
-                const endDate = new Date(i.end_date).toLocaleDateString();
-
-                // Desktop table row
-                const row = document.createElement('tr');
-                row.innerHTML = `
+          // Desktop table row
+          const row = document.createElement("tr");
+          row.innerHTML = `
                     <td>
                         <p style="font-weight:700">${i.profiles.full_name}</p>
                         <p style="font-size:11px; color:var(--text-muted)">@${i.profiles.username}</p>
@@ -488,12 +930,12 @@
                         <button class="action-icon" onclick="viewInv('${i.id}')"><i class="fas fa-eye"></i></button>
                     </td>
                 `;
-                tableBody.appendChild(row);
+          tableBody.appendChild(row);
 
-                // Mobile stacked card
-                const card = document.createElement('div');
-                card.className = 'inv-card';
-                card.innerHTML = `
+          // Mobile stacked card
+          const card = document.createElement("div");
+          card.className = "inv-card";
+          card.innerHTML = `
                     <div class="inv-card-top">
                         <div>
                             <div class="inv-user-name">${i.profiles.full_name}</div>
@@ -506,29 +948,29 @@
                         <div><span class="label">Amount</span>₦${amount}</div>
                         <div><span class="label">Daily Profit</span><span class="profit">+₦${profit}</span></div>
                         <div><span class="label">End Date</span>${endDate}</div>
-                        <div><span class="label">ID</span>${i.id.slice(0,8)}</div>
+                        <div><span class="label">ID</span>${i.id.slice(0, 8)}</div>
                     </div>
                     <div class="inv-card-action">
                         <button class="btn-view-full" onclick="viewInv('${i.id}')">View Details</button>
                     </div>
                 `;
-                cardList.appendChild(card);
-            });
-        }
+          cardList.appendChild(card);
+        });
+      }
 
-        window.viewInv = (id) => {
-            const i = invData.find(x => x.id === id);
-            const modal = document.getElementById('invModal');
+      window.viewInv = (id) => {
+        const i = invData.find((x) => x.id === id);
+        const modal = document.getElementById("invModal");
 
-            document.getElementById('investorInfo').innerHTML = `
+        document.getElementById("investorInfo").innerHTML = `
                 <div class="detail-row"><span>Name</span><b>${i.profiles.full_name}</b></div>
                 <div class="detail-row"><span>Email</span><b>${i.profiles.email}</b></div>
-                <div class="detail-row"><span>Phone</span><b>${i.profiles.phone || 'N/A'}</b></div>
-                <div class="detail-row"><span>Member ID</span><b>${i.user_id.slice(0,12)}</b></div>
+                <div class="detail-row"><span>Phone</span><b>${i.profiles.phone || "N/A"}</b></div>
+                <div class="detail-row"><span>Member ID</span><b>${i.user_id.slice(0, 12)}</b></div>
             `;
 
-            document.getElementById('financialInfo').innerHTML = `
-                <div class="detail-row"><span>Investment ID</span><b>#${i.id.slice(0,8)}</b></div>
+        document.getElementById("financialInfo").innerHTML = `
+                <div class="detail-row"><span>Investment ID</span><b>#${i.id.slice(0, 8)}</b></div>
                 <div class="detail-row"><span>Plan</span><b>${i.plan_name}</b></div>
                 <div class="detail-row"><span>Principal</span><b>₦${parseFloat(i.amount).toLocaleString()}</b></div>
                 <div class="detail-row"><span>Daily Profit</span><b style="color:var(--success)">₦${parseFloat(i.daily_profit).toLocaleString()}</b></div>
@@ -536,86 +978,106 @@
                 <div class="detail-row"><span>End Date</span><b>${new Date(i.end_date).toLocaleDateString()}</b></div>
             `;
 
-            const actions = document.getElementById('adminActions');
-            actions.innerHTML = '';
-            if(i.status === 'active') {
-                actions.innerHTML += `<button class="btn-action btn-pause" onclick="updateInvStatus('${i.id}', 'paused')">Pause Earnings</button>`;
-            } else if(i.status === 'paused') {
-                actions.innerHTML += `<button class="btn-action btn-resume" onclick="updateInvStatus('${i.id}', 'active')">Resume Earnings</button>`;
-            }
-            if(i.status !== 'completed' && i.status !== 'cancelled') {
-                actions.innerHTML += `<button class="btn-action btn-complete" onclick="updateInvStatus('${i.id}', 'completed')">Mark Complete</button>`;
-                actions.innerHTML += `<button class="btn-action btn-cancel" onclick="updateInvStatus('${i.id}', 'cancelled')">Cancel Investment</button>`;
-            }
-
-            modal.style.display = 'flex';
-        };
-
-        window.updateInvStatus = async (id, newStatus) => {
-            if(!confirm(`Are you sure you want to set status to ${newStatus}?`)) return;
-
-            const { error } = await supabase.from('investments').update({ status: newStatus }).eq('id', id);
-            if(!error) {
-                // Log Admin Action
-                await supabase.from('admin_logs').insert([{
-                    admin_id: currentAdmin.id,
-                    action: `Updated Investment ${id} to ${newStatus}`,
-                    target_id: id
-                }]);
-
-                // Notify User
-                await supabase.from('notifications').insert([{
-                    user_id: invData.find(x => x.id === id).user_id,
-                    title: `Investment Status Updated`,
-                    message: `Your investment (${invData.find(x => x.id === id).plan_name}) is now ${newStatus}.`
-                }]);
-
-                closeModal();
-                fetchInvestments();
-            } else {
-                alert("Operation failed: " + error.message);
-            }
-        };
-
-        window.exportInvestments = () => {
-            let csv = 'ID,Investor,Plan,Amount,Daily Profit,Status,End Date\n';
-            filteredInv.forEach(i => {
-                csv += `${i.id},${i.profiles.full_name},${i.plan_name},${i.amount},${i.daily_profit},${i.status},${i.end_date}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `easypie_investments_${Date.now()}.csv`;
-            a.click();
-        };
-
-        function setupEventListeners() {
-            document.getElementById('invSearch').addEventListener('input', applyFilters);
-            document.getElementById('statusFilter').addEventListener('change', applyFilters);
-            document.getElementById('mobileMenuBtn').onclick = () => {
-                document.getElementById('sidebar').classList.add('active');
-                document.getElementById('sidebarBackdrop').classList.add('active');
-            };
+        const actions = document.getElementById("adminActions");
+        actions.innerHTML = "";
+        if (i.status === "active") {
+          actions.innerHTML += `<button class="btn-action btn-pause" onclick="updateInvStatus('${i.id}', 'paused')">Pause Earnings</button>`;
+        } else if (i.status === "paused") {
+          actions.innerHTML += `<button class="btn-action btn-resume" onclick="updateInvStatus('${i.id}', 'active')">Resume Earnings</button>`;
+        }
+        if (i.status !== "completed" && i.status !== "cancelled") {
+          actions.innerHTML += `<button class="btn-action btn-complete" onclick="updateInvStatus('${i.id}', 'completed')">Mark Complete</button>`;
+          actions.innerHTML += `<button class="btn-action btn-cancel" onclick="updateInvStatus('${i.id}', 'cancelled')">Cancel Investment</button>`;
         }
 
-        window.closeSidebar = () => {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('sidebarBackdrop').classList.remove('active');
-        };
+        modal.style.display = "flex";
+      };
 
-        function setupRealtime() {
-            supabase.channel('inv-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'investments' }, fetchInvestments).subscribe();
+      window.updateInvStatus = async (id, newStatus) => {
+        if (!confirm(`Are you sure you want to set status to ${newStatus}?`))
+          return;
+
+        const { error } = await supabase
+          .from("investments")
+          .update({ status: newStatus })
+          .eq("id", id);
+        if (!error) {
+          // Log Admin Action
+          await supabase.from("admin_logs").insert([
+            {
+              admin_id: currentAdmin.id,
+              action: `Updated Investment ${id} to ${newStatus}`,
+              target_id: id,
+            },
+          ]);
+
+          // Notify User
+          await supabase.from("notifications").insert([
+            {
+              user_id: invData.find((x) => x.id === id).user_id,
+              title: `Investment Status Updated`,
+              message: `Your investment (${invData.find((x) => x.id === id).plan_name}) is now ${newStatus}.`,
+            },
+          ]);
+
+          closeModal();
+          fetchInvestments();
+        } else {
+          alert("Operation failed: " + error.message);
         }
+      };
 
-        window.closeModal = () => document.getElementById('invModal').style.display = 'none';
+      window.exportInvestments = () => {
+        let csv = "ID,Investor,Plan,Amount,Daily Profit,Status,End Date\n";
+        filteredInv.forEach((i) => {
+          csv += `${i.id},${i.profiles.full_name},${i.plan_name},${i.amount},${i.daily_profit},${i.status},${i.end_date}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `easypie_investments_${Date.now()}.csv`;
+        a.click();
+      };
 
-        window.adminLogout = async () => {
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+      function setupEventListeners() {
+        document
+          .getElementById("invSearch")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("statusFilter")
+          .addEventListener("change", applyFilters);
+        document.getElementById("mobileMenuBtn").onclick = () => {
+          document.getElementById("sidebar").classList.add("active");
+          document.getElementById("sidebarBackdrop").classList.add("active");
         };
+      }
 
-        window.addEventListener('DOMContentLoaded', init);
+      window.closeSidebar = () => {
+        document.getElementById("sidebar").classList.remove("active");
+        document.getElementById("sidebarBackdrop").classList.remove("active");
+      };
+
+      function setupRealtime() {
+        supabase
+          .channel("inv-changes")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "investments" },
+            fetchInvestments,
+          )
+          .subscribe();
+      }
+
+      window.closeModal = () =>
+        (document.getElementById("invModal").style.display = "none");
+
+      window.adminLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      };
+
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

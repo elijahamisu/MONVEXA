@@ -1,477 +1,920 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Deposit Management | EASYPIE Admin</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #060b13;
-            --secondary-bg: #0a0f1a;
-            --sidebar-bg: #0d121f;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.4);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
-            --header-height: 60px;
+      :root {
+        --primary-bg: #060b13;
+        --secondary-bg: #0a0f1a;
+        --sidebar-bg: #0d121f;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.4);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --sidebar-width: 260px;
+        --header-height: 60px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        width: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      aside {
+        width: min(80vw, var(--sidebar-width));
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--glass-border);
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        height: 100dvh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
+      aside.active {
+        transform: translateX(0);
+      }
+
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .sidebar-backdrop.active {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .sidebar-header {
+        padding: 22px 20px;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--glass-border);
+      }
+      .sidebar-close {
+        font-size: 18px;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 6px;
+      }
+
+      .nav-item {
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.2s;
+        min-height: 48px;
+      }
+      .nav-item i {
+        width: 20px;
+        text-align: center;
+      }
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        border-left: 4px solid var(--accent-color);
+      }
+
+      main {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      header {
+        height: var(--header-height);
+        background: var(--secondary-bg);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 14px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .header-left h2 {
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #mobileMenuBtn {
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 8px;
+        flex-shrink: 0;
+      }
+
+      #adminProfile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      #adminName {
+        display: none;
+      }
+
+      .container {
+        padding: 16px;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .stat-card {
+        background: var(--card-bg);
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+      }
+      .stat-card p {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .stat-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        word-break: break-word;
+      }
+
+      .toolbar {
+        background: var(--card-bg);
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .search-box {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        padding: 12px 14px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .search-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .toolbar-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .filter-select {
+        flex: 1;
+        background: var(--secondary-bg);
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        font-size: 13px;
+        outline: none;
+      }
+
+      .btn-prime {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      .table-container {
+        background: var(--card-bg);
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+
+      table {
+        display: none;
+      }
+
+      .mobile-dep-list {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .dep-card {
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .dep-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .dep-user-name {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .dep-username {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .dep-amount {
+        font-weight: 700;
+        color: var(--success);
+        font-size: 16px;
+      }
+
+      .dep-card-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        font-size: 13px;
+      }
+      .dep-card-details .label {
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .dep-card-action {
+        border-top: 1px solid var(--glass-border);
+        padding-top: 10px;
+      }
+      .btn-view-full {
+        width: 100%;
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--accent-color);
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        min-height: 42px;
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+      .status-approved {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+      .status-rejected {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+      }
+
+      .action-icon {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 15px;
+        padding: 6px;
+        transition: 0.2s;
+      }
+      .action-icon:hover {
+        color: var(--accent-color);
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(10px);
+      }
+      .modal-content {
+        background: var(--sidebar-bg);
+        width: 100%;
+        max-width: 600px;
+        border-radius: 20px 20px 0 0;
+        border: 1px solid var(--glass-border);
+        max-height: 92vh;
+        overflow-y: auto;
+      }
+      .modal-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: var(--sidebar-bg);
+        z-index: 10;
+      }
+      .modal-body {
+        padding: 20px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 8px;
+      }
+      .detail-row span {
+        color: var(--text-muted);
+      }
+      .detail-row b {
+        color: white;
+        text-align: right;
+      }
+
+      .action-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--glass-border);
+      }
+      .btn-modal {
+        padding: 14px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        flex: 1;
+        min-height: 46px;
+      }
+      .btn-approve {
+        background: var(--success);
+        color: #fff;
+      }
+      .btn-reject {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      #rejectModal .modal-content {
+        max-width: 400px;
+      }
+      .reason-area {
+        width: 100%;
+        height: 100px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        color: white;
+        padding: 10px;
+        outline: none;
+        margin-top: 15px;
+        font-family: inherit;
+        font-size: 14px;
+      }
+
+      .overlay-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-bg);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            width: 100%;
-            overflow-x: hidden;
-        }
-
-        body { min-height: 100vh; min-height: 100dvh; }
-
-        aside {
-            width: min(80vw, var(--sidebar-width));
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--glass-border);
-            position: fixed; top: 0; left: 0;
-            height: 100vh; height: 100dvh;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex; flex-direction: column;
-        }
-        aside.active { transform: translateX(0); }
-
-        .sidebar-backdrop {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .sidebar-backdrop.active { display: block; opacity: 1; pointer-events: auto; }
-
-        .sidebar-header {
-            padding: 22px 20px;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent-color);
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid var(--glass-border);
-        }
-        .sidebar-close { font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 6px; }
-
-        .nav-item {
-            padding: 14px 22px; display: flex; align-items: center; gap: 15px;
-            color: var(--text-muted); text-decoration: none; font-size: 14px; transition: 0.2s;
-            min-height: 48px;
-        }
-        .nav-item i { width: 20px; text-align: center; }
-        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); border-left: 4px solid var(--accent-color); }
-
-        main { width: 100%; min-height: 100vh; min-height: 100dvh; }
-
-        header {
-            height: var(--header-height);
-            background: var(--secondary-bg);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; padding: 0 14px;
-            position: sticky; top: 0; z-index: 900;
-        }
-        .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .header-left h2 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #mobileMenuBtn { font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 8px; flex-shrink: 0; }
-
-        #adminProfile { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        #adminName { display: none; }
-
-        .container { padding: 16px; max-width: 1600px; margin: 0 auto; }
-
+      @media (min-width: 480px) {
         .stats-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 10px; margin-bottom: 18px;
+          grid-template-columns: repeat(4, 1fr);
         }
-        .stat-card {
-            background: var(--card-bg); padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border);
-        }
-        .stat-card p { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
-        .stat-card h3 { font-size: 18px; font-weight: 700; word-break: break-word; }
+      }
 
+      @media (min-width: 640px) {
         .toolbar {
-            background: var(--card-bg); padding: 14px; border-radius: 14px;
-            border: 1px solid var(--glass-border); margin-bottom: 16px;
-            display: flex; flex-direction: column; gap: 10px;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
         }
         .search-box {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            padding: 12px 14px; border-radius: 10px; display: flex; align-items: center; gap: 10px;
+          flex: 1;
+          min-width: 220px;
+          width: auto;
         }
-        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-
-        .toolbar-row { display: flex; gap: 10px; }
-
+        .toolbar-row {
+          display: contents;
+        }
         .filter-select {
-            flex: 1;
-            background: var(--secondary-bg); color: white; padding: 12px; border-radius: 10px;
-            border: 1px solid var(--glass-border); font-size: 13px; outline: none;
+          flex: none;
+          width: auto;
         }
-
-        .btn-prime {
-            background: var(--accent-color); color: white; border: none; padding: 12px 16px;
-            border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; white-space: nowrap;
-        }
-
-        .table-container {
-            background: var(--card-bg); border-radius: 18px; border: 1px solid var(--glass-border);
-        }
-
-        table { display: none; }
-
-        .mobile-dep-list { display: flex; flex-direction: column; padding: 10px; gap: 10px; }
-
-        .dep-card {
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .dep-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .dep-user-name { font-weight: 700; font-size: 14px; }
-        .dep-username { font-size: 11px; color: var(--text-muted); }
-        .dep-amount { font-weight: 700; color: var(--success); font-size: 16px; }
-
-        .dep-card-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; }
-        .dep-card-details .label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; }
-
-        .dep-card-action {
-            border-top: 1px solid var(--glass-border);
-            padding-top: 10px;
-        }
-        .btn-view-full {
-            width: 100%;
-            background: rgba(59,130,246,0.12);
-            color: var(--accent-color);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            min-height: 42px;
-        }
-
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
-        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .status-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .status-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
-        .action-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 6px; transition: 0.2s; }
-        .action-icon:hover { color: var(--accent-color); }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; align-items: flex-end;
-            justify-content: center; z-index: 2000; backdrop-filter: blur(10px);
+          align-items: center;
+          padding: 20px;
         }
         .modal-content {
-            background: var(--sidebar-bg); width: 100%; max-width: 600px;
-            border-radius: 20px 20px 0 0;
-            border: 1px solid var(--glass-border);
-            max-height: 92vh; overflow-y: auto;
+          border-radius: 24px;
+          max-height: 90vh;
         }
-        .modal-header { padding: 18px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--sidebar-bg); z-index: 10; }
-        .modal-body { padding: 20px; }
+        .action-bar {
+          flex-direction: row;
+        }
+      }
 
-        .detail-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-        .detail-row span { color: var(--text-muted); }
-        .detail-row b { color: white; text-align: right; }
-
-        .action-bar { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border); }
-        .btn-modal { padding: 14px; border-radius: 12px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; flex: 1; min-height: 46px; }
-        .btn-approve { background: var(--success); color: #fff; }
-        .btn-reject { background: var(--danger); color: #fff; }
-
-        #rejectModal .modal-content { max-width: 400px; }
-        .reason-area { width: 100%; height: 100px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: white; padding: 10px; outline: none; margin-top: 15px; font-family: inherit; font-size: 14px; }
-
-        .overlay-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-bg); z-index: 3000; display: flex; align-items: center; justify-content: center; }
-        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (min-width: 480px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+      @media (min-width: 768px) {
+        table {
+          display: table;
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 700px;
+        }
+        .mobile-dep-list {
+          display: none;
+        }
+        .table-container {
+          overflow-x: auto;
         }
 
-        @media (min-width: 640px) {
-            .toolbar { flex-direction: row; flex-wrap: wrap; align-items: center; }
-            .search-box { flex: 1; min-width: 220px; width: auto; }
-            .toolbar-row { display: contents; }
-            .filter-select { flex: none; width: auto; }
-
-            .modal-overlay { align-items: center; padding: 20px; }
-            .modal-content { border-radius: 24px; max-height: 90vh; }
-            .action-bar { flex-direction: row; }
+        th {
+          text-align: left;
+          padding: 18px 15px;
+          color: var(--text-muted);
+          font-size: 11px;
+          text-transform: uppercase;
+          border-bottom: 1px solid var(--glass-border);
         }
-
-        @media (min-width: 768px) {
-            table { display: table; width: 100%; border-collapse: collapse; min-width: 700px; }
-            .mobile-dep-list { display: none; }
-            .table-container { overflow-x: auto; }
-
-            th { text-align: left; padding: 18px 15px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
-            td { padding: 15px; font-size: 13px; border-bottom: 1px solid var(--glass-border); vertical-align: middle; }
+        td {
+          padding: 15px;
+          font-size: 13px;
+          border-bottom: 1px solid var(--glass-border);
+          vertical-align: middle;
         }
+      }
 
-        @media (min-width: 1024px) {
-            .sidebar-backdrop { display: none !important; }
-            aside { transform: none; width: var(--sidebar-width); }
-            main { margin-left: var(--sidebar-width); }
-            #mobileMenuBtn { display: none; }
-            #adminName { display: inline; font-size: 12px; font-weight: 600; }
-            .container { padding: 25px; }
-            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+      @media (min-width: 1024px) {
+        .sidebar-backdrop {
+          display: none !important;
         }
+        aside {
+          transform: none;
+          width: var(--sidebar-width);
+        }
+        main {
+          margin-left: var(--sidebar-width);
+        }
+        #mobileMenuBtn {
+          display: none;
+        }
+        #adminName {
+          display: inline;
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .container {
+          padding: 25px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="loader" class="overlay-loader">
-        <div class="spinner"></div>
+      <div class="spinner"></div>
     </div>
 
-    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+    <div
+      class="sidebar-backdrop"
+      id="sidebarBackdrop"
+      onclick="closeSidebar()"
+    ></div>
 
     <aside id="sidebar">
-        <div class="sidebar-header">
-            EASYPIE ADMIN
-            <i class="fas fa-times sidebar-close" onclick="closeSidebar()"></i>
-        </div>
-        <nav style="flex:1; overflow-y:auto;">
-            <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
-            <a href="deposits.html" class="nav-item active"><i class="fas fa-arrow-down"></i> Deposits</a>
-            <a href="withdrawals.html" class="nav-item"><i class="fas fa-arrow-up"></i> Withdrawals</a>
-            <a href="investments.html" class="nav-item"><i class="fas fa-rocket"></i> Investments</a>
-            <a href="giftcodes.html" class="nav-item"><i class="fas fa-gift"></i> Gift Codes</a>
-            <a href="support.html" class="nav-item"><i class="fas fa-headset"></i> Support Tickets</a>
-            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
-        </nav>
-        <a href="#" onclick="adminLogout()" class="nav-item" style="color: var(--danger); border-top: 1px solid var(--glass-border);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <div class="sidebar-header">
+        EASYPIE ADMIN
+        <i class="fas fa-times sidebar-close" onclick="closeSidebar()"></i>
+      </div>
+      <nav style="flex: 1; overflow-y: auto">
+        <a href="index.html" class="nav-item"
+          ><i class="fas fa-th-large"></i> Dashboard</a
+        >
+        <a href="users.html" class="nav-item"
+          ><i class="fas fa-users"></i> Users</a
+        >
+        <a href="deposits.html" class="nav-item active"
+          ><i class="fas fa-arrow-down"></i> Deposits</a
+        >
+        <a href="withdrawals.html" class="nav-item"
+          ><i class="fas fa-arrow-up"></i> Withdrawals</a
+        >
+        <a href="investments.html" class="nav-item"
+          ><i class="fas fa-rocket"></i> Investments</a
+        >
+        <a href="giftcodes.html" class="nav-item"
+          ><i class="fas fa-gift"></i> Gift Codes</a
+        >
+        <a href="support.html" class="nav-item"
+          ><i class="fas fa-headset"></i> Support Tickets</a
+        >
+        <a href="settings.html" class="nav-item"
+          ><i class="fas fa-cog"></i> Settings</a
+        >
+      </nav>
+      <a
+        href="#"
+        onclick="adminLogout()"
+        class="nav-item"
+        style="color: var(--danger); border-top: 1px solid var(--glass-border)"
+        ><i class="fas fa-sign-out-alt"></i> Logout</a
+      >
     </aside>
 
     <main>
-        <header>
-            <div class="header-left">
-                <i class="fas fa-bars" id="mobileMenuBtn"></i>
-                <h2>Deposit Management</h2>
-            </div>
-            <div id="adminProfile">
-                <span id="adminName">Admin</span>
-                <div style="width:30px; height:30px; border-radius:50%; background:var(--accent-color);"></div>
-            </div>
-        </header>
-
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-card"><p>Total Deposits</p><h3 id="statTotal">0</h3></div>
-                <div class="stat-card"><p>Pending</p><h3 id="statPending" style="color: var(--warning);">0</h3></div>
-                <div class="stat-card"><p>Total Volume</p><h3 id="statVolume" style="color: var(--success);">₦0</h3></div>
-                <div class="stat-card"><p>Avg. Deposit</p><h3 id="statAvg">₦0</h3></div>
-            </div>
-
-            <div class="toolbar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="depSearch" placeholder="Search user, amount, or ID...">
-                </div>
-                <div class="toolbar-row">
-                    <select class="filter-select" id="statusFilter">
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                    <button class="btn-prime" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
-                </div>
-            </div>
-
-            <div class="table-container">
-                <div class="mobile-dep-list" id="depCardList"></div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Amount</th>
-                            <th>Bank Details</th>
-                            <th>Date & Time</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="depTableBody">
-                    </tbody>
-                </table>
-            </div>
+      <header>
+        <div class="header-left">
+          <i class="fas fa-bars" id="mobileMenuBtn"></i>
+          <h2>Deposit Management</h2>
         </div>
+        <div id="adminProfile">
+          <span id="adminName">Admin</span>
+          <div
+            style="
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              background: var(--accent-color);
+            "
+          ></div>
+        </div>
+      </header>
+
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p>Total Deposits</p>
+            <h3 id="statTotal">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Pending</p>
+            <h3 id="statPending" style="color: var(--warning)">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Total Volume</p>
+            <h3 id="statVolume" style="color: var(--success)">₦0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Avg. Deposit</p>
+            <h3 id="statAvg">₦0</h3>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="depSearch"
+              placeholder="Search user, amount, or ID..."
+            />
+          </div>
+          <div class="toolbar-row">
+            <select class="filter-select" id="statusFilter">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <button class="btn-prime" onclick="exportCSV()">
+              <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="mobile-dep-list" id="depCardList"></div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Bank Details</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="depTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </main>
 
     <div class="modal-overlay" id="detailModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Deposit Verification</h3>
-                <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; padding:6px;"></i>
-            </div>
-            <div class="modal-body" id="modalBody">
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Deposit Verification</h3>
+          <i
+            class="fas fa-times"
+            onclick="closeModals()"
+            style="cursor: pointer; padding: 6px"
+          ></i>
         </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
     </div>
 
     <div class="modal-overlay" id="rejectModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Reject Deposit</h3>
-                <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; padding:6px;"></i>
-            </div>
-            <div class="modal-body">
-                <p style="font-size: 13px; color: var(--text-muted);">Please provide a reason for rejecting this deposit. This will be sent to the user.</p>
-                <textarea id="rejectionReason" class="reason-area" placeholder="e.g. Transaction receipt not found or incorrect amount."></textarea>
-                <div class="action-bar">
-                    <button class="btn-modal btn-reject" onclick="confirmReject()">Confirm Rejection</button>
-                    <button class="btn-modal" style="background:#333; color:white;" onclick="closeModals()">Cancel</button>
-                </div>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Reject Deposit</h3>
+          <i
+            class="fas fa-times"
+            onclick="closeModals()"
+            style="cursor: pointer; padding: 6px"
+          ></i>
         </div>
+        <div class="modal-body">
+          <p style="font-size: 13px; color: var(--text-muted)">
+            Please provide a reason for rejecting this deposit. This will be
+            sent to the user.
+          </p>
+          <textarea
+            id="rejectionReason"
+            class="reason-area"
+            placeholder="e.g. Transaction receipt not found or incorrect amount."
+          ></textarea>
+          <div class="action-bar">
+            <button class="btn-modal btn-reject" onclick="confirmReject()">
+              Confirm Rejection
+            </button>
+            <button
+              class="btn-modal"
+              style="background: #333; color: white"
+              onclick="closeModals()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let depositData = [];
-        let filteredDep = [];
-        let activeAdmin = null;
-        let pendingActionId = null;
+      let depositData = [];
+      let filteredDep = [];
+      let activeAdmin = null;
+      let pendingActionId = null;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-            if (!profile?.is_admin) { window.location.href = '../login.html'; return; }
-
-            activeAdmin = profile;
-            document.getElementById('adminName').innerText = profile.full_name;
-            document.getElementById('loader').style.display = 'none';
-
-            await fetchDeposits();
-            setupRealtime();
-
-            document.getElementById('depSearch').addEventListener('input', applyFilters);
-            document.getElementById('statusFilter').addEventListener('change', applyFilters);
-            document.getElementById('mobileMenuBtn').onclick = () => {
-                document.getElementById('sidebar').classList.add('active');
-                document.getElementById('sidebarBackdrop').classList.add('active');
-            };
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
         }
 
-        window.closeSidebar = () => {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('sidebarBackdrop').classList.remove('active');
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        if (!profile?.is_admin) {
+          window.location.href = "../login.html";
+          return;
+        }
+
+        activeAdmin = profile;
+        document.getElementById("adminName").innerText = profile.full_name;
+        document.getElementById("loader").style.display = "none";
+
+        await fetchDeposits();
+        setupRealtime();
+
+        document
+          .getElementById("depSearch")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("statusFilter")
+          .addEventListener("change", applyFilters);
+        document.getElementById("mobileMenuBtn").onclick = () => {
+          document.getElementById("sidebar").classList.add("active");
+          document.getElementById("sidebarBackdrop").classList.add("active");
         };
+      }
 
-        async function fetchDeposits() {
-            const { data, error } = await supabase
-                .from('deposits')
-                .select('*, profiles!deposits_user_id_fkey(full_name, username, email)')
-                .order('created_at', { ascending: false });
+      window.closeSidebar = () => {
+        document.getElementById("sidebar").classList.remove("active");
+        document.getElementById("sidebarBackdrop").classList.remove("active");
+      };
 
-            // FIX: previously any error here (RLS block, ambiguous/missing FK, etc.)
-            // was swallowed silently because there was no `else`/error branch —
-            // the table would just stay empty with zero indication why.
-            if (error) {
-                console.error('fetchDeposits error:', error);
-                alert('Could not load deposits: ' + error.message);
-                return;
-            }
+      async function fetchDeposits() {
+        const { data, error } = await supabase
+          .from("deposits")
+          .select(
+            "*, profiles!deposits_user_id_fkey(full_name, username, email)",
+          )
+          .order("created_at", { ascending: false });
 
-            if (data) {
-                depositData = data;
-                applyFilters();
-                updateStats();
-            }
+        // FIX: previously any error here (RLS block, ambiguous/missing FK, etc.)
+        // was swallowed silently because there was no `else`/error branch —
+        // the table would just stay empty with zero indication why.
+        if (error) {
+          console.error("fetchDeposits error:", error);
+          alert("Could not load deposits: " + error.message);
+          return;
         }
 
-        function updateStats() {
-            const total = depositData.length;
-            const pending = depositData.filter(d => d.status === 'pending').length;
-            const approved = depositData.filter(d => d.status === 'approved');
-            const volume = approved.reduce((s, d) => s + parseFloat(d.amount), 0);
-            const avg = total > 0 ? volume / (approved.length || 1) : 0;
+        if (data) {
+          depositData = data;
+          applyFilters();
+          updateStats();
+        }
+      }
 
-            document.getElementById('statTotal').innerText = total;
-            document.getElementById('statPending').innerText = pending;
-            document.getElementById('statVolume').innerText = `₦${volume.toLocaleString()}`;
-            document.getElementById('statAvg').innerText = `₦${Math.round(avg).toLocaleString()}`;
+      function updateStats() {
+        const total = depositData.length;
+        const pending = depositData.filter(
+          (d) => d.status === "pending",
+        ).length;
+        const approved = depositData.filter((d) => d.status === "approved");
+        const volume = approved.reduce((s, d) => s + parseFloat(d.amount), 0);
+        const avg = total > 0 ? volume / (approved.length || 1) : 0;
+
+        document.getElementById("statTotal").innerText = total;
+        document.getElementById("statPending").innerText = pending;
+        document.getElementById("statVolume").innerText =
+          `₦${volume.toLocaleString()}`;
+        document.getElementById("statAvg").innerText =
+          `₦${Math.round(avg).toLocaleString()}`;
+      }
+
+      function applyFilters() {
+        const query = document.getElementById("depSearch").value.toLowerCase();
+        const status = document.getElementById("statusFilter").value;
+
+        filteredDep = depositData.filter((d) => {
+          const matchSearch =
+            d.profiles.full_name.toLowerCase().includes(query) ||
+            d.amount.toString().includes(query) ||
+            d.id.includes(query);
+          const matchStatus = status === "all" || d.status === status;
+          return matchSearch && matchStatus;
+        });
+        renderTable();
+      }
+
+      function renderTable() {
+        const tableBody = document.getElementById("depTableBody");
+        const cardList = document.getElementById("depCardList");
+        tableBody.innerHTML = "";
+        cardList.innerHTML = "";
+
+        if (filteredDep.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No deposits found.</td></tr>';
+          cardList.innerHTML =
+            '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">No deposits found.</div>';
+          return;
         }
 
-        function applyFilters() {
-            const query = document.getElementById('depSearch').value.toLowerCase();
-            const status = document.getElementById('statusFilter').value;
+        filteredDep.forEach((d) => {
+          const date = new Date(d.created_at);
+          const amount = parseFloat(d.amount).toLocaleString();
 
-            filteredDep = depositData.filter(d => {
-                const matchSearch = d.profiles.full_name.toLowerCase().includes(query) ||
-                                    d.amount.toString().includes(query) ||
-                                    d.id.includes(query);
-                const matchStatus = status === 'all' || d.status === status;
-                return matchSearch && matchStatus;
-            });
-            renderTable();
-        }
-
-        function renderTable() {
-            const tableBody = document.getElementById('depTableBody');
-            const cardList = document.getElementById('depCardList');
-            tableBody.innerHTML = '';
-            cardList.innerHTML = '';
-
-            if (filteredDep.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No deposits found.</td></tr>';
-                cardList.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">No deposits found.</div>';
-                return;
-            }
-
-            filteredDep.forEach(d => {
-                const date = new Date(d.created_at);
-                const amount = parseFloat(d.amount).toLocaleString();
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
+          const row = document.createElement("tr");
+          row.innerHTML = `
                     <td>
                         <p style="font-weight:700">${d.profiles.full_name}</p>
                         <p style="font-size:11px; color:var(--text-muted)">@${d.profiles.username}</p>
@@ -479,7 +922,7 @@
                     <td><b>₦${amount}</b></td>
                     <td>
                         <p style="font-size:12px;">Kuda Bank</p>
-                        <p style="font-size:10px; color:var(--text-muted)">ID: ${d.id.slice(0,8)}</p>
+                        <p style="font-size:10px; color:var(--text-muted)">ID: ${d.id.slice(0, 8)}</p>
                     </td>
                     <td>${date.toLocaleDateString()} <br> <span style="font-size:10px; color:var(--text-muted)">${date.toLocaleTimeString()}</span></td>
                     <td><span class="status-badge status-${d.status}">${d.status}</span></td>
@@ -487,11 +930,11 @@
                         <button class="action-icon" onclick="viewDetail('${d.id}')"><i class="fas fa-eye"></i></button>
                     </td>
                 `;
-                tableBody.appendChild(row);
+          tableBody.appendChild(row);
 
-                const card = document.createElement('div');
-                card.className = 'dep-card';
-                card.innerHTML = `
+          const card = document.createElement("div");
+          card.className = "dep-card";
+          card.innerHTML = `
                     <div class="dep-card-top">
                         <div>
                             <div class="dep-user-name">${d.profiles.full_name}</div>
@@ -509,154 +952,239 @@
                         <button class="btn-view-full" onclick="viewDetail('${d.id}')">View Details</button>
                     </div>
                 `;
-                cardList.appendChild(card);
-            });
-        }
+          cardList.appendChild(card);
+        });
+      }
 
-        window.viewDetail = (id) => {
-            const d = depositData.find(x => x.id === id);
-            const body = document.getElementById('modalBody');
-            pendingActionId = id;
+      window.viewDetail = (id) => {
+        const d = depositData.find((x) => x.id === id);
+        const body = document.getElementById("modalBody");
+        pendingActionId = id;
 
-            body.innerHTML = `
-                <div class="detail-row"><span>Deposit ID</span><b>#${d.id.slice(0,12)}</b></div>
+        body.innerHTML = `
+                <div class="detail-row"><span>Deposit ID</span><b>#${d.id.slice(0, 12)}</b></div>
                 <div class="detail-row"><span>User</span><b>${d.profiles.full_name} (${d.profiles.email})</b></div>
                 <div class="detail-row"><span>Amount</span><b style="color:var(--success); font-size:18px;">₦${parseFloat(d.amount).toLocaleString()}</b></div>
                 <div class="detail-row"><span>Method</span><b>Kuda Bank</b></div>
                 <div class="detail-row"><span>Status</span><b class="status-badge status-${d.status}">${d.status}</b></div>
 
-                ${d.status === 'pending' ? `
+                ${
+                  d.status === "pending"
+                    ? `
                 <div class="action-bar">
                     <button class="btn-modal btn-approve" onclick="approveDeposit('${d.id}', ${d.amount}, '${d.user_id}')">Approve & Fund Wallet</button>
                     <button class="btn-modal btn-reject" onclick="openRejectModal()">Reject</button>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
             `;
-            document.getElementById('detailModal').style.display = 'flex';
-        };
+        document.getElementById("detailModal").style.display = "flex";
+      };
 
-        async function creditReferralCommission(depositorUserId, depositAmount) {
-            const { data: depositorProfile } = await supabase
-                .from('profiles')
-                .select('referral_by, username')
-                .eq('id', depositorUserId)
-                .single();
+      async function creditReferralCommission(depositorUserId, depositAmount) {
+        const { data: depositorProfile } = await supabase
+          .from("profiles")
+          .select("referral_by, username")
+          .eq("id", depositorUserId)
+          .single();
 
-            if (!depositorProfile || !depositorProfile.referral_by) return;
+        if (!depositorProfile || !depositorProfile.referral_by) return;
 
-            const { data: referrerProfile } = await supabase
-                .from('profiles')
-                .select('id')
-                .ilike('username', depositorProfile.referral_by)
-                .single();
+        const { data: referrerProfile } = await supabase
+          .from("profiles")
+          .select("id")
+          .ilike("username", depositorProfile.referral_by)
+          .single();
 
-            if (!referrerProfile) return;
+        if (!referrerProfile) return;
 
-            const commission = parseFloat(depositAmount) * 0.20;
+        const commission = parseFloat(depositAmount) * 0.2;
 
-            const { data: referrerWallet } = await supabase
-                .from('wallets')
-                .select('balance')
-                .eq('user_id', referrerProfile.id)
-                .single();
-            if (!referrerWallet) return;
+        const { data: referrerWallet } = await supabase
+          .from("wallets")
+          .select("balance")
+          .eq("user_id", referrerProfile.id)
+          .single();
+        if (!referrerWallet) return;
 
-            const newReferrerBalance = parseFloat(referrerWallet.balance) + commission;
-            await supabase.from('wallets').update({ balance: newReferrerBalance }).eq('user_id', referrerProfile.id);
+        const newReferrerBalance =
+          parseFloat(referrerWallet.balance) + commission;
+        await supabase
+          .from("wallets")
+          .update({ balance: newReferrerBalance })
+          .eq("user_id", referrerProfile.id);
 
-            await supabase.from('transactions').insert([{
-                user_id: referrerProfile.id,
-                amount: commission,
-                type: 'referral',
-                description: `Referral commission (20%) from @${depositorProfile.username}'s deposit`
-            }]);
+        await supabase.from("transactions").insert([
+          {
+            user_id: referrerProfile.id,
+            amount: commission,
+            type: "referral",
+            description: `Referral commission (20%) from @${depositorProfile.username}'s deposit`,
+          },
+        ]);
 
-            await supabase.from('notifications').insert([{
-                user_id: referrerProfile.id,
-                title: 'Referral Commission Earned',
-                message: `You earned ₦${commission.toLocaleString()} (20%) from @${depositorProfile.username}'s deposit!`
-            }]);
+        await supabase.from("notifications").insert([
+          {
+            user_id: referrerProfile.id,
+            title: "Referral Commission Earned",
+            message: `You earned ₦${commission.toLocaleString()} (20%) from @${depositorProfile.username}'s deposit!`,
+          },
+        ]);
+      }
+
+      window.approveDeposit = async (id, amount, userId) => {
+        if (
+          !confirm(
+            "Approve this deposit and add ₦" +
+              amount.toLocaleString() +
+              " to user wallet?",
+          )
+        )
+          return;
+
+        try {
+          const { error: dErr } = await supabase
+            .from("deposits")
+            .update({ status: "approved" })
+            .eq("id", id);
+          if (dErr) throw dErr;
+
+          const { data: wallet } = await supabase
+            .from("wallets")
+            .select("balance")
+            .eq("user_id", userId)
+            .single();
+          const newBalance = parseFloat(wallet.balance) + parseFloat(amount);
+
+          const { error: wErr } = await supabase
+            .from("wallets")
+            .update({ balance: newBalance })
+            .eq("user_id", userId);
+          if (wErr) throw wErr;
+
+          await supabase
+            .from("transactions")
+            .insert([
+              {
+                user_id: userId,
+                amount: amount,
+                type: "deposit",
+                description: "Deposit Verified & Approved",
+              },
+            ]);
+
+          await supabase
+            .from("notifications")
+            .insert([
+              {
+                user_id: userId,
+                title: "Deposit Approved",
+                message: `Your deposit of ₦${amount.toLocaleString()} has been verified and added to your wallet.`,
+              },
+            ]);
+
+          await creditReferralCommission(userId, amount);
+
+          await supabase
+            .from("admin_logs")
+            .insert([
+              {
+                admin_id: activeAdmin.id,
+                action: `Approved Deposit #${id}`,
+                target_id: id,
+              },
+            ]);
+
+          alert("Deposit approved successfully!");
+          closeModals();
+          fetchDeposits();
+        } catch (err) {
+          alert("Error: " + err.message);
+        }
+      };
+
+      window.openRejectModal = () => {
+        document.getElementById("rejectModal").style.display = "flex";
+      };
+
+      window.confirmReject = async () => {
+        const reason = document.getElementById("rejectionReason").value.trim();
+        if (!reason) {
+          alert("Please provide a reason.");
+          return;
         }
 
-        window.approveDeposit = async (id, amount, userId) => {
-            if(!confirm("Approve this deposit and add ₦" + amount.toLocaleString() + " to user wallet?")) return;
+        const dep = depositData.find((x) => x.id === pendingActionId);
 
-            try {
-                const { error: dErr } = await supabase.from('deposits').update({ status: 'approved' }).eq('id', id);
-                if(dErr) throw dErr;
+        try {
+          await supabase
+            .from("deposits")
+            .update({ status: "rejected", rejection_reason: reason })
+            .eq("id", pendingActionId);
+          await supabase
+            .from("notifications")
+            .insert([
+              {
+                user_id: dep.user_id,
+                title: "Deposit Rejected",
+                message: `Your deposit of ₦${parseFloat(dep.amount).toLocaleString()} was rejected. Reason: ${reason}`,
+              },
+            ]);
+          await supabase
+            .from("admin_logs")
+            .insert([
+              {
+                admin_id: activeAdmin.id,
+                action: `Rejected Deposit #${pendingActionId}`,
+                target_id: pendingActionId,
+              },
+            ]);
 
-                const { data: wallet } = await supabase.from('wallets').select('balance').eq('user_id', userId).single();
-                const newBalance = parseFloat(wallet.balance) + parseFloat(amount);
-
-                const { error: wErr } = await supabase.from('wallets').update({ balance: newBalance }).eq('user_id', userId);
-                if(wErr) throw wErr;
-
-                await supabase.from('transactions').insert([{ user_id: userId, amount: amount, type: 'deposit', description: 'Deposit Verified & Approved' }]);
-
-                await supabase.from('notifications').insert([{ user_id: userId, title: 'Deposit Approved', message: `Your deposit of ₦${amount.toLocaleString()} has been verified and added to your wallet.` }]);
-
-                await creditReferralCommission(userId, amount);
-
-                await supabase.from('admin_logs').insert([{ admin_id: activeAdmin.id, action: `Approved Deposit #${id}`, target_id: id }]);
-
-                alert("Deposit approved successfully!");
-                closeModals();
-                fetchDeposits();
-            } catch (err) {
-                alert("Error: " + err.message);
-            }
-        };
-
-        window.openRejectModal = () => {
-            document.getElementById('rejectModal').style.display = 'flex';
-        };
-
-        window.confirmReject = async () => {
-            const reason = document.getElementById('rejectionReason').value.trim();
-            if(!reason) { alert("Please provide a reason."); return; }
-
-            const dep = depositData.find(x => x.id === pendingActionId);
-
-            try {
-                await supabase.from('deposits').update({ status: 'rejected', rejection_reason: reason }).eq('id', pendingActionId);
-                await supabase.from('notifications').insert([{ user_id: dep.user_id, title: 'Deposit Rejected', message: `Your deposit of ₦${parseFloat(dep.amount).toLocaleString()} was rejected. Reason: ${reason}` }]);
-                await supabase.from('admin_logs').insert([{ admin_id: activeAdmin.id, action: `Rejected Deposit #${pendingActionId}`, target_id: pendingActionId }]);
-
-                alert("Deposit rejected.");
-                closeModals();
-                fetchDeposits();
-            } catch (err) {
-                alert(err.message);
-            }
-        };
-
-        window.exportCSV = () => {
-            let csv = 'ID,User,Amount,Date,Status\n';
-            filteredDep.forEach(d => {
-                csv += `${d.id},${d.profiles.full_name},${d.amount},${d.created_at},${d.status}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `EASYPIE_Deposits_${Date.now()}.csv`;
-            a.click();
-        };
-
-        function setupRealtime() {
-            supabase.channel('deposits-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'deposits' }, fetchDeposits).subscribe();
+          alert("Deposit rejected.");
+          closeModals();
+          fetchDeposits();
+        } catch (err) {
+          alert(err.message);
         }
+      };
 
-        window.closeModals = () => {
-            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-        };
+      window.exportCSV = () => {
+        let csv = "ID,User,Amount,Date,Status\n";
+        filteredDep.forEach((d) => {
+          csv += `${d.id},${d.profiles.full_name},${d.amount},${d.created_at},${d.status}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `EASYPIE_Deposits_${Date.now()}.csv`;
+        a.click();
+      };
 
-        window.adminLogout = async () => {
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
-        };
+      function setupRealtime() {
+        supabase
+          .channel("deposits-realtime")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "deposits" },
+            fetchDeposits,
+          )
+          .subscribe();
+      }
 
-        window.addEventListener('DOMContentLoaded', init);
+      window.closeModals = () => {
+        document
+          .querySelectorAll(".modal-overlay")
+          .forEach((m) => (m.style.display = "none"));
+      };
+
+      window.adminLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      };
+
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

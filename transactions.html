@@ -1,17 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Transaction History | EASYPIE</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- External Libs for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -21,371 +30,629 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #0a0e17;
-            --secondary-bg: #111827;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.6);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --nav-height: 70px;
+      :root {
+        --primary-bg: #0a0e17;
+        --secondary-bg: #111827;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.6);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --nav-height: 70px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        padding-bottom: calc(var(--nav-height) + 30px);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .container {
+        width: 92%;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      /* --- Header --- */
+      header {
+        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        background: rgba(10, 14, 23, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 100;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .back-btn {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mini-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      /* --- Summary Horizontal Scroll --- */
+      .summary-wrapper {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding: 20px 0;
+        scrollbar-width: none;
+      }
+      .summary-wrapper::-webkit-scrollbar {
+        display: none;
+      }
+
+      .summary-card {
+        min-width: 140px;
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+      .summary-card p {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+      }
+      .summary-card h4 {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      /* --- Search & Filter Bar --- */
+      .tools-section {
+        background: var(--secondary-bg);
+        padding: 15px;
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 20px;
+      }
+
+      .search-box {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .search-box i {
+        color: var(--text-muted);
+      }
+      .search-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        width: 100%;
+        outline: none;
+        font-size: 14px;
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      select.filter-select {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 12px;
+        outline: none;
+      }
+
+      /* --- Action Buttons --- */
+      .action-btns {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .btn-export {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid var(--accent-color);
+        background: transparent;
+        color: var(--accent-color);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn-export:active {
+        background: var(--accent-color);
+        color: white;
+      }
+
+      /* --- Transaction List --- */
+      .tx-list-container {
+        margin-top: 10px;
+      }
+
+      .tx-card {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .tx-card:active {
+        transform: scale(0.98);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .tx-main h5 {
+        font-size: 14px;
+        margin-bottom: 4px;
+        text-transform: capitalize;
+      }
+      .tx-main p {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .tx-end {
+        text-align: right;
+      }
+      .tx-end h4 {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .status-pill {
+        font-size: 9px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+      }
+      .success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+      .pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+      .failed {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+      }
+
+      /* --- Modal --- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+        backdrop-filter: blur(8px);
+      }
+      .modal-content {
+        background: var(--secondary-bg);
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        animation: slideUp 0.3s ease;
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
         }
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .detail-row span {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .detail-row b {
+        font-size: 13px;
+        color: white;
+        word-break: break-all;
+        text-align: right;
+        margin-left: 10px;
+      }
+
+      .btn-copy {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 700;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+
+      /* --- Bottom Nav --- */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(17, 24, 39, 0.95);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid var(--glass-border);
+        z-index: 1000;
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 10px;
+      }
+      .nav-item.active {
+        color: var(--accent-color);
+      }
+      .nav-item i {
+        font-size: 18px;
+      }
+
+      /* --- Skeleton --- */
+      .skeleton {
+        background: #1f2937;
+        border-radius: 18px;
+        animation: pulse 1.5s infinite;
+        height: 70px;
+        margin-bottom: 12px;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
         }
+      }
 
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            padding-bottom: calc(var(--nav-height) + 30px);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container { width: 92%; max-width: 1000px; margin: 0 auto; }
-
-        /* --- Header --- */
-        header {
-            padding: 20px 0;
-            position: sticky; top: 0;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .header-flex { display: flex; justify-content: space-between; align-items: center; }
-
-        .back-btn {
-            color: white; text-decoration: none; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .mini-avatar {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: var(--accent-color);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px;
-        }
-
-        /* --- Summary Horizontal Scroll --- */
-        .summary-wrapper {
-            display: flex; gap: 12px; overflow-x: auto; padding: 20px 0;
-            scrollbar-width: none;
-        }
-        .summary-wrapper::-webkit-scrollbar { display: none; }
-
-        .summary-card {
-            min-width: 140px; background: var(--card-bg); padding: 15px;
-            border-radius: 18px; border: 1px solid var(--glass-border);
-        }
-        .summary-card p { font-size: 10px; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
-        .summary-card h4 { font-size: 14px; font-weight: 700; }
-
-        /* --- Search & Filter Bar --- */
-        .tools-section {
-            background: var(--secondary-bg); padding: 15px; border-radius: 20px;
-            border: 1px solid var(--glass-border); margin-bottom: 20px;
-        }
-
-        .search-box {
-            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 10px 15px; display: flex; align-items: center;
-            gap: 10px; margin-bottom: 15px;
-        }
-        .search-box i { color: var(--text-muted); }
-        .search-box input {
-            background: transparent; border: none; color: white; width: 100%;
-            outline: none; font-size: 14px;
-        }
-
-        .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        select.filter-select {
-            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
-            color: white; padding: 10px; border-radius: 10px; font-size: 12px; outline: none;
-        }
-
-        /* --- Action Buttons --- */
-        .action-btns { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-export {
-            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--accent-color);
-            background: transparent; color: var(--accent-color); font-size: 12px;
-            font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-export:active { background: var(--accent-color); color: white; }
-
-        /* --- Transaction List --- */
-        .tx-list-container { margin-top: 10px; }
-        
-        .tx-card {
-            background: var(--card-bg); padding: 15px; border-radius: 18px;
-            border: 1px solid var(--glass-border); margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: 0.3s;
-        }
-        .tx-card:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
-
-        .tx-main h5 { font-size: 14px; margin-bottom: 4px; text-transform: capitalize; }
-        .tx-main p { font-size: 11px; color: var(--text-muted); }
-
-        .tx-end { text-align: right; }
-        .tx-end h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-        
-        .status-pill {
-            font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase;
-        }
-        .success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .failed { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
-        /* --- Modal --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; align-items: center;
-            justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(8px);
-        }
-        .modal-content {
-            background: var(--secondary-bg); width: 100%; max-width: 400px;
-            padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border);
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } }
-
-        .detail-row {
-            display: flex; justify-content: space-between; margin-bottom: 15px;
-            padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .detail-row span { font-size: 12px; color: var(--text-muted); }
-        .detail-row b { font-size: 13px; color: white; word-break: break-all; text-align: right; margin-left: 10px; }
-
-        .btn-copy {
-            background: var(--accent-color); color: white; border: none; width: 100%;
-            padding: 12px; border-radius: 12px; font-weight: 700; margin-top: 10px; cursor: pointer;
-        }
-
-        /* --- Bottom Nav --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: var(--nav-height); background: rgba(17, 24, 39, 0.95);
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            border-top: 1px solid var(--glass-border); z-index: 1000;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 4px; color: var(--text-muted);
-            text-decoration: none; font-size: 10px;
-        }
-        .nav-item.active { color: var(--accent-color); }
-        .nav-item i { font-size: 18px; }
-
-        /* --- Skeleton --- */
-        .skeleton { background: #1f2937; border-radius: 18px; animation: pulse 1.5s infinite; height: 70px; margin-bottom: 12px; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
-
-        /* --- Empty State --- */
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-state i { font-size: 50px; color: var(--text-muted); opacity: 0.2; margin-bottom: 20px; }
-        .empty-state p { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
+      /* --- Empty State --- */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+      }
+      .empty-state i {
+        font-size: 50px;
+        color: var(--text-muted);
+        opacity: 0.2;
+        margin-bottom: 20px;
+      }
+      .empty-state p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 25px;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <div class="container header-flex">
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> History</a>
-            <div class="profile-area">
-                <div class="mini-avatar" id="userAvatar">U</div>
-            </div>
+      <div class="container header-flex">
+        <a href="dashboard.html" class="back-btn"
+          ><i class="fas fa-arrow-left"></i> History</a
+        >
+        <div class="profile-area">
+          <div class="mini-avatar" id="userAvatar">U</div>
         </div>
+      </div>
     </header>
 
     <main class="container">
-        <!-- Summary Stats -->
-        <div class="summary-wrapper">
-            <div class="summary-card"><p>Total</p><h4 id="statTotal">0</h4></div>
-            <div class="summary-card"><p>Deposits</p><h4 id="statDeposit">₦0</h4></div>
-            <div class="summary-card"><p>Withdrawals</p><h4 id="statWithdraw">₦0</h4></div>
-            <div class="summary-card"><p>Investments</p><h4 id="statInvest">₦0</h4></div>
-            <div class="summary-card"><p>Earnings</p><h4 id="statEarn">₦0</h4></div>
-            <div class="summary-card"><p>Ref Bonus</p><h4 id="statRef">₦0</h4></div>
+      <!-- Summary Stats -->
+      <div class="summary-wrapper">
+        <div class="summary-card">
+          <p>Total</p>
+          <h4 id="statTotal">0</h4>
         </div>
-
-        <!-- Search & Filter -->
-        <section class="tools-section">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search ID, Type, or Amount...">
-            </div>
-            <div class="filter-grid">
-                <select id="typeFilter" class="filter-select">
-                    <option value="all">All Types</option>
-                    <option value="deposit">Deposits</option>
-                    <option value="withdrawal">Withdrawals</option>
-                    <option value="investment">Investments</option>
-                    <option value="earning">Daily Earnings</option>
-                    <option value="referral">Referral Bonus</option>
-                    <option value="bonus">Welcome Bonus</option>
-                    <option value="gift">Gift Codes</option>
-                </select>
-                <select id="dateFilter" class="filter-select">
-                    <option value="all">All Time</option>
-                    <option value="today">Today</option>
-                    <option value="week">Last 7 Days</option>
-                    <option value="month">Last 30 Days</option>
-                    <option value="year">This Year</option>
-                </select>
-            </div>
-        </section>
-
-        <!-- Export Area -->
-        <div class="action-btns">
-            <button class="btn-export" onclick="exportCSV()"><i class="fas fa-file-csv"></i> CSV</button>
-            <button class="btn-export" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+        <div class="summary-card">
+          <p>Deposits</p>
+          <h4 id="statDeposit">₦0</h4>
         </div>
+        <div class="summary-card">
+          <p>Withdrawals</p>
+          <h4 id="statWithdraw">₦0</h4>
+        </div>
+        <div class="summary-card">
+          <p>Investments</p>
+          <h4 id="statInvest">₦0</h4>
+        </div>
+        <div class="summary-card">
+          <p>Earnings</p>
+          <h4 id="statEarn">₦0</h4>
+        </div>
+        <div class="summary-card">
+          <p>Ref Bonus</p>
+          <h4 id="statRef">₦0</h4>
+        </div>
+      </div>
 
-        <!-- Transaction List -->
-        <section id="txList" class="tx-list-container">
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-        </section>
+      <!-- Search & Filter -->
+      <section class="tools-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search ID, Type, or Amount..."
+          />
+        </div>
+        <div class="filter-grid">
+          <select id="typeFilter" class="filter-select">
+            <option value="all">All Types</option>
+            <option value="deposit">Deposits</option>
+            <option value="withdrawal">Withdrawals</option>
+            <option value="investment">Investments</option>
+            <option value="earning">Daily Earnings</option>
+            <option value="referral">Referral Bonus</option>
+            <option value="bonus">Welcome Bonus</option>
+            <option value="gift">Gift Codes</option>
+          </select>
+          <select id="dateFilter" class="filter-select">
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">Last 7 Days</option>
+            <option value="month">Last 30 Days</option>
+            <option value="year">This Year</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Export Area -->
+      <div class="action-btns">
+        <button class="btn-export" onclick="exportCSV()">
+          <i class="fas fa-file-csv"></i> CSV
+        </button>
+        <button class="btn-export" onclick="exportPDF()">
+          <i class="fas fa-file-pdf"></i> PDF
+        </button>
+      </div>
+
+      <!-- Transaction List -->
+      <section id="txList" class="tx-list-container">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </section>
     </main>
 
     <!-- Details Modal -->
     <div class="modal-overlay" id="txModal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
-                <h3 style="font-size: 18px;">Transaction Details</h3>
-                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer"></i>
-            </div>
-            <div id="modalBody"></div>
-            <button class="btn-copy" id="copyIdBtn">Copy Transaction ID</button>
+      <div class="modal-content">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+          "
+        >
+          <h3 style="font-size: 18px">Transaction Details</h3>
+          <i
+            class="fas fa-times"
+            onclick="closeModal()"
+            style="cursor: pointer"
+          ></i>
         </div>
+        <div id="modalBody"></div>
+        <button class="btn-copy" id="copyIdBtn">Copy Transaction ID</button>
+      </div>
     </div>
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">
-            <i class="fas fa-th-large"></i><span>Home</span>
-        </a>
-        <a href="plans.html" class="nav-item">
-            <i class="fas fa-layer-group"></i><span>Plans</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i><span>Wallet</span>
-        </a>
-        <a href="transactions.html" class="nav-item active">
-            <i class="fas fa-list-ul"></i><span>History</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user-circle"></i><span>Profile</span>
-        </a>
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-th-large"></i><span>Home</span>
+      </a>
+      <a href="plans.html" class="nav-item">
+        <i class="fas fa-layer-group"></i><span>Plans</span>
+      </a>
+      <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i><span>Wallet</span>
+      </a>
+      <a href="transactions.html" class="nav-item active">
+        <i class="fas fa-list-ul"></i><span>History</span>
+      </a>
+      <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i><span>Profile</span>
+      </a>
     </nav>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
-        let allTransactions = [];
-        let filteredTransactions = [];
+      let currentUser = null;
+      let allTransactions = [];
+      let filteredTransactions = [];
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
-
-            await loadProfile();
-            await fetchTransactions();
-            
-            // Event Listeners
-            document.getElementById('searchInput').addEventListener('input', applyFilters);
-            document.getElementById('typeFilter').addEventListener('change', applyFilters);
-            document.getElementById('dateFilter').addEventListener('change', applyFilters);
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
         }
+        currentUser = session.user;
 
-        async function loadProfile() {
-            const { data } = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
-            if (data) document.getElementById('userAvatar').innerText = data.full_name.charAt(0).toUpperCase();
+        await loadProfile();
+        await fetchTransactions();
+
+        // Event Listeners
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("typeFilter")
+          .addEventListener("change", applyFilters);
+        document
+          .getElementById("dateFilter")
+          .addEventListener("change", applyFilters);
+      }
+
+      async function loadProfile() {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", currentUser.id)
+          .single();
+        if (data)
+          document.getElementById("userAvatar").innerText = data.full_name
+            .charAt(0)
+            .toUpperCase();
+      }
+
+      async function fetchTransactions() {
+        const { data, error } = await supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (data) {
+          allTransactions = data;
+          updateStats(data);
+          applyFilters();
         }
+      }
 
-        async function fetchTransactions() {
-            const { data, error } = await supabase
-                .from('transactions')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
+      function updateStats(data) {
+        let dep = 0,
+          wit = 0,
+          inv = 0,
+          ear = 0,
+          ref = 0;
+        data.forEach((t) => {
+          const amt = parseFloat(t.amount);
+          if (t.type === "deposit") dep += amt;
+          else if (t.type === "withdrawal") wit += amt;
+          else if (t.type === "investment") inv += amt;
+          else if (t.type === "earning") ear += amt;
+          else if (t.type === "referral") ref += amt;
+        });
+        document.getElementById("statTotal").innerText = data.length;
+        document.getElementById("statDeposit").innerText =
+          `₦${dep.toLocaleString()}`;
+        document.getElementById("statWithdraw").innerText =
+          `₦${wit.toLocaleString()}`;
+        document.getElementById("statInvest").innerText =
+          `₦${inv.toLocaleString()}`;
+        document.getElementById("statEarn").innerText =
+          `₦${ear.toLocaleString()}`;
+        document.getElementById("statRef").innerText =
+          `₦${ref.toLocaleString()}`;
+      }
 
-            if (data) {
-                allTransactions = data;
-                updateStats(data);
-                applyFilters();
-            }
-        }
+      function applyFilters() {
+        const query = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const type = document.getElementById("typeFilter").value;
+        const dateVal = document.getElementById("dateFilter").value;
 
-        function updateStats(data) {
-            let dep = 0, wit = 0, inv = 0, ear = 0, ref = 0;
-            data.forEach(t => {
-                const amt = parseFloat(t.amount);
-                if (t.type === 'deposit') dep += amt;
-                else if (t.type === 'withdrawal') wit += amt;
-                else if (t.type === 'investment') inv += amt;
-                else if (t.type === 'earning') ear += amt;
-                else if (t.type === 'referral') ref += amt;
-            });
-            document.getElementById('statTotal').innerText = data.length;
-            document.getElementById('statDeposit').innerText = `₦${dep.toLocaleString()}`;
-            document.getElementById('statWithdraw').innerText = `₦${wit.toLocaleString()}`;
-            document.getElementById('statInvest').innerText = `₦${inv.toLocaleString()}`;
-            document.getElementById('statEarn').innerText = `₦${ear.toLocaleString()}`;
-            document.getElementById('statRef').innerText = `₦${ref.toLocaleString()}`;
-        }
+        filteredTransactions = allTransactions.filter((t) => {
+          // Search
+          const matchSearch =
+            t.id.toLowerCase().includes(query) ||
+            t.type.toLowerCase().includes(query) ||
+            t.amount.toString().includes(query) ||
+            (t.description && t.description.toLowerCase().includes(query));
 
-        function applyFilters() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const type = document.getElementById('typeFilter').value;
-            const dateVal = document.getElementById('dateFilter').value;
+          // Type
+          const matchType = type === "all" || t.type === type;
 
-            filteredTransactions = allTransactions.filter(t => {
-                // Search
-                const matchSearch = t.id.toLowerCase().includes(query) || 
-                                    t.type.toLowerCase().includes(query) || 
-                                    t.amount.toString().includes(query) ||
-                                    (t.description && t.description.toLowerCase().includes(query));
-                
-                // Type
-                const matchType = type === 'all' || t.type === type;
+          // Date
+          let matchDate = true;
+          const createdAt = new Date(t.created_at);
+          const now = new Date();
+          if (dateVal === "today")
+            matchDate = createdAt.toDateString() === now.toDateString();
+          else if (dateVal === "week")
+            matchDate = now - createdAt <= 7 * 86400000;
+          else if (dateVal === "month")
+            matchDate = now - createdAt <= 30 * 86400000;
+          else if (dateVal === "year")
+            matchDate = createdAt.getFullYear() === now.getFullYear();
 
-                // Date
-                let matchDate = true;
-                const createdAt = new Date(t.created_at);
-                const now = new Date();
-                if (dateVal === 'today') matchDate = createdAt.toDateString() === now.toDateString();
-                else if (dateVal === 'week') matchDate = (now - createdAt) <= (7 * 86400000);
-                else if (dateVal === 'month') matchDate = (now - createdAt) <= (30 * 86400000);
-                else if (dateVal === 'year') matchDate = createdAt.getFullYear() === now.getFullYear();
+          return matchSearch && matchType && matchDate;
+        });
 
-                return matchSearch && matchType && matchDate;
-            });
+        renderTransactions(filteredTransactions);
+      }
 
-            renderTransactions(filteredTransactions);
-        }
+      function renderTransactions(data) {
+        const container = document.getElementById("txList");
+        container.innerHTML = "";
 
-        function renderTransactions(data) {
-            const container = document.getElementById('txList');
-            container.innerHTML = '';
-
-            if (data.length === 0) {
-                container.innerHTML = `
+        if (data.length === 0) {
+          container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-search"></i>
                         <p>No transactions found matching your criteria.</p>
@@ -395,94 +662,104 @@
                         </div>
                     </div>
                 `;
-                return;
-            }
+          return;
+        }
 
-            data.forEach(t => {
-                const isPositive = ['deposit', 'earning', 'referral', 'bonus', 'gift'].includes(t.type);
-                const status = t.status || 'success';
-                const date = new Date(t.created_at);
-                
-                const card = document.createElement('div');
-                card.className = 'tx-card';
-                card.onclick = () => showDetails(t);
-                card.innerHTML = `
+        data.forEach((t) => {
+          const isPositive = [
+            "deposit",
+            "earning",
+            "referral",
+            "bonus",
+            "gift",
+          ].includes(t.type);
+          const status = t.status || "success";
+          const date = new Date(t.created_at);
+
+          const card = document.createElement("div");
+          card.className = "tx-card";
+          card.onclick = () => showDetails(t);
+          card.innerHTML = `
                     <div class="tx-main">
                         <h5>${t.description || t.type}</h5>
-                        <p>${date.toLocaleDateString()} • ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                        <p>${date.toLocaleDateString()} • ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
                     </div>
                     <div class="tx-end">
-                        <h4 style="color: ${isPositive ? 'var(--success)' : 'var(--danger)'}">
-                            ${isPositive ? '+' : '-'}₦${parseFloat(t.amount).toLocaleString()}
+                        <h4 style="color: ${isPositive ? "var(--success)" : "var(--danger)"}">
+                            ${isPositive ? "+" : "-"}₦${parseFloat(t.amount).toLocaleString()}
                         </h4>
                         <span class="status-pill ${status}">${status}</span>
                     </div>
                 `;
-                container.appendChild(card);
-            });
-        }
+          container.appendChild(card);
+        });
+      }
 
-        window.showDetails = (t) => {
-            const date = new Date(t.created_at);
-            const modalBody = document.getElementById('modalBody');
-            modalBody.innerHTML = `
+      window.showDetails = (t) => {
+        const date = new Date(t.created_at);
+        const modalBody = document.getElementById("modalBody");
+        modalBody.innerHTML = `
                 <div class="detail-row"><span>Transaction ID</span><b>${t.id}</b></div>
                 <div class="detail-row"><span>Type</span><b>${t.type.toUpperCase()}</b></div>
                 <div class="detail-row"><span>Amount</span><b style="color:var(--success)">₦${parseFloat(t.amount).toLocaleString()}</b></div>
                 <div class="detail-row"><span>Date & Time</span><b>${date.toLocaleString()}</b></div>
-                <div class="detail-row"><span>Status</span><b style="color:var(--success)">${(t.status || 'SUCCESS').toUpperCase()}</b></div>
-                <div class="detail-row"><span>Description</span><b>${t.description || 'N/A'}</b></div>
+                <div class="detail-row"><span>Status</span><b style="color:var(--success)">${(t.status || "SUCCESS").toUpperCase()}</b></div>
+                <div class="detail-row"><span>Description</span><b>${t.description || "N/A"}</b></div>
             `;
-            
-            document.getElementById('copyIdBtn').onclick = () => {
-                navigator.clipboard.writeText(t.id);
-                alert('ID Copied!');
-            };
-            
-            document.getElementById('txModal').style.display = 'flex';
+
+        document.getElementById("copyIdBtn").onclick = () => {
+          navigator.clipboard.writeText(t.id);
+          alert("ID Copied!");
         };
 
-        window.closeModal = () => document.getElementById('txModal').style.display = 'none';
+        document.getElementById("txModal").style.display = "flex";
+      };
 
-        window.exportCSV = () => {
-            let csv = 'Date,Type,Description,Amount,Status,ID\n';
-            filteredTransactions.forEach(t => {
-                csv += `${new Date(t.created_at).toLocaleString()},${t.type},${t.description || ''},${t.amount},${t.status || 'success'},${t.id}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `EASYPIE_Transactions_${new Date().getTime()}.csv`);
-            a.click();
-        };
+      window.closeModal = () =>
+        (document.getElementById("txModal").style.display = "none");
 
-        window.exportPDF = () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFontSize(18);
-            doc.text("EASYPIE - Transaction Statement", 14, 22);
-            doc.setFontSize(11);
-            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
-            
-            const rows = filteredTransactions.map(t => [
-                new Date(t.created_at).toLocaleDateString(),
-                t.type.toUpperCase(),
-                t.amount.toLocaleString(),
-                (t.status || 'SUCCESS').toUpperCase()
-            ]);
+      window.exportCSV = () => {
+        let csv = "Date,Type,Description,Amount,Status,ID\n";
+        filteredTransactions.forEach((t) => {
+          csv += `${new Date(t.created_at).toLocaleString()},${t.type},${t.description || ""},${t.amount},${t.status || "success"},${t.id}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.setAttribute("href", url);
+        a.setAttribute(
+          "download",
+          `EASYPIE_Transactions_${new Date().getTime()}.csv`,
+        );
+        a.click();
+      };
 
-            doc.autoTable({
-                startY: 40,
-                head: [['Date', 'Type', 'Amount (NGN)', 'Status']],
-                body: rows,
-            });
+      window.exportPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-            doc.save(`EASYPIE_Statement_${new Date().getTime()}.pdf`);
-        };
+        doc.setFontSize(18);
+        doc.text("EASYPIE - Transaction Statement", 14, 22);
+        doc.setFontSize(11);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
 
-        window.addEventListener('DOMContentLoaded', init);
+        const rows = filteredTransactions.map((t) => [
+          new Date(t.created_at).toLocaleDateString(),
+          t.type.toUpperCase(),
+          t.amount.toLocaleString(),
+          (t.status || "SUCCESS").toUpperCase(),
+        ]);
+
+        doc.autoTable({
+          startY: 40,
+          head: [["Date", "Type", "Amount (NGN)", "Status"]],
+          body: rows,
+        });
+
+        doc.save(`EASYPIE_Statement_${new Date().getTime()}.pdf`);
+      };
+
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

@@ -1,545 +1,1069 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Investment Plans | EASYPIE Admin</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #060b13;
-            --secondary-bg: #0a0f1a;
-            --sidebar-bg: #0d121f;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.4);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
-            --header-height: 60px;
+      :root {
+        --primary-bg: #060b13;
+        --secondary-bg: #0a0f1a;
+        --sidebar-bg: #0d121f;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.4);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --sidebar-width: 260px;
+        --header-height: 60px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        width: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      aside {
+        width: min(80vw, var(--sidebar-width));
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--glass-border);
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        height: 100dvh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
+      aside.active {
+        transform: translateX(0);
+      }
+
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .sidebar-backdrop.active {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .sidebar-header {
+        padding: 22px 20px;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--glass-border);
+      }
+      .sidebar-close {
+        font-size: 18px;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 6px;
+      }
+
+      .nav-item {
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.2s;
+        min-height: 48px;
+      }
+      .nav-item i {
+        width: 20px;
+        text-align: center;
+      }
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        border-left: 4px solid var(--accent-color);
+      }
+
+      main {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      header {
+        height: var(--header-height);
+        background: var(--secondary-bg);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 14px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .header-left h2 {
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #mobileMenuBtn {
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 8px;
+        flex-shrink: 0;
+      }
+
+      #adminProfile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      #adminName {
+        display: none;
+      }
+
+      .container {
+        padding: 16px;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .stat-card {
+        background: var(--card-bg);
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+      }
+      .stat-card p {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .stat-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        word-break: break-word;
+      }
+
+      .toolbar {
+        background: var(--card-bg);
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .search-box {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        padding: 12px 14px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .search-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .toolbar-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .filter-select {
+        flex: 1;
+        background: var(--secondary-bg);
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        font-size: 13px;
+        outline: none;
+      }
+
+      .btn-prime {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      .table-container {
+        background: var(--card-bg);
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+
+      table {
+        display: none;
+      }
+
+      .mobile-plan-list {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .plan-card {
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .plan-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .plan-name {
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .plan-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 3px;
+      }
+
+      .plan-card-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        font-size: 13px;
+      }
+      .plan-card-details .label {
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 2px;
+      }
+      .plan-card-details .rate {
+        color: var(--success);
+        font-weight: 700;
+      }
+
+      .plan-card-actions {
+        display: flex;
+        gap: 8px;
+        border-top: 1px solid var(--glass-border);
+        padding-top: 10px;
+      }
+      .btn-edit-plan,
+      .btn-delete-plan {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        min-height: 42px;
+      }
+      .btn-edit-plan {
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--accent-color);
+      }
+      .btn-delete-plan {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--danger);
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .status-active-plan {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+      .status-inactive-plan {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+      }
+
+      .action-icon {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 15px;
+        padding: 6px;
+        transition: 0.2s;
+      }
+      .action-icon:hover {
+        color: var(--accent-color);
+      }
+      .action-icon.danger:hover {
+        color: var(--danger);
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(10px);
+      }
+      .modal-content {
+        background: var(--sidebar-bg);
+        width: 100%;
+        max-width: 600px;
+        border-radius: 20px 20px 0 0;
+        border: 1px solid var(--glass-border);
+        max-height: 92vh;
+        overflow-y: auto;
+      }
+      .modal-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: var(--sidebar-bg);
+        z-index: 10;
+      }
+      .modal-body {
+        padding: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        letter-spacing: 0.02em;
+      }
+      .form-control {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: white;
+        outline: none;
+        font-size: 14px;
+        font-family: inherit;
+      }
+      textarea.form-control {
+        min-height: 80px;
+        resize: vertical;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 0;
+      }
+      .toggle-switch {
+        position: relative;
+        width: 46px;
+        height: 26px;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: rgba(255, 255, 255, 0.15);
+        transition: 0.2s;
+        border-radius: 26px;
+      }
+      .toggle-slider::before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.2s;
+        border-radius: 50%;
+      }
+      .toggle-switch input:checked + .toggle-slider {
+        background-color: var(--success);
+      }
+      .toggle-switch input:checked + .toggle-slider::before {
+        transform: translateX(20px);
+      }
+
+      .calc-preview {
+        background: rgba(59, 130, 246, 0.08);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+      }
+      .calc-preview-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      .calc-preview-row:last-child {
+        margin-bottom: 0;
+      }
+      .calc-preview-row span:first-child {
+        color: var(--text-muted);
+      }
+      .calc-preview-row span:last-child {
+        font-weight: 700;
+        color: var(--success);
+      }
+
+      .action-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--glass-border);
+      }
+      .btn-modal {
+        padding: 14px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        flex: 1;
+        min-height: 46px;
+      }
+      .btn-save {
+        background: var(--accent-color);
+        color: #fff;
+      }
+      .btn-cancel-flat {
+        background: #333;
+        color: white;
+      }
+
+      .overlay-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-bg);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+      .empty-state {
+        text-align: center;
+        padding: 24px;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
 
-        html, body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            width: 100%;
-            overflow-x: hidden;
-        }
-
-        body { min-height: 100vh; min-height: 100dvh; }
-
-        aside {
-            width: min(80vw, var(--sidebar-width));
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--glass-border);
-            position: fixed; top: 0; left: 0;
-            height: 100vh; height: 100dvh;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex; flex-direction: column;
-        }
-        aside.active { transform: translateX(0); }
-
-        .sidebar-backdrop {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .sidebar-backdrop.active { display: block; opacity: 1; pointer-events: auto; }
-
-        .sidebar-header {
-            padding: 22px 20px;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent-color);
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid var(--glass-border);
-        }
-        .sidebar-close { font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 6px; }
-
-        .nav-item {
-            padding: 14px 22px; display: flex; align-items: center; gap: 15px;
-            color: var(--text-muted); text-decoration: none; font-size: 14px; transition: 0.2s;
-            min-height: 48px;
-        }
-        .nav-item i { width: 20px; text-align: center; }
-        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); border-left: 4px solid var(--accent-color); }
-
-        main { width: 100%; min-height: 100vh; min-height: 100dvh; }
-
-        header {
-            height: var(--header-height);
-            background: var(--secondary-bg);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; padding: 0 14px;
-            position: sticky; top: 0; z-index: 900;
-        }
-        .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .header-left h2 { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #mobileMenuBtn { font-size: 20px; cursor: pointer; color: var(--text-muted); padding: 8px; flex-shrink: 0; }
-
-        #adminProfile { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        #adminName { display: none; }
-
-        .container { padding: 16px; max-width: 1600px; margin: 0 auto; }
-
+      @media (min-width: 480px) {
         .stats-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 10px; margin-bottom: 18px;
+          grid-template-columns: repeat(4, 1fr);
         }
-        .stat-card {
-            background: var(--card-bg); padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border);
-        }
-        .stat-card p { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
-        .stat-card h3 { font-size: 18px; font-weight: 700; word-break: break-word; }
+      }
 
+      @media (min-width: 640px) {
         .toolbar {
-            background: var(--card-bg); padding: 14px; border-radius: 14px;
-            border: 1px solid var(--glass-border); margin-bottom: 16px;
-            display: flex; flex-direction: column; gap: 10px;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
         }
         .search-box {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            padding: 12px 14px; border-radius: 10px; display: flex; align-items: center; gap: 10px;
+          flex: 1;
+          min-width: 220px;
+          width: auto;
         }
-        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-
-        .toolbar-row { display: flex; gap: 10px; }
-
+        .toolbar-row {
+          display: contents;
+        }
         .filter-select {
-            flex: 1;
-            background: var(--secondary-bg); color: white; padding: 12px; border-radius: 10px;
-            border: 1px solid var(--glass-border); font-size: 13px; outline: none;
+          flex: none;
+          width: auto;
         }
-
-        .btn-prime {
-            background: var(--accent-color); color: white; border: none; padding: 12px 16px;
-            border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; white-space: nowrap;
-        }
-
-        .table-container {
-            background: var(--card-bg); border-radius: 18px; border: 1px solid var(--glass-border);
-        }
-
-        table { display: none; }
-
-        .mobile-plan-list { display: flex; flex-direction: column; padding: 10px; gap: 10px; }
-
-        .plan-card {
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .plan-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .plan-name { font-weight: 700; font-size: 15px; }
-        .plan-desc { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-
-        .plan-card-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; }
-        .plan-card-details .label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; }
-        .plan-card-details .rate { color: var(--success); font-weight: 700; }
-
-        .plan-card-actions { display: flex; gap: 8px; border-top: 1px solid var(--glass-border); padding-top: 10px; }
-        .btn-edit-plan, .btn-delete-plan {
-            flex: 1; padding: 10px; border-radius: 8px; border: none;
-            font-weight: 600; font-size: 13px; cursor: pointer; min-height: 42px;
-        }
-        .btn-edit-plan { background: rgba(59,130,246,0.12); color: var(--accent-color); }
-        .btn-delete-plan { background: rgba(239,68,68,0.12); color: var(--danger); }
-
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
-        .status-active-plan { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .status-inactive-plan { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
-        .action-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 6px; transition: 0.2s; }
-        .action-icon:hover { color: var(--accent-color); }
-        .action-icon.danger:hover { color: var(--danger); }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; align-items: flex-end;
-            justify-content: center; z-index: 2000; backdrop-filter: blur(10px);
+          align-items: center;
+          padding: 20px;
         }
         .modal-content {
-            background: var(--sidebar-bg); width: 100%; max-width: 600px;
-            border-radius: 20px 20px 0 0;
-            border: 1px solid var(--glass-border);
-            max-height: 92vh; overflow-y: auto;
+          border-radius: 24px;
+          max-height: 90vh;
         }
-        .modal-header { padding: 18px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--sidebar-bg); z-index: 10; }
-        .modal-body { padding: 20px; }
-
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.02em; }
-        .form-control {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            padding: 12px 14px; border-radius: 10px; color: white; outline: none; font-size: 14px;
-            font-family: inherit;
+        .action-bar {
+          flex-direction: row;
         }
-        textarea.form-control { min-height: 80px; resize: vertical; }
-
-        .form-row { display: grid; grid-template-columns: 1fr; gap: 16px; }
-
-        .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
-        .toggle-switch { position: relative; width: 46px; height: 26px; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider {
-            position: absolute; cursor: pointer; inset: 0;
-            background-color: rgba(255,255,255,0.15);
-            transition: 0.2s; border-radius: 26px;
+        .form-row.two-col {
+          grid-template-columns: 1fr 1fr;
         }
-        .toggle-slider::before {
-            position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
-            background-color: white; transition: 0.2s; border-radius: 50%;
+      }
+
+      @media (min-width: 768px) {
+        table {
+          display: table;
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 700px;
         }
-        .toggle-switch input:checked + .toggle-slider { background-color: var(--success); }
-        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
-
-        .calc-preview {
-            background: rgba(59, 130, 246, 0.08);
-            border: 1px solid rgba(59, 130, 246, 0.25);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 16px;
-            font-size: 13px;
+        .mobile-plan-list {
+          display: none;
         }
-        .calc-preview-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .calc-preview-row:last-child { margin-bottom: 0; }
-        .calc-preview-row span:first-child { color: var(--text-muted); }
-        .calc-preview-row span:last-child { font-weight: 700; color: var(--success); }
-
-        .action-bar { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border); }
-        .btn-modal { padding: 14px; border-radius: 12px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; flex: 1; min-height: 46px; }
-        .btn-save { background: var(--accent-color); color: #fff; }
-        .btn-cancel-flat { background: #333; color: white; }
-
-        .overlay-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-bg); z-index: 3000; display: flex; align-items: center; justify-content: center; }
-        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .empty-state { text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; }
-
-        @media (min-width: 480px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+        .table-container {
+          overflow-x: auto;
         }
 
-        @media (min-width: 640px) {
-            .toolbar { flex-direction: row; flex-wrap: wrap; align-items: center; }
-            .search-box { flex: 1; min-width: 220px; width: auto; }
-            .toolbar-row { display: contents; }
-            .filter-select { flex: none; width: auto; }
-
-            .modal-overlay { align-items: center; padding: 20px; }
-            .modal-content { border-radius: 24px; max-height: 90vh; }
-            .action-bar { flex-direction: row; }
-            .form-row.two-col { grid-template-columns: 1fr 1fr; }
+        th {
+          text-align: left;
+          padding: 18px 15px;
+          color: var(--text-muted);
+          font-size: 11px;
+          text-transform: uppercase;
+          border-bottom: 1px solid var(--glass-border);
+          letter-spacing: 1px;
         }
-
-        @media (min-width: 768px) {
-            table { display: table; width: 100%; border-collapse: collapse; min-width: 700px; }
-            .mobile-plan-list { display: none; }
-            .table-container { overflow-x: auto; }
-
-            th { text-align: left; padding: 18px 15px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); letter-spacing: 1px; }
-            td { padding: 15px; font-size: 13px; border-bottom: 1px solid var(--glass-border); vertical-align: middle; }
+        td {
+          padding: 15px;
+          font-size: 13px;
+          border-bottom: 1px solid var(--glass-border);
+          vertical-align: middle;
         }
+      }
 
-        @media (min-width: 1024px) {
-            .sidebar-backdrop { display: none !important; }
-            aside { transform: none; width: var(--sidebar-width); }
-            main { margin-left: var(--sidebar-width); }
-            #mobileMenuBtn { display: none; }
-            #adminName { display: inline; font-size: 12px; font-weight: 600; }
-            .container { padding: 25px; }
-            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+      @media (min-width: 1024px) {
+        .sidebar-backdrop {
+          display: none !important;
         }
+        aside {
+          transform: none;
+          width: var(--sidebar-width);
+        }
+        main {
+          margin-left: var(--sidebar-width);
+        }
+        #mobileMenuBtn {
+          display: none;
+        }
+        #adminName {
+          display: inline;
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .container {
+          padding: 25px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="loader" class="overlay-loader">
-        <div class="spinner"></div>
+      <div class="spinner"></div>
     </div>
 
-    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+    <div
+      class="sidebar-backdrop"
+      id="sidebarBackdrop"
+      onclick="closeSidebar()"
+    ></div>
 
     <!-- Sidebar -->
     <aside id="sidebar">
-        <div class="sidebar-header">
-            EASYPIE ADMIN
-            <i class="fas fa-times sidebar-close" onclick="closeSidebar()"></i>
-        </div>
-        <nav style="flex:1; overflow-y:auto;">
-            <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
-            <a href="deposits.html" class="nav-item"><i class="fas fa-arrow-down"></i> Deposits</a>
-            <a href="withdrawals.html" class="nav-item"><i class="fas fa-arrow-up"></i> Withdrawals</a>
-            <a href="investments.html" class="nav-item"><i class="fas fa-rocket"></i> Investments</a>
-            <a href="plans.html" class="nav-item active"><i class="fas fa-layer-group"></i> Investment Plans</a>
-            <a href="giftcodes.html" class="nav-item"><i class="fas fa-gift"></i> Gift Codes</a>
-            <a href="support.html" class="nav-item"><i class="fas fa-headset"></i> Support Tickets</a>
-            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
-        </nav>
-        <a href="#" onclick="adminLogout()" class="nav-item" style="color: var(--danger); border-top: 1px solid var(--glass-border);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <div class="sidebar-header">
+        EASYPIE ADMIN
+        <i class="fas fa-times sidebar-close" onclick="closeSidebar()"></i>
+      </div>
+      <nav style="flex: 1; overflow-y: auto">
+        <a href="index.html" class="nav-item"
+          ><i class="fas fa-th-large"></i> Dashboard</a
+        >
+        <a href="users.html" class="nav-item"
+          ><i class="fas fa-users"></i> Users</a
+        >
+        <a href="deposits.html" class="nav-item"
+          ><i class="fas fa-arrow-down"></i> Deposits</a
+        >
+        <a href="withdrawals.html" class="nav-item"
+          ><i class="fas fa-arrow-up"></i> Withdrawals</a
+        >
+        <a href="investments.html" class="nav-item"
+          ><i class="fas fa-rocket"></i> Investments</a
+        >
+        <a href="plans.html" class="nav-item active"
+          ><i class="fas fa-layer-group"></i> Investment Plans</a
+        >
+        <a href="giftcodes.html" class="nav-item"
+          ><i class="fas fa-gift"></i> Gift Codes</a
+        >
+        <a href="support.html" class="nav-item"
+          ><i class="fas fa-headset"></i> Support Tickets</a
+        >
+        <a href="settings.html" class="nav-item"
+          ><i class="fas fa-cog"></i> Settings</a
+        >
+      </nav>
+      <a
+        href="#"
+        onclick="adminLogout()"
+        class="nav-item"
+        style="color: var(--danger); border-top: 1px solid var(--glass-border)"
+        ><i class="fas fa-sign-out-alt"></i> Logout</a
+      >
     </aside>
 
     <main>
-        <header>
-            <div class="header-left">
-                <i class="fas fa-bars" id="mobileMenuBtn"></i>
-                <h2>Investment Plans</h2>
-            </div>
-            <div id="adminProfile">
-                <span id="adminName">Admin</span>
-                <div style="width:30px; height:30px; border-radius:50%; background:var(--accent-color);"></div>
-            </div>
-        </header>
-
-        <div class="container">
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card"><p>Total Plans</p><h3 id="statTotal">0</h3></div>
-                <div class="stat-card"><p>Active</p><h3 id="statActive" style="color: var(--success);">0</h3></div>
-                <div class="stat-card"><p>Inactive</p><h3 id="statInactive" style="color: var(--danger);">0</h3></div>
-                <div class="stat-card"><p>Avg. Daily Rate</p><h3 id="statAvgRate">0%</h3></div>
-            </div>
-
-            <!-- Toolbar -->
-            <div class="toolbar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="planSearch" placeholder="Search plan name...">
-                </div>
-                <div class="toolbar-row">
-                    <select class="filter-select" id="statusFilter">
-                        <option value="all">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <button class="btn-prime" onclick="openCreateModal()"><i class="fas fa-plus"></i> New Plan</button>
-                </div>
-            </div>
-
-            <!-- List / Table -->
-            <div class="table-container">
-                <!-- Mobile: stacked cards -->
-                <div class="mobile-plan-list" id="planCardList"></div>
-
-                <!-- >=768px: real table -->
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Plan Name</th>
-                            <th>Amount Range</th>
-                            <th>Daily Profit</th>
-                            <th>Duration</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="planTableBody">
-                        <!-- Dynamic Content -->
-                    </tbody>
-                </table>
-            </div>
+      <header>
+        <div class="header-left">
+          <i class="fas fa-bars" id="mobileMenuBtn"></i>
+          <h2>Investment Plans</h2>
         </div>
+        <div id="adminProfile">
+          <span id="adminName">Admin</span>
+          <div
+            style="
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              background: var(--accent-color);
+            "
+          ></div>
+        </div>
+      </header>
+
+      <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p>Total Plans</p>
+            <h3 id="statTotal">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Active</p>
+            <h3 id="statActive" style="color: var(--success)">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Inactive</p>
+            <h3 id="statInactive" style="color: var(--danger)">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Avg. Daily Rate</p>
+            <h3 id="statAvgRate">0%</h3>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="planSearch"
+              placeholder="Search plan name..."
+            />
+          </div>
+          <div class="toolbar-row">
+            <select class="filter-select" id="statusFilter">
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <button class="btn-prime" onclick="openCreateModal()">
+              <i class="fas fa-plus"></i> New Plan
+            </button>
+          </div>
+        </div>
+
+        <!-- List / Table -->
+        <div class="table-container">
+          <!-- Mobile: stacked cards -->
+          <div class="mobile-plan-list" id="planCardList"></div>
+
+          <!-- >=768px: real table -->
+          <table>
+            <thead>
+              <tr>
+                <th>Plan Name</th>
+                <th>Amount Range</th>
+                <th>Daily Profit</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="planTableBody">
+              <!-- Dynamic Content -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </main>
 
     <!-- Create / Edit Plan Modal -->
     <div class="modal-overlay" id="planModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="planModalTitle">New Investment Plan</h3>
-                <i class="fas fa-times" onclick="closePlanModal()" style="cursor:pointer; padding:6px;"></i>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="planId">
-
-                <div class="form-group">
-                    <label>Plan Name</label>
-                    <input type="text" class="form-control" id="planName" placeholder="e.g. Gold Plan">
-                </div>
-
-                <div class="form-row two-col">
-                    <div class="form-group">
-                        <label>Minimum Amount (₦)</label>
-                        <input type="number" class="form-control" id="planMinAmount" placeholder="5000">
-                    </div>
-                    <div class="form-group">
-                        <label>Maximum Amount (₦)</label>
-                        <input type="number" class="form-control" id="planMaxAmount" placeholder="500000">
-                    </div>
-                </div>
-
-                <div class="form-row two-col">
-                    <div class="form-group">
-                        <label>Rate Multiplier (Amount \u00d7 this = Total Income)</label>
-                        <input type="number" step="0.0001" class="form-control" id="planMultiplier" placeholder="e.g. 3">
-                    </div>
-                    <div class="form-group">
-                        <label>Duration (Days)</label>
-                        <input type="number" class="form-control" id="planDuration" placeholder="30">
-                    </div>
-                </div>
-
-                <!-- Live-calculated preview: updates automatically as the fields above are filled in -->
-                <div class="calc-preview" id="calcPreview" style="display:none;">
-                    <div class="calc-preview-row"><span>Total Income over duration</span><span id="previewTotal">₦0</span></div>
-                    <div class="calc-preview-row"><span>Daily Profit</span><span id="previewDaily">₦0</span></div>
-                    <div class="calc-preview-row"><span>Equivalent Daily Rate</span><span id="previewRate">0%</span></div>
-                </div>
-
-                <div class="form-group">
-                    <div class="toggle-row">
-                        <label style="margin-bottom:0;">Plan Active</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="planActive" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="action-bar">
-                    <button class="btn-modal btn-save" onclick="savePlan()">Save Plan</button>
-                    <button class="btn-modal btn-cancel-flat" onclick="closePlanModal()">Cancel</button>
-                </div>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="planModalTitle">New Investment Plan</h3>
+          <i
+            class="fas fa-times"
+            onclick="closePlanModal()"
+            style="cursor: pointer; padding: 6px"
+          ></i>
         </div>
+        <div class="modal-body">
+          <input type="hidden" id="planId" />
+
+          <div class="form-group">
+            <label>Plan Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="planName"
+              placeholder="e.g. Gold Plan"
+            />
+          </div>
+
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label>Minimum Amount (₦)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="planMinAmount"
+                placeholder="5000"
+              />
+            </div>
+            <div class="form-group">
+              <label>Maximum Amount (₦)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="planMaxAmount"
+                placeholder="500000"
+              />
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label>Rate Multiplier (Amount \u00d7 this = Total Income)</label>
+              <input
+                type="number"
+                step="0.0001"
+                class="form-control"
+                id="planMultiplier"
+                placeholder="e.g. 3"
+              />
+            </div>
+            <div class="form-group">
+              <label>Duration (Days)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="planDuration"
+                placeholder="30"
+              />
+            </div>
+          </div>
+
+          <!-- Live-calculated preview: updates automatically as the fields above are filled in -->
+          <div class="calc-preview" id="calcPreview" style="display: none">
+            <div class="calc-preview-row">
+              <span>Total Income over duration</span
+              ><span id="previewTotal">₦0</span>
+            </div>
+            <div class="calc-preview-row">
+              <span>Daily Profit</span><span id="previewDaily">₦0</span>
+            </div>
+            <div class="calc-preview-row">
+              <span>Equivalent Daily Rate</span><span id="previewRate">0%</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="toggle-row">
+              <label style="margin-bottom: 0">Plan Active</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="planActive" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button class="btn-modal btn-save" onclick="savePlan()">
+              Save Plan
+            </button>
+            <button
+              class="btn-modal btn-cancel-flat"
+              onclick="closePlanModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        // Matches the 'investment_plans' table columns:
-        // id, name, min_amount, max_amount, daily_profit_percent, duration_days, is_available, created_at
-        //
-        // The admin form below collects a "Rate Multiplier" that is applied ONLY
-        // to the investment amount to produce the plan's TOTAL income over its
-        // full duration (Total Income = Amount x Multiplier). Daily Profit is then
-        // derived automatically by spreading that total evenly across the
-        // duration (Daily Profit = Total Income / Duration). That daily figure is
-        // what gets converted to daily_profit_percent before saving — the
-        // database schema and the rest of the app (investment calculations on the
-        // user-facing plans page, etc.) are unaffected and keep working exactly
-        // as before.
+      // Matches the 'investment_plans' table columns:
+      // id, name, min_amount, max_amount, daily_profit_percent, duration_days, is_available, created_at
+      //
+      // The admin form below collects a "Rate Multiplier" that is applied ONLY
+      // to the investment amount to produce the plan's TOTAL income over its
+      // full duration (Total Income = Amount x Multiplier). Daily Profit is then
+      // derived automatically by spreading that total evenly across the
+      // duration (Daily Profit = Total Income / Duration). That daily figure is
+      // what gets converted to daily_profit_percent before saving — the
+      // database schema and the rest of the app (investment calculations on the
+      // user-facing plans page, etc.) are unaffected and keep working exactly
+      // as before.
 
-        let plansData = [];
-        let filteredPlans = [];
-        let currentAdmin = null;
+      let plansData = [];
+      let filteredPlans = [];
+      let currentAdmin = null;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-            if (!profile?.is_admin) { window.location.href = '../login.html'; return; }
-
-            currentAdmin = profile;
-            document.getElementById('adminName').innerText = profile.full_name;
-            document.getElementById('loader').style.display = 'none';
-
-            await fetchPlans();
-            setupEventListeners();
-            setupRealtime();
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
         }
 
-        async function fetchPlans() {
-            const { data, error } = await supabase
-                .from('investment_plans')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (data) {
-                plansData = data;
-                applyFilters();
-                updateStats();
-            } else if (error) {
-                console.error('Failed to load investment plans:', error.message);
-            }
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        if (!profile?.is_admin) {
+          window.location.href = "../login.html";
+          return;
         }
 
-        // What ₦ figure a plan pays daily at its own minimum investment — used
-        // both for the table/card display and matches minAmount x (daily_profit_percent / 100).
-        function dailyProfitNairaAtMin(plan) {
-            const min = parseFloat(plan.min_amount || 0);
-            const rate = parseFloat(plan.daily_profit_percent || 0);
-            return (min * rate) / 100;
+        currentAdmin = profile;
+        document.getElementById("adminName").innerText = profile.full_name;
+        document.getElementById("loader").style.display = "none";
+
+        await fetchPlans();
+        setupEventListeners();
+        setupRealtime();
+      }
+
+      async function fetchPlans() {
+        const { data, error } = await supabase
+          .from("investment_plans")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (data) {
+          plansData = data;
+          applyFilters();
+          updateStats();
+        } else if (error) {
+          console.error("Failed to load investment plans:", error.message);
+        }
+      }
+
+      // What ₦ figure a plan pays daily at its own minimum investment — used
+      // both for the table/card display and matches minAmount x (daily_profit_percent / 100).
+      function dailyProfitNairaAtMin(plan) {
+        const min = parseFloat(plan.min_amount || 0);
+        const rate = parseFloat(plan.daily_profit_percent || 0);
+        return (min * rate) / 100;
+      }
+
+      function updateStats() {
+        const active = plansData.filter((p) => p.is_available);
+        document.getElementById("statTotal").innerText = plansData.length;
+        document.getElementById("statActive").innerText = active.length;
+        document.getElementById("statInactive").innerText =
+          plansData.length - active.length;
+
+        const avgRate =
+          plansData.length > 0
+            ? plansData.reduce(
+                (s, p) => s + parseFloat(p.daily_profit_percent || 0),
+                0,
+              ) / plansData.length
+            : 0;
+        document.getElementById("statAvgRate").innerText =
+          `${avgRate.toFixed(2)}%`;
+      }
+
+      function applyFilters() {
+        const query = document.getElementById("planSearch").value.toLowerCase();
+        const status = document.getElementById("statusFilter").value;
+
+        filteredPlans = plansData.filter((p) => {
+          const matchSearch = p.name.toLowerCase().includes(query);
+          const matchStatus =
+            status === "all" ||
+            (status === "active" ? p.is_available : !p.is_available);
+          return matchSearch && matchStatus;
+        });
+        renderTable();
+      }
+
+      function renderTable() {
+        const tableBody = document.getElementById("planTableBody");
+        const cardList = document.getElementById("planCardList");
+        tableBody.innerHTML = "";
+        cardList.innerHTML = "";
+
+        if (filteredPlans.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No investment plans found.</td></tr>';
+          cardList.innerHTML =
+            '<div class="empty-state">No investment plans found. Tap "New Plan" to create one.</div>';
+          return;
         }
 
-        function updateStats() {
-            const active = plansData.filter(p => p.is_available);
-            document.getElementById('statTotal').innerText = plansData.length;
-            document.getElementById('statActive').innerText = active.length;
-            document.getElementById('statInactive').innerText = plansData.length - active.length;
+        filteredPlans.forEach((p) => {
+          const statusClass = p.is_available
+            ? "status-active-plan"
+            : "status-inactive-plan";
+          const statusLabel = p.is_available ? "Active" : "Inactive";
+          const minAmt = parseFloat(p.min_amount || 0).toLocaleString();
+          const maxAmt = parseFloat(p.max_amount || 0).toLocaleString();
+          const dailyNaira = dailyProfitNairaAtMin(p).toLocaleString();
 
-            const avgRate = plansData.length > 0
-                ? plansData.reduce((s, p) => s + parseFloat(p.daily_profit_percent || 0), 0) / plansData.length
-                : 0;
-            document.getElementById('statAvgRate').innerText = `${avgRate.toFixed(2)}%`;
-        }
-
-        function applyFilters() {
-            const query = document.getElementById('planSearch').value.toLowerCase();
-            const status = document.getElementById('statusFilter').value;
-
-            filteredPlans = plansData.filter(p => {
-                const matchSearch = p.name.toLowerCase().includes(query);
-                const matchStatus = status === 'all' ||
-                    (status === 'active' ? p.is_available : !p.is_available);
-                return matchSearch && matchStatus;
-            });
-            renderTable();
-        }
-
-        function renderTable() {
-            const tableBody = document.getElementById('planTableBody');
-            const cardList = document.getElementById('planCardList');
-            tableBody.innerHTML = '';
-            cardList.innerHTML = '';
-
-            if (filteredPlans.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No investment plans found.</td></tr>';
-                cardList.innerHTML = '<div class="empty-state">No investment plans found. Tap "New Plan" to create one.</div>';
-                return;
-            }
-
-            filteredPlans.forEach(p => {
-                const statusClass = p.is_available ? 'status-active-plan' : 'status-inactive-plan';
-                const statusLabel = p.is_available ? 'Active' : 'Inactive';
-                const minAmt = parseFloat(p.min_amount || 0).toLocaleString();
-                const maxAmt = parseFloat(p.max_amount || 0).toLocaleString();
-                const dailyNaira = dailyProfitNairaAtMin(p).toLocaleString();
-
-                // Desktop table row
-                const row = document.createElement('tr');
-                row.innerHTML = `
+          // Desktop table row
+          const row = document.createElement("tr");
+          row.innerHTML = `
                     <td>
                         <p style="font-weight:700">${p.name}</p>
                     </td>
@@ -552,12 +1076,12 @@
                         <button class="action-icon danger" onclick="deletePlan('${p.id}')" title="Delete"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
-                tableBody.appendChild(row);
+          tableBody.appendChild(row);
 
-                // Mobile stacked card
-                const card = document.createElement('div');
-                card.className = 'plan-card';
-                card.innerHTML = `
+          // Mobile stacked card
+          const card = document.createElement("div");
+          card.className = "plan-card";
+          card.innerHTML = `
                     <div class="plan-card-top">
                         <div>
                             <div class="plan-name">${p.name}</div>
@@ -568,200 +1092,281 @@
                         <div><span class="label">Amount Range</span>₦${minAmt} - ₦${maxAmt}</div>
                         <div><span class="label">Daily Profit</span><span class="rate">₦${dailyNaira}</span></div>
                         <div><span class="label">Duration</span>${p.duration_days} days</div>
-                        <div><span class="label">Plan ID</span>${p.id.toString().slice(0,8)}</div>
+                        <div><span class="label">Plan ID</span>${p.id.toString().slice(0, 8)}</div>
                     </div>
                     <div class="plan-card-actions">
                         <button class="btn-edit-plan" onclick="openEditModal('${p.id}')"><i class="fas fa-pen"></i> Edit</button>
                         <button class="btn-delete-plan" onclick="deletePlan('${p.id}')"><i class="fas fa-trash"></i> Delete</button>
                     </div>
                 `;
-                cardList.appendChild(card);
-            });
+          cardList.appendChild(card);
+        });
+      }
+
+      // Recomputes Total Income, Daily Profit, and the equivalent daily %, live
+      // as the admin fills in Min Amount / Multiplier / Duration.
+      // Total Income = Min Amount x Multiplier (multiplier only ever touches the
+      // investment amount). Daily Profit = Total Income / Duration (auto-derived).
+      function updateCalcPreview() {
+        const minAmount = parseFloat(
+          document.getElementById("planMinAmount").value,
+        );
+        const multiplier = parseFloat(
+          document.getElementById("planMultiplier").value,
+        );
+        const duration = parseInt(
+          document.getElementById("planDuration").value,
+          10,
+        );
+
+        const preview = document.getElementById("calcPreview");
+
+        if (
+          !minAmount ||
+          minAmount <= 0 ||
+          isNaN(multiplier) ||
+          multiplier <= 0
+        ) {
+          preview.style.display = "none";
+          return;
         }
 
-        // Recomputes Total Income, Daily Profit, and the equivalent daily %, live
-        // as the admin fills in Min Amount / Multiplier / Duration.
-        // Total Income = Min Amount x Multiplier (multiplier only ever touches the
-        // investment amount). Daily Profit = Total Income / Duration (auto-derived).
-        function updateCalcPreview() {
-            const minAmount = parseFloat(document.getElementById('planMinAmount').value);
-            const multiplier = parseFloat(document.getElementById('planMultiplier').value);
-            const duration = parseInt(document.getElementById('planDuration').value, 10);
+        // Multiplier only multiplies the investment amount.
+        const totalIncome = minAmount * multiplier;
+        document.getElementById("previewTotal").innerText =
+          `₦${totalIncome.toLocaleString()}`;
 
-            const preview = document.getElementById('calcPreview');
+        if (duration && duration > 0) {
+          const dailyProfit = totalIncome / duration;
+          const ratePercent = (dailyProfit / minAmount) * 100;
 
-            if (!minAmount || minAmount <= 0 || isNaN(multiplier) || multiplier <= 0) {
-                preview.style.display = 'none';
-                return;
-            }
-
-            // Multiplier only multiplies the investment amount.
-            const totalIncome = minAmount * multiplier;
-            document.getElementById('previewTotal').innerText = `₦${totalIncome.toLocaleString()}`;
-
-            if (duration && duration > 0) {
-                const dailyProfit = totalIncome / duration;
-                const ratePercent = (dailyProfit / minAmount) * 100;
-
-                document.getElementById('previewDaily').innerText = `₦${dailyProfit.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-                document.getElementById('previewRate').innerText = `${ratePercent.toFixed(2)}%`;
-            } else {
-                document.getElementById('previewDaily').innerText = 'Enter duration to calculate';
-                document.getElementById('previewRate').innerText = '—';
-            }
-
-            preview.style.display = 'block';
+          document.getElementById("previewDaily").innerText =
+            `₦${dailyProfit.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+          document.getElementById("previewRate").innerText =
+            `${ratePercent.toFixed(2)}%`;
+        } else {
+          document.getElementById("previewDaily").innerText =
+            "Enter duration to calculate";
+          document.getElementById("previewRate").innerText = "—";
         }
 
-        window.openCreateModal = () => {
-            document.getElementById('planModalTitle').innerText = 'New Investment Plan';
-            document.getElementById('planId').value = '';
-            document.getElementById('planName').value = '';
-            document.getElementById('planMinAmount').value = '';
-            document.getElementById('planMaxAmount').value = '';
-            document.getElementById('planMultiplier').value = '';
-            document.getElementById('planDuration').value = '';
-            document.getElementById('planActive').checked = true;
-            document.getElementById('calcPreview').style.display = 'none';
-            document.getElementById('planModal').style.display = 'flex';
-        };
+        preview.style.display = "block";
+      }
 
-        window.openEditModal = (id) => {
-            const p = plansData.find(x => x.id === id);
-            if (!p) return;
+      window.openCreateModal = () => {
+        document.getElementById("planModalTitle").innerText =
+          "New Investment Plan";
+        document.getElementById("planId").value = "";
+        document.getElementById("planName").value = "";
+        document.getElementById("planMinAmount").value = "";
+        document.getElementById("planMaxAmount").value = "";
+        document.getElementById("planMultiplier").value = "";
+        document.getElementById("planDuration").value = "";
+        document.getElementById("planActive").checked = true;
+        document.getElementById("calcPreview").style.display = "none";
+        document.getElementById("planModal").style.display = "flex";
+      };
 
-            document.getElementById('planModalTitle').innerText = 'Edit Investment Plan';
-            document.getElementById('planId').value = p.id;
-            document.getElementById('planName').value = p.name || '';
-            document.getElementById('planMinAmount').value = p.min_amount || '';
-            document.getElementById('planMaxAmount').value = p.max_amount || '';
-            // Convert the stored daily percentage back into a total-income
-            // multiplier for editing, matching what the admin originally typed:
-            // multiplier = (daily_profit_percent / 100) x duration_days.
-            document.getElementById('planMultiplier').value = (p.daily_profit_percent && p.duration_days)
-                ? (((parseFloat(p.daily_profit_percent) / 100)) * p.duration_days).toString()
-                : '';
-            document.getElementById('planDuration').value = p.duration_days || '';
-            document.getElementById('planActive').checked = !!p.is_available;
-            updateCalcPreview();
-            document.getElementById('planModal').style.display = 'flex';
-        };
+      window.openEditModal = (id) => {
+        const p = plansData.find((x) => x.id === id);
+        if (!p) return;
 
-        window.closePlanModal = () => {
-            document.getElementById('planModal').style.display = 'none';
-        };
+        document.getElementById("planModalTitle").innerText =
+          "Edit Investment Plan";
+        document.getElementById("planId").value = p.id;
+        document.getElementById("planName").value = p.name || "";
+        document.getElementById("planMinAmount").value = p.min_amount || "";
+        document.getElementById("planMaxAmount").value = p.max_amount || "";
+        // Convert the stored daily percentage back into a total-income
+        // multiplier for editing, matching what the admin originally typed:
+        // multiplier = (daily_profit_percent / 100) x duration_days.
+        document.getElementById("planMultiplier").value =
+          p.daily_profit_percent && p.duration_days
+            ? (
+                (parseFloat(p.daily_profit_percent) / 100) *
+                p.duration_days
+              ).toString()
+            : "";
+        document.getElementById("planDuration").value = p.duration_days || "";
+        document.getElementById("planActive").checked = !!p.is_available;
+        updateCalcPreview();
+        document.getElementById("planModal").style.display = "flex";
+      };
 
-        window.savePlan = async () => {
-            const id = document.getElementById('planId').value;
-            const name = document.getElementById('planName').value.trim();
-            const minAmount = parseFloat(document.getElementById('planMinAmount').value);
-            const maxAmount = parseFloat(document.getElementById('planMaxAmount').value);
-            const multiplier = parseFloat(document.getElementById('planMultiplier').value);
-            const duration = parseInt(document.getElementById('planDuration').value, 10);
-            const isActive = document.getElementById('planActive').checked;
+      window.closePlanModal = () => {
+        document.getElementById("planModal").style.display = "none";
+      };
 
-            if (!name) { alert('Plan name is required.'); return; }
-            if (isNaN(minAmount) || isNaN(maxAmount) || minAmount < 0 || maxAmount <= minAmount) {
-                alert('Please enter a valid amount range (max must be greater than min).');
-                return;
-            }
-            if (isNaN(multiplier) || multiplier <= 0) { alert('Please enter a valid rate multiplier.'); return; }
-            if (isNaN(duration) || duration <= 0) { alert('Please enter a valid duration in days.'); return; }
+      window.savePlan = async () => {
+        const id = document.getElementById("planId").value;
+        const name = document.getElementById("planName").value.trim();
+        const minAmount = parseFloat(
+          document.getElementById("planMinAmount").value,
+        );
+        const maxAmount = parseFloat(
+          document.getElementById("planMaxAmount").value,
+        );
+        const multiplier = parseFloat(
+          document.getElementById("planMultiplier").value,
+        );
+        const duration = parseInt(
+          document.getElementById("planDuration").value,
+          10,
+        );
+        const isActive = document.getElementById("planActive").checked;
 
-            // Multiplier only multiplies the amount to get the plan's total
-            // income; daily profit (and the % the rest of the app runs on) is
-            // derived by spreading that total across the duration.
-            const totalIncome = minAmount * multiplier;
-            const dailyProfit = totalIncome / duration;
-            const dailyRatePercent = (dailyProfit / minAmount) * 100;
-
-            const payload = {
-                name,
-                min_amount: minAmount,
-                max_amount: maxAmount,
-                daily_profit_percent: dailyRatePercent,
-                duration_days: duration,
-                is_available: isActive
-            };
-
-            try {
-                if (id) {
-                    // Update existing plan
-                    const { error } = await supabase.from('investment_plans').update(payload).eq('id', id);
-                    if (error) throw error;
-
-                    await supabase.from('admin_logs').insert([{
-                        admin_id: currentAdmin.id,
-                        action: `Updated Investment Plan "${name}"`,
-                        target_id: id
-                    }]);
-                } else {
-                    // Create new plan
-                    const { data: created, error } = await supabase.from('investment_plans').insert([payload]).select().single();
-                    if (error) throw error;
-
-                    await supabase.from('admin_logs').insert([{
-                        admin_id: currentAdmin.id,
-                        action: `Created Investment Plan "${name}"`,
-                        target_id: created?.id
-                    }]);
-                }
-
-                closePlanModal();
-                fetchPlans();
-            } catch (err) {
-                alert('Could not save plan: ' + err.message);
-            }
-        };
-
-        window.deletePlan = async (id) => {
-            const p = plansData.find(x => x.id === id);
-            if (!confirm(`Delete the plan "${p?.name || 'this plan'}"? This cannot be undone. Existing user investments already on this plan are not affected.`)) return;
-
-            try {
-                const { error } = await supabase.from('investment_plans').delete().eq('id', id);
-                if (error) throw error;
-
-                await supabase.from('admin_logs').insert([{
-                    admin_id: currentAdmin.id,
-                    action: `Deleted Investment Plan "${p?.name || id}"`,
-                    target_id: id
-                }]);
-
-                fetchPlans();
-            } catch (err) {
-                alert('Could not delete plan: ' + err.message);
-            }
-        };
-
-        function setupEventListeners() {
-            document.getElementById('planSearch').addEventListener('input', applyFilters);
-            document.getElementById('statusFilter').addEventListener('change', applyFilters);
-            document.getElementById('mobileMenuBtn').onclick = () => {
-                document.getElementById('sidebar').classList.add('active');
-                document.getElementById('sidebarBackdrop').classList.add('active');
-            };
-
-            ['planMinAmount', 'planMultiplier', 'planDuration'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateCalcPreview);
-            });
+        if (!name) {
+          alert("Plan name is required.");
+          return;
+        }
+        if (
+          isNaN(minAmount) ||
+          isNaN(maxAmount) ||
+          minAmount < 0 ||
+          maxAmount <= minAmount
+        ) {
+          alert(
+            "Please enter a valid amount range (max must be greater than min).",
+          );
+          return;
+        }
+        if (isNaN(multiplier) || multiplier <= 0) {
+          alert("Please enter a valid rate multiplier.");
+          return;
+        }
+        if (isNaN(duration) || duration <= 0) {
+          alert("Please enter a valid duration in days.");
+          return;
         }
 
-        window.closeSidebar = () => {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('sidebarBackdrop').classList.remove('active');
+        // Multiplier only multiplies the amount to get the plan's total
+        // income; daily profit (and the % the rest of the app runs on) is
+        // derived by spreading that total across the duration.
+        const totalIncome = minAmount * multiplier;
+        const dailyProfit = totalIncome / duration;
+        const dailyRatePercent = (dailyProfit / minAmount) * 100;
+
+        const payload = {
+          name,
+          min_amount: minAmount,
+          max_amount: maxAmount,
+          daily_profit_percent: dailyRatePercent,
+          duration_days: duration,
+          is_available: isActive,
         };
 
-        function setupRealtime() {
-            supabase.channel('plans-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'investment_plans' }, fetchPlans).subscribe();
+        try {
+          if (id) {
+            // Update existing plan
+            const { error } = await supabase
+              .from("investment_plans")
+              .update(payload)
+              .eq("id", id);
+            if (error) throw error;
+
+            await supabase.from("admin_logs").insert([
+              {
+                admin_id: currentAdmin.id,
+                action: `Updated Investment Plan "${name}"`,
+                target_id: id,
+              },
+            ]);
+          } else {
+            // Create new plan
+            const { data: created, error } = await supabase
+              .from("investment_plans")
+              .insert([payload])
+              .select()
+              .single();
+            if (error) throw error;
+
+            await supabase.from("admin_logs").insert([
+              {
+                admin_id: currentAdmin.id,
+                action: `Created Investment Plan "${name}"`,
+                target_id: created?.id,
+              },
+            ]);
+          }
+
+          closePlanModal();
+          fetchPlans();
+        } catch (err) {
+          alert("Could not save plan: " + err.message);
         }
+      };
 
-        window.adminLogout = async () => {
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+      window.deletePlan = async (id) => {
+        const p = plansData.find((x) => x.id === id);
+        if (
+          !confirm(
+            `Delete the plan "${p?.name || "this plan"}"? This cannot be undone. Existing user investments already on this plan are not affected.`,
+          )
+        )
+          return;
+
+        try {
+          const { error } = await supabase
+            .from("investment_plans")
+            .delete()
+            .eq("id", id);
+          if (error) throw error;
+
+          await supabase.from("admin_logs").insert([
+            {
+              admin_id: currentAdmin.id,
+              action: `Deleted Investment Plan "${p?.name || id}"`,
+              target_id: id,
+            },
+          ]);
+
+          fetchPlans();
+        } catch (err) {
+          alert("Could not delete plan: " + err.message);
+        }
+      };
+
+      function setupEventListeners() {
+        document
+          .getElementById("planSearch")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("statusFilter")
+          .addEventListener("change", applyFilters);
+        document.getElementById("mobileMenuBtn").onclick = () => {
+          document.getElementById("sidebar").classList.add("active");
+          document.getElementById("sidebarBackdrop").classList.add("active");
         };
 
-        window.addEventListener('DOMContentLoaded', init);
+        ["planMinAmount", "planMultiplier", "planDuration"].forEach((id) => {
+          document
+            .getElementById(id)
+            .addEventListener("input", updateCalcPreview);
+        });
+      }
+
+      window.closeSidebar = () => {
+        document.getElementById("sidebar").classList.remove("active");
+        document.getElementById("sidebarBackdrop").classList.remove("active");
+      };
+
+      function setupRealtime() {
+        supabase
+          .channel("plans-changes")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "investment_plans" },
+            fetchPlans,
+          )
+          .subscribe();
+      }
+
+      window.adminLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      };
+
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>
