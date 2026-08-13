@@ -1,416 +1,739 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>My Profile | EASYPIE</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #0a0e17;
-            --secondary-bg: #111827;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.6);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --nav-height: 70px;
-        }
+      :root {
+        --primary-bg: #0a0e17;
+        --secondary-bg: #111827;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.6);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --nav-height: 70px;
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            padding-bottom: calc(var(--nav-height) + 30px);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        padding-bottom: calc(var(--nav-height) + 30px);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
 
-        .container { width: 92%; max-width: 600px; margin: 0 auto; }
+      .container {
+        width: 92%;
+        max-width: 600px;
+        margin: 0 auto;
+      }
 
-        /* --- Header --- */
-        header {
-            padding: 20px 0;
-            position: sticky; top: 0;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-        }
+      /* --- Header --- */
+      header {
+        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        background: rgba(10, 14, 23, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 100;
+        border-bottom: 1px solid var(--glass-border);
+      }
 
-        .header-flex { display: flex; justify-content: space-between; align-items: center; }
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .back-btn {
-            color: white; text-decoration: none; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
+      .back-btn {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-        /* --- Profile Header Card --- */
-        .profile-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            padding: 30px 20px; border-radius: 24px; margin: 20px 0;
-            border: 1px solid var(--glass-border);
-            text-align: center; position: relative;
-        }
+      /* --- Profile Header Card --- */
+      .profile-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        padding: 30px 20px;
+        border-radius: 24px;
+        margin: 20px 0;
+        border: 1px solid var(--glass-border);
+        text-align: center;
+        position: relative;
+      }
 
-        .avatar-container {
-            width: 100px; height: 100px; margin: 0 auto 15px;
-            position: relative;
-        }
+      .avatar-container {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 15px;
+        position: relative;
+      }
 
-        .profile-img {
-            width: 100%; height: 100%; border-radius: 50%;
-            object-fit: cover; border: 4px solid var(--glass-border);
-            background: var(--secondary-bg);
-        }
+      .profile-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--glass-border);
+        background: var(--secondary-bg);
+      }
 
-        .edit-avatar-btn {
-            position: absolute; bottom: 0; right: 0;
-            background: var(--accent-color); color: white;
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: 3px solid #1e3a8a; cursor: pointer; font-size: 12px;
-        }
+      .edit-avatar-btn {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: var(--accent-color);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #1e3a8a;
+        cursor: pointer;
+        font-size: 12px;
+      }
 
-        .profile-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-        .profile-card p { font-size: 13px; color: rgba(255,255,255,0.7); }
-        .status-badge {
-            display: inline-block; margin-top: 10px; padding: 4px 12px;
-            background: rgba(16, 185, 129, 0.2); color: var(--success);
-            border-radius: 20px; font-size: 11px; font-weight: 700;
-        }
+      .profile-card h2 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+      .profile-card p {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .status-badge {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 4px 12px;
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+      }
 
-        /* --- Stats Grid --- */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px;
-        }
-        .stat-box {
-            background: var(--card-bg); padding: 15px 10px;
-            border-radius: 18px; border: 1px solid var(--glass-border);
-            text-align: center;
-        }
-        .stat-box p { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
-        .stat-box h4 { font-size: 14px; font-weight: 700; color: var(--accent-color); }
+      /* --- Stats Grid --- */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 25px;
+      }
+      .stat-box {
+        background: var(--card-bg);
+        padding: 15px 10px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+        text-align: center;
+      }
+      .stat-box p {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 5px;
+      }
+      .stat-box h4 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--accent-color);
+      }
 
-        /* --- Form Sections --- */
-        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .section-title i { color: var(--accent-color); }
+      /* --- Form Sections --- */
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .section-title i {
+        color: var(--accent-color);
+      }
 
-        .info-group {
-            background: var(--secondary-bg); padding: 20px; border-radius: 20px;
-            border: 1px solid var(--glass-border); margin-bottom: 25px;
-        }
+      .info-group {
+        background: var(--secondary-bg);
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 25px;
+      }
 
-        .form-item { margin-bottom: 15px; }
-        .form-item:last-child { margin-bottom: 0; }
-        .form-item label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
-        .form-item input {
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.2);
-            border: 1px solid var(--glass-border); border-radius: 10px;
-            color: white; font-size: 14px; outline: none; transition: 0.3s;
-        }
-        .form-item input:focus { border-color: var(--accent-color); }
-        .form-item input:read-only { opacity: 0.6; cursor: not-allowed; }
+      .form-item {
+        margin-bottom: 15px;
+      }
+      .form-item:last-child {
+        margin-bottom: 0;
+      }
+      .form-item label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .form-item input {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        outline: none;
+        transition: 0.3s;
+      }
+      .form-item input:focus {
+        border-color: var(--accent-color);
+      }
+      .form-item input:read-only {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
 
-        /* --- Action Buttons --- */
-        .btn-save {
-            width: 100%; padding: 15px; background: var(--accent-color);
-            color: white; border: none; border-radius: 15px;
-            font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px;
-        }
-        .btn-logout {
-            width: 100%; padding: 15px; background: rgba(239, 68, 68, 0.1);
-            color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 15px; font-weight: 700; font-size: 15px;
-            cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+      /* --- Action Buttons --- */
+      .btn-save {
+        width: 100%;
+        padding: 15px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      .btn-logout {
+        width: 100%;
+        padding: 15px;
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
 
-        /* --- Quick Links Grid --- */
-        .quick-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px;
-        }
-        .quick-item {
-            background: var(--card-bg); padding: 15px 5px; border-radius: 15px;
-            text-align: center; text-decoration: none; color: white;
-            border: 1px solid var(--glass-border); transition: 0.3s;
-        }
-        .quick-item i { font-size: 18px; color: var(--accent-color); margin-bottom: 8px; display: block; }
-        .quick-item span { font-size: 11px; font-weight: 500; }
+      /* --- Quick Links Grid --- */
+      .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+      .quick-item {
+        background: var(--card-bg);
+        padding: 15px 5px;
+        border-radius: 15px;
+        text-align: center;
+        text-decoration: none;
+        color: white;
+        border: 1px solid var(--glass-border);
+        transition: 0.3s;
+      }
+      .quick-item i {
+        font-size: 18px;
+        color: var(--accent-color);
+        margin-bottom: 8px;
+        display: block;
+      }
+      .quick-item span {
+        font-size: 11px;
+        font-weight: 500;
+      }
 
-        /* --- Modal --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: none; align-items: center;
-            justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(8px);
+      /* --- Modal --- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+        backdrop-filter: blur(8px);
+      }
+      .modal-content {
+        background: var(--secondary-bg);
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        text-align: center;
+        animation: popIn 0.3s ease;
+      }
+      @keyframes popIn {
+        from {
+          transform: scale(0.9);
+          opacity: 0;
         }
-        .modal-content {
-            background: var(--secondary-bg); width: 100%; max-width: 400px;
-            padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border);
-            text-align: center; animation: popIn 0.3s ease;
-        }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } }
+      }
 
-        /* --- Bottom Nav --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: var(--nav-height); background: rgba(17, 24, 39, 0.95);
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            border-top: 1px solid var(--glass-border); z-index: 1000;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 4px; color: var(--text-muted);
-            text-decoration: none; font-size: 10px;
-        }
-        .nav-item.active { color: var(--accent-color); }
-        .nav-item i { font-size: 18px; }
+      /* --- Bottom Nav --- */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(17, 24, 39, 0.95);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid var(--glass-border);
+        z-index: 1000;
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 10px;
+      }
+      .nav-item.active {
+        color: var(--accent-color);
+      }
+      .nav-item i {
+        font-size: 18px;
+      }
 
-        /* --- Loading Spinner --- */
-        .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s infinite linear; display: none; margin: 0 auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+      /* --- Loading Spinner --- */
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+        display: none;
+        margin: 0 auto;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-        .skeleton { height: 20px; background: #1f2937; border-radius: 4px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
+      .skeleton {
+        height: 20px;
+        background: #1f2937;
+        border-radius: 4px;
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
+        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <div class="container header-flex">
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
-            <a href="notifications.html" style="color: white; font-size: 18px;"><i class="fas fa-bell"></i></a>
-        </div>
+      <div class="container header-flex">
+        <a href="dashboard.html" class="back-btn"
+          ><i class="fas fa-arrow-left"></i> Dashboard</a
+        >
+        <a href="notifications.html" style="color: white; font-size: 18px"
+          ><i class="fas fa-bell"></i
+        ></a>
+      </div>
     </header>
 
     <main class="container">
-        <!-- Profile Header -->
-        <section class="profile-card">
-            <div class="avatar-container">
-                <img src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff" id="avatarImg" class="profile-img" alt="Profile">
-                <label for="avatarUpload" class="edit-avatar-btn">
-                    <i class="fas fa-camera"></i>
-                    <input type="file" id="avatarUpload" hidden accept="image/*">
-                </label>
-            </div>
-            <h2 id="cardFullName">Loading...</h2>
-            <p id="cardUsername">@username</p>
-            <div class="status-badge">Active Investor</div>
-        </section>
+      <!-- Profile Header -->
+      <section class="profile-card">
+        <div class="avatar-container">
+          <img
+            src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff"
+            id="avatarImg"
+            class="profile-img"
+            alt="Profile"
+          />
+          <label for="avatarUpload" class="edit-avatar-btn">
+            <i class="fas fa-camera"></i>
+            <input type="file" id="avatarUpload" hidden accept="image/*" />
+          </label>
+        </div>
+        <h2 id="cardFullName">Loading...</h2>
+        <p id="cardUsername">@username</p>
+        <div class="status-badge">Active Investor</div>
+      </section>
 
-        <!-- Stats Grid -->
-        <section class="stats-grid">
-            <div class="stat-box"><p>Balance</p><h4 id="statBalance">₦0</h4></div>
-            <div class="stat-box"><p>Invested</p><h4 id="statInvested">₦0</h4></div>
-            <div class="stat-box"><p>Earnings</p><h4 id="statEarnings">₦0</h4></div>
-        </section>
+      <!-- Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-box">
+          <p>Balance</p>
+          <h4 id="statBalance">₦0</h4>
+        </div>
+        <div class="stat-box">
+          <p>Invested</p>
+          <h4 id="statInvested">₦0</h4>
+        </div>
+        <div class="stat-box">
+          <p>Earnings</p>
+          <h4 id="statEarnings">₦0</h4>
+        </div>
+      </section>
 
-        <!-- Quick Links -->
-        <div class="quick-grid">
-            <a href="wallet.html" class="quick-item"><i class="fas fa-wallet"></i><span>Wallet</span></a>
-            <a href="plans.html" class="quick-item"><i class="fas fa-layer-group"></i><span>Plans</span></a>
-            <a href="transactions.html" class="quick-item"><i class="fas fa-list-ul"></i><span>History</span></a>
-            <a href="referrals.html" class="quick-item"><i class="fas fa-users"></i><span>Referrals</span></a>
-            <a href="giftcode.html" class="quick-item"><i class="fas fa-gift"></i><span>Gift Code</span></a>
-            <a href="support.html" class="quick-item"><i class="fas fa-headset"></i><span>Support</span></a>
+      <!-- Quick Links -->
+      <div class="quick-grid">
+        <a href="wallet.html" class="quick-item"
+          ><i class="fas fa-wallet"></i><span>Wallet</span></a
+        >
+        <a href="plans.html" class="quick-item"
+          ><i class="fas fa-layer-group"></i><span>Plans</span></a
+        >
+        <a href="transactions.html" class="quick-item"
+          ><i class="fas fa-list-ul"></i><span>History</span></a
+        >
+        <a href="referrals.html" class="quick-item"
+          ><i class="fas fa-users"></i><span>Referrals</span></a
+        >
+        <a href="giftcode.html" class="quick-item"
+          ><i class="fas fa-gift"></i><span>Gift Code</span></a
+        >
+        <a href="support.html" class="quick-item"
+          ><i class="fas fa-headset"></i><span>Support</span></a
+        >
+      </div>
+
+      <!-- Personal Info Form -->
+      <h3 class="section-title">
+        <i class="fas fa-user-shield"></i> Personal Information
+      </h3>
+      <section class="info-group">
+        <div class="form-item">
+          <label>Full Name</label><input type="text" id="inputFullName" />
+        </div>
+        <div class="form-item">
+          <label>Username</label><input type="text" id="inputUsername" />
+        </div>
+        <div class="form-item">
+          <label>Phone Number</label><input type="tel" id="inputPhone" />
+        </div>
+        <div class="form-item">
+          <label>Email Address (Read Only)</label
+          ><input type="email" id="inputEmail" readonly />
         </div>
 
-        <!-- Personal Info Form -->
-        <h3 class="section-title"><i class="fas fa-user-shield"></i> Personal Information</h3>
-        <section class="info-group">
-            <div class="form-item"><label>Full Name</label><input type="text" id="inputFullName"></div>
-            <div class="form-item"><label>Username</label><input type="text" id="inputUsername"></div>
-            <div class="form-item"><label>Phone Number</label><input type="tel" id="inputPhone"></div>
-            <div class="form-item"><label>Email Address (Read Only)</label><input type="email" id="inputEmail" readonly></div>
-            
-            <button class="btn-save" id="saveProfileBtn">
-                <span id="saveText">Save Profile Changes</span>
-                <div class="spinner" id="saveSpinner"></div>
-            </button>
-        </section>
-
-        <!-- Account Data -->
-        <h3 class="section-title"><i class="fas fa-database"></i> Account Metadata</h3>
-        <section class="info-group">
-            <div class="form-item"><label>Member ID</label><input type="text" id="metaId" readonly></div>
-            <div class="form-item"><label>Referral Code</label><input type="text" id="metaRef" readonly></div>
-            <div class="form-item"><label>Member Since</label><input type="text" id="metaDate" readonly></div>
-        </section>
-
-        <!-- Danger Zone -->
-        <button class="btn-logout" onclick="openLogoutModal()">
-            <i class="fas fa-sign-out-alt"></i> Logout from EASYPIE
+        <button class="btn-save" id="saveProfileBtn">
+          <span id="saveText">Save Profile Changes</span>
+          <div class="spinner" id="saveSpinner"></div>
         </button>
+      </section>
+
+      <!-- Account Data -->
+      <h3 class="section-title">
+        <i class="fas fa-database"></i> Account Metadata
+      </h3>
+      <section class="info-group">
+        <div class="form-item">
+          <label>Member ID</label><input type="text" id="metaId" readonly />
+        </div>
+        <div class="form-item">
+          <label>Referral Code</label
+          ><input type="text" id="metaRef" readonly />
+        </div>
+        <div class="form-item">
+          <label>Member Since</label
+          ><input type="text" id="metaDate" readonly />
+        </div>
+      </section>
+
+      <!-- Danger Zone -->
+      <button class="btn-logout" onclick="openLogoutModal()">
+        <i class="fas fa-sign-out-alt"></i> Logout from EASYPIE
+      </button>
     </main>
 
     <!-- Logout Confirmation Modal -->
     <div class="modal-overlay" id="logoutModal">
-        <div class="modal-content">
-            <i class="fas fa-exclamation-circle" style="font-size: 50px; color: var(--danger); margin-bottom: 20px;"></i>
-            <h3>Confirm Logout</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin: 15px 0;">Are you sure you want to sign out of your EASYPIE account?</p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-                <button class="btn-save" style="margin-top:0; background: var(--danger);" onclick="executeLogout()">Logout</button>
-                <button class="btn-save" style="margin-top:0; background: var(--secondary-bg); border: 1px solid var(--glass-border);" onclick="closeLogoutModal()">Cancel</button>
-            </div>
+      <div class="modal-content">
+        <i
+          class="fas fa-exclamation-circle"
+          style="font-size: 50px; color: var(--danger); margin-bottom: 20px"
+        ></i>
+        <h3>Confirm Logout</h3>
+        <p style="font-size: 14px; color: var(--text-muted); margin: 15px 0">
+          Are you sure you want to sign out of your EASYPIE account?
+        </p>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+          "
+        >
+          <button
+            class="btn-save"
+            style="margin-top: 0; background: var(--danger)"
+            onclick="executeLogout()"
+          >
+            Logout
+          </button>
+          <button
+            class="btn-save"
+            style="
+              margin-top: 0;
+              background: var(--secondary-bg);
+              border: 1px solid var(--glass-border);
+            "
+            onclick="closeLogoutModal()"
+          >
+            Cancel
+          </button>
         </div>
+      </div>
     </div>
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">
-            <i class="fas fa-th-large"></i><span>Home</span>
-        </a>
-        <a href="plans.html" class="nav-item">
-            <i class="fas fa-layer-group"></i><span>Plans</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i><span>Wallet</span>
-        </a>
-        <a href="notifications.html" class="nav-item">
-            <i class="fas fa-bell"></i><span>Alerts</span>
-        </a>
-        <a href="profile.html" class="nav-item active">
-            <i class="fas fa-user-circle"></i><span>Profile</span>
-        </a>
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-th-large"></i><span>Home</span>
+      </a>
+      <a href="plans.html" class="nav-item">
+        <i class="fas fa-layer-group"></i><span>Plans</span>
+      </a>
+      <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i><span>Wallet</span>
+      </a>
+      <a href="notifications.html" class="nav-item">
+        <i class="fas fa-bell"></i><span>Alerts</span>
+      </a>
+      <a href="profile.html" class="nav-item active">
+        <i class="fas fa-user-circle"></i><span>Profile</span>
+      </a>
     </nav>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
+      let currentUser = null;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
+        }
+        currentUser = session.user;
 
-            await loadProfile();
-            await loadWalletStats();
-            setupAvatarUpload();
+        await loadProfile();
+        await loadWalletStats();
+        setupAvatarUpload();
+      }
+
+      async function loadProfile() {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentUser.id)
+          .single();
+        if (data) {
+          // UI Header
+          document.getElementById("cardFullName").innerText = data.full_name;
+          document.getElementById("cardUsername").innerText =
+            `@${data.username}`;
+          if (data.avatar_url)
+            document.getElementById("avatarImg").src = data.avatar_url;
+
+          // Form
+          document.getElementById("inputFullName").value = data.full_name;
+          document.getElementById("inputUsername").value = data.username;
+          document.getElementById("inputPhone").value = data.phone || "";
+          document.getElementById("inputEmail").value = currentUser.email;
+
+          // Meta
+          document.getElementById("metaId").value = currentUser.id
+            .slice(0, 12)
+            .toUpperCase();
+          document.getElementById("metaRef").value =
+            data.username.toUpperCase();
+          document.getElementById("metaDate").value = new Date(
+            data.created_at,
+          ).toLocaleDateString();
+        }
+      }
+
+      async function loadWalletStats() {
+        // Balance
+        const { data: wallet } = await supabase
+          .from("wallets")
+          .select("balance")
+          .eq("user_id", currentUser.id)
+          .single();
+        if (wallet)
+          document.getElementById("statBalance").innerText =
+            `₦${parseFloat(wallet.balance).toLocaleString()}`;
+
+        // Invested
+        const { data: invs } = await supabase
+          .from("investments")
+          .select("amount")
+          .eq("user_id", currentUser.id)
+          .eq("status", "active");
+        const totalInv = invs
+          ? invs.reduce((s, t) => s + parseFloat(t.amount), 0)
+          : 0;
+        document.getElementById("statInvested").innerText =
+          `₦${totalInv.toLocaleString()}`;
+
+        // Earnings
+        const { data: earn } = await supabase
+          .from("transactions")
+          .select("amount")
+          .eq("user_id", currentUser.id)
+          .eq("type", "earning");
+        const totalEarn = earn
+          ? earn.reduce((s, t) => s + parseFloat(t.amount), 0)
+          : 0;
+        document.getElementById("statEarnings").innerText =
+          `₦${totalEarn.toLocaleString()}`;
+      }
+
+      document.getElementById("saveProfileBtn").onclick = async () => {
+        const name = document.getElementById("inputFullName").value.trim();
+        const user = document
+          .getElementById("inputUsername")
+          .value.trim()
+          .toLowerCase();
+        const phone = document.getElementById("inputPhone").value.trim();
+
+        if (!name || !user) {
+          alert("Name and Username are required.");
+          return;
         }
 
-        async function loadProfile() {
-            const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-            if (data) {
-                // UI Header
-                document.getElementById('cardFullName').innerText = data.full_name;
-                document.getElementById('cardUsername').innerText = `@${data.username}`;
-                if (data.avatar_url) document.getElementById('avatarImg').src = data.avatar_url;
+        toggleLoading(true);
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            full_name: name,
+            username: user,
+            phone: phone,
+          })
+          .eq("id", currentUser.id);
 
-                // Form
-                document.getElementById('inputFullName').value = data.full_name;
-                document.getElementById('inputUsername').value = data.username;
-                document.getElementById('inputPhone').value = data.phone || '';
-                document.getElementById('inputEmail').value = currentUser.email;
-
-                // Meta
-                document.getElementById('metaId').value = currentUser.id.slice(0, 12).toUpperCase();
-                document.getElementById('metaRef').value = data.username.toUpperCase();
-                document.getElementById('metaDate').value = new Date(data.created_at).toLocaleDateString();
-            }
+        if (!error) {
+          alert("Profile updated successfully!");
+          location.reload();
+        } else {
+          alert(error.message);
+          toggleLoading(false);
         }
+      };
 
-        async function loadWalletStats() {
-            // Balance
-            const { data: wallet } = await supabase.from('wallets').select('balance').eq('user_id', currentUser.id).single();
-            if (wallet) document.getElementById('statBalance').innerText = `₦${parseFloat(wallet.balance).toLocaleString()}`;
+      function setupAvatarUpload() {
+        const upload = document.getElementById("avatarUpload");
+        upload.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          if (file.size > 2 * 1024 * 1024) {
+            alert("File too large. Max 2MB.");
+            return;
+          }
 
-            // Invested
-            const { data: invs } = await supabase.from('investments').select('amount').eq('user_id', currentUser.id).eq('status', 'active');
-            const totalInv = invs ? invs.reduce((s, t) => s + parseFloat(t.amount), 0) : 0;
-            document.getElementById('statInvested').innerText = `₦${totalInv.toLocaleString()}`;
+          const fileExt = file.name.split(".").pop();
+          const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
+          const filePath = `avatars/${fileName}`;
 
-            // Earnings
-            const { data: earn } = await supabase.from('transactions').select('amount').eq('user_id', currentUser.id).eq('type', 'earning');
-            const totalEarn = earn ? earn.reduce((s, t) => s + parseFloat(t.amount), 0) : 0;
-            document.getElementById('statEarnings').innerText = `₦${totalEarn.toLocaleString()}`;
-        }
+          // Upload to Storage (Assuming 'avatars' bucket exists and is public)
+          const { error: uploadError } = await supabase.storage
+            .from("avatars")
+            .upload(filePath, file);
 
-        document.getElementById('saveProfileBtn').onclick = async () => {
-            const name = document.getElementById('inputFullName').value.trim();
-            const user = document.getElementById('inputUsername').value.trim().toLowerCase();
-            const phone = document.getElementById('inputPhone').value.trim();
-
-            if(!name || !user) { alert("Name and Username are required."); return; }
-
-            toggleLoading(true);
-            const { error } = await supabase.from('profiles').update({
-                full_name: name,
-                username: user,
-                phone: phone
-            }).eq('id', currentUser.id);
-
-            if (!error) {
-                alert("Profile updated successfully!");
-                location.reload();
-            } else {
-                alert(error.message);
-                toggleLoading(false);
-            }
+          if (!uploadError) {
+            const {
+              data: { publicUrl },
+            } = supabase.storage.from("avatars").getPublicUrl(filePath);
+            await supabase
+              .from("profiles")
+              .update({ avatar_url: publicUrl })
+              .eq("id", currentUser.id);
+            document.getElementById("avatarImg").src = publicUrl;
+            alert("Profile picture updated!");
+          } else {
+            alert("Upload failed: " + uploadError.message);
+          }
         };
+      }
 
-        function setupAvatarUpload() {
-            const upload = document.getElementById('avatarUpload');
-            upload.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                if (file.size > 2 * 1024 * 1024) { alert("File too large. Max 2MB."); return; }
+      function toggleLoading(isLoading) {
+        const btn = document.getElementById("saveProfileBtn");
+        const txt = document.getElementById("saveText");
+        const spin = document.getElementById("saveSpinner");
+        btn.disabled = isLoading;
+        txt.style.display = isLoading ? "none" : "block";
+        spin.style.display = isLoading ? "block" : "none";
+      }
 
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
-                const filePath = `avatars/${fileName}`;
+      window.openLogoutModal = () =>
+        (document.getElementById("logoutModal").style.display = "flex");
+      window.closeLogoutModal = () =>
+        (document.getElementById("logoutModal").style.display = "none");
+      window.executeLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      };
 
-                // Upload to Storage (Assuming 'avatars' bucket exists and is public)
-                const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file);
-                
-                if (!uploadError) {
-                    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
-                    await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
-                    document.getElementById('avatarImg').src = publicUrl;
-                    alert("Profile picture updated!");
-                } else {
-                    alert("Upload failed: " + uploadError.message);
-                }
-            };
-        }
-
-        function toggleLoading(isLoading) {
-            const btn = document.getElementById('saveProfileBtn');
-            const txt = document.getElementById('saveText');
-            const spin = document.getElementById('saveSpinner');
-            btn.disabled = isLoading;
-            txt.style.display = isLoading ? 'none' : 'block';
-            spin.style.display = isLoading ? 'block' : 'none';
-        }
-
-        window.openLogoutModal = () => document.getElementById('logoutModal').style.display = 'flex';
-        window.closeLogoutModal = () => document.getElementById('logoutModal').style.display = 'none';
-        window.executeLogout = async () => {
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
-        };
-
-        window.addEventListener('DOMContentLoaded', init);
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

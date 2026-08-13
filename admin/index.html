@@ -1,601 +1,817 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Admin Dashboard | EASYPIE Management</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Icons & Charts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* ==========================================================
+      /* ==========================================================
            MOBILE-FIRST BASE STYLES
            Base rules below target small screens (~360px+).
            Larger breakpoints progressively ENHANCE via min-width
            media queries further down the file.
            ========================================================== */
-        :root {
-            --primary-bg: #060b13;
-            --secondary-bg: #0a0f1a;
-            --sidebar-bg: #0d121f;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.4);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
-            --header-height: 60px;
-        }
+      :root {
+        --primary-bg: #060b13;
+        --secondary-bg: #0a0f1a;
+        --sidebar-bg: #0d121f;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.4);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --sidebar-width: 260px;
+        --header-height: 60px;
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        html, body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            width: 100%;
-            overflow-x: hidden;
-        }
+      html,
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        width: 100%;
+        overflow-x: hidden;
+      }
 
-        body {
-            min-height: 100vh;
-            min-height: 100dvh;
-        }
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
 
-        /* --- Sidebar (mobile: off-canvas drawer over content) --- */
-        aside {
-            width: min(80vw, var(--sidebar-width));
-            height: 100vh;
-            height: 100dvh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--glass-border);
-            position: fixed;
-            top: 0;
-            left: 0;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
+      /* --- Sidebar (mobile: off-canvas drawer over content) --- */
+      aside {
+        width: min(80vw, var(--sidebar-width));
+        height: 100vh;
+        height: 100dvh;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--glass-border);
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
 
-        aside.active { transform: translateX(0); }
+      aside.active {
+        transform: translateX(0);
+      }
 
-        /* Backdrop shown behind the drawer on mobile */
-        .sidebar-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
+      /* Backdrop shown behind the drawer on mobile */
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
 
-        .sidebar-backdrop.active {
-            display: block;
-            opacity: 1;
-            pointer-events: auto;
-        }
+      .sidebar-backdrop.active {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+      }
 
-        .sidebar-header {
-            padding: 22px 20px;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent-color);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+      .sidebar-header {
+        padding: 22px 20px;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--accent-color);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-        .sidebar-close {
-            font-size: 18px;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 6px;
-        }
+      .sidebar-close {
+        font-size: 18px;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 6px;
+      }
 
-        .nav-menu {
-            flex: 1;
-            padding: 16px 0;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+      .nav-menu {
+        flex: 1;
+        padding: 16px 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
 
-        .nav-item {
-            padding: 14px 22px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: 0.2s;
-            min-height: 48px; /* touch target */
-        }
+      .nav-item {
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: 0.2s;
+        min-height: 48px; /* touch target */
+      }
 
-        .nav-item i { width: 20px; font-size: 18px; text-align: center; }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent-color);
-            border-left: 4px solid var(--accent-color);
-        }
+      .nav-item i {
+        width: 20px;
+        font-size: 18px;
+        text-align: center;
+      }
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        border-left: 4px solid var(--accent-color);
+      }
 
-        /* --- Main Content (mobile: full width, no offset) --- */
-        main {
-            width: 100%;
-            min-height: 100vh;
-            min-height: 100dvh;
-        }
+      /* --- Main Content (mobile: full width, no offset) --- */
+      main {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
 
-        /* --- Header --- */
-        header {
-            height: var(--header-height);
-            background: var(--secondary-bg);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 0 14px;
-            position: sticky;
-            top: 0;
-            z-index: 900;
-        }
+      /* --- Header --- */
+      header {
+        height: var(--header-height);
+        background: var(--secondary-bg);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 14px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
 
-        .header-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        flex: 1;
+      }
 
-        .menu-toggle {
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 8px;
-            flex-shrink: 0;
-        }
+      .menu-toggle {
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 8px;
+        flex-shrink: 0;
+      }
 
-        .search-container {
-            background: rgba(255,255,255,0.05);
-            padding: 8px 12px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid var(--glass-border);
-            min-width: 0;
-            flex: 1;
-        }
+      .search-container {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px 12px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--glass-border);
+        min-width: 0;
+        flex: 1;
+      }
 
-        .search-container input {
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 14px;
-            min-width: 0;
-            width: 100%;
-        }
+      .search-container input {
+        background: transparent;
+        border: none;
+        color: white;
+        outline: none;
+        font-size: 14px;
+        min-width: 0;
+        width: 100%;
+      }
 
-        /* Hide search placeholder text on very small screens, keep icon */
-        .search-label { display: none; }
+      /* Hide search placeholder text on very small screens, keep icon */
+      .search-label {
+        display: none;
+      }
 
-        .admin-profile { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-        .admin-avatar {
-            width: 34px; height: 34px; border-radius: 50%;
-            background: var(--accent-color);
-            flex-shrink: 0;
-        }
+      .admin-profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .admin-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        flex-shrink: 0;
+      }
 
-        #adminInfo { display: none; } /* revealed via JS + breakpoint below */
+      #adminInfo {
+        display: none;
+      } /* revealed via JS + breakpoint below */
 
-        /* --- Dashboard Body --- */
-        .dashboard-content { padding: 16px; }
+      /* --- Dashboard Body --- */
+      .dashboard-content {
+        padding: 16px;
+      }
 
-        /* Stats Grid: 1 column on mobile */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 14px;
-            margin-bottom: 22px;
-        }
+      /* Stats Grid: 1 column on mobile */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 22px;
+      }
 
-        .stat-card {
-            background: var(--card-bg);
-            padding: 18px;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+      .stat-card {
+        background: var(--card-bg);
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .stat-info p { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.02em; }
-        .stat-info h2 { font-size: 22px; font-weight: 700; word-break: break-word; }
-        .stat-icon { font-size: 22px; color: var(--accent-color); opacity: 0.5; flex-shrink: 0; margin-left: 10px; }
+      .stat-info p {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        letter-spacing: 0.02em;
+      }
+      .stat-info h2 {
+        font-size: 22px;
+        font-weight: 700;
+        word-break: break-word;
+      }
+      .stat-icon {
+        font-size: 22px;
+        color: var(--accent-color);
+        opacity: 0.5;
+        flex-shrink: 0;
+        margin-left: 10px;
+      }
 
-        /* Charts: stacked on mobile, fixed height so canvas doesn't collapse/stretch */
-        .charts-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 14px;
-            margin-bottom: 22px;
-        }
+      /* Charts: stacked on mobile, fixed height so canvas doesn't collapse/stretch */
+      .charts-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 22px;
+      }
 
-        .chart-container {
-            background: var(--card-bg);
-            padding: 18px;
-            border-radius: 18px;
-            border: 1px solid var(--glass-border);
-            position: relative;
-            height: 240px;
-        }
+      .chart-container {
+        background: var(--card-bg);
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+        position: relative;
+        height: 240px;
+      }
 
-        .chart-container h3 { margin-bottom: 14px; font-size: 14px; color: var(--text-muted); }
-        .chart-container canvas { max-height: 170px; }
+      .chart-container h3 {
+        margin-bottom: 14px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+      .chart-container canvas {
+        max-height: 170px;
+      }
 
-        /* --- Tables --- */
-        .table-section {
-            background: var(--card-bg);
-            border-radius: 18px;
-            border: 1px solid var(--glass-border);
-            padding: 16px;
-        }
+      /* --- Tables --- */
+      .table-section {
+        background: var(--card-bg);
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+        padding: 16px;
+      }
 
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            gap: 10px;
-        }
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        gap: 10px;
+      }
 
-        .table-header h3 { font-size: 15px; }
-        .table-header a { font-size: 13px; }
+      .table-header h3 {
+        font-size: 15px;
+      }
+      .table-header a {
+        font-size: 13px;
+      }
 
-        /* Mobile: hide the literal <table> and render stacked cards instead */
-        table { display: none; }
+      /* Mobile: hide the literal <table> and render stacked cards instead */
+      table {
+        display: none;
+      }
 
-        .mobile-approval-list { display: flex; flex-direction: column; gap: 10px; }
+      .mobile-approval-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-        .approval-card {
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+      .approval-card {
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-        .approval-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-        }
+      .approval-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+      }
 
-        .approval-row .label { color: var(--text-muted); }
-        .approval-user { font-weight: 600; font-size: 14px; }
-        .approval-amount { font-weight: 700; }
+      .approval-row .label {
+        color: var(--text-muted);
+      }
+      .approval-user {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .approval-amount {
+        font-weight: 700;
+      }
 
-        .approval-empty {
-            text-align: center;
-            padding: 24px 10px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
+      .approval-empty {
+        text-align: center;
+        padding: 24px 10px;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
 
-        .user-cell { display: flex; align-items: center; gap: 10px; }
+      .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-        .status-pill {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: inline-block;
-        }
+      .status-pill {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+      }
 
-        .pill-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .pill-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+      .pill-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+      .pill-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
 
-        .action-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            min-height: 40px; /* touch target */
-            width: 100%;
-        }
+      .action-btn {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        min-height: 40px; /* touch target */
+        width: 100%;
+      }
 
-        /* --- Loading Overlays --- */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--primary-bg); z-index: 2000;
-            display: flex; align-items: center; justify-content: center;
-        }
+      /* --- Loading Overlays --- */
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-bg);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        /* ==========================================================
+      /* ==========================================================
            PROGRESSIVE ENHANCEMENT — larger screens
            ========================================================== */
 
-        /* Small tablets and up: show real table, drop card list */
-        @media (min-width: 640px) {
-            .search-label { display: inline; }
-
-            table { display: table; width: 100%; border-collapse: collapse; font-size: 14px; }
-            .mobile-approval-list { display: none; }
-
-            th {
-                text-align: left;
-                padding: 15px;
-                color: var(--text-muted);
-                border-bottom: 1px solid var(--glass-border);
-                font-weight: 500;
-            }
-
-            td { padding: 15px; border-bottom: 1px solid var(--glass-border); }
-
-            .table-section { overflow-x: auto; }
-
-            .action-btn { width: auto; }
-
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      /* Small tablets and up: show real table, drop card list */
+      @media (min-width: 640px) {
+        .search-label {
+          display: inline;
         }
 
-        /* Tablet/desktop: sidebar becomes permanent, main content offsets */
-        @media (min-width: 1024px) {
-            .sidebar-backdrop { display: none !important; }
-
-            aside {
-                position: fixed;
-                transform: none;
-                left: 0;
-                width: var(--sidebar-width);
-            }
-
-            main { margin-left: var(--sidebar-width); }
-            .menu-toggle { display: none; }
-
-            #adminInfo { display: block; }
-
-            .dashboard-content { padding: 25px; }
-
-            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-
-            .charts-row {
-                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-                gap: 20px;
-            }
-
-            .chart-container { height: 280px; }
-            .chart-container canvas { max-height: 210px; }
+        table {
+          display: table;
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 14px;
         }
+        .mobile-approval-list {
+          display: none;
+        }
+
+        th {
+          text-align: left;
+          padding: 15px;
+          color: var(--text-muted);
+          border-bottom: 1px solid var(--glass-border);
+          font-weight: 500;
+        }
+
+        td {
+          padding: 15px;
+          border-bottom: 1px solid var(--glass-border);
+        }
+
+        .table-section {
+          overflow-x: auto;
+        }
+
+        .action-btn {
+          width: auto;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      /* Tablet/desktop: sidebar becomes permanent, main content offsets */
+      @media (min-width: 1024px) {
+        .sidebar-backdrop {
+          display: none !important;
+        }
+
+        aside {
+          position: fixed;
+          transform: none;
+          left: 0;
+          width: var(--sidebar-width);
+        }
+
+        main {
+          margin-left: var(--sidebar-width);
+        }
+        .menu-toggle {
+          display: none;
+        }
+
+        #adminInfo {
+          display: block;
+        }
+
+        .dashboard-content {
+          padding: 25px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 20px;
+        }
+
+        .charts-row {
+          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+          gap: 20px;
+        }
+
+        .chart-container {
+          height: 280px;
+        }
+        .chart-container canvas {
+          max-height: 210px;
+        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- Auth Guard Overlay -->
     <div id="authOverlay" class="overlay">
-        <div style="text-align: center;">
-            <i class="fas fa-circle-notch fa-spin" style="font-size: 40px; color: var(--accent-color);"></i>
-            <p style="margin-top: 15px; color: var(--text-muted);">Verifying Admin Session...</p>
-        </div>
+      <div style="text-align: center">
+        <i
+          class="fas fa-circle-notch fa-spin"
+          style="font-size: 40px; color: var(--accent-color)"
+        ></i>
+        <p style="margin-top: 15px; color: var(--text-muted)">
+          Verifying Admin Session...
+        </p>
+      </div>
     </div>
 
     <!-- Backdrop for mobile drawer -->
-    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+    <div
+      id="sidebarBackdrop"
+      class="sidebar-backdrop"
+      onclick="toggleSidebar()"
+    ></div>
 
     <!-- Sidebar -->
     <aside id="sidebar">
-        <div class="sidebar-header">
-            EASYPIE ADMIN
-            <i class="fas fa-times sidebar-close" onclick="toggleSidebar()"></i>
-        </div>
-        <nav class="nav-menu">
-            <a href="index.html" class="nav-item active"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
-            <a href="referrals.html" class="nav-item"><i class="fas fa-user-friends"></i> Referrals</a>
-            <a href="deposits.html" class="nav-item"><i class="fas fa-arrow-down"></i> Deposits</a>
-            <a href="withdrawals.html" class="nav-item"><i class="fas fa-arrow-up"></i> Withdrawals</a>
-            <a href="transactions.html" class="nav-item"><i class="fas fa-exchange-alt"></i> Transactions</a>
-            <a href="investments.html" class="nav-item"><i class="fas fa-rocket"></i> Investments</a>
-            <a href="plans.html" class="nav-item"><i class="fas fa-layer-group"></i> Investment Plans</a>
-            <a href="earnings.html" class="nav-item"><i class="fas fa-coins"></i> Earnings</a>
-            <a href="giftcodes.html" class="nav-item"><i class="fas fa-gift"></i> Gift Codes</a>
-            <a href="support.html" class="nav-item"><i class="fas fa-headset"></i> Support Tickets</a>
-            <a href="notifications.html" class="nav-item"><i class="fas fa-bell"></i> Notifications</a>
-            <a href="reports.html" class="nav-item"><i class="fas fa-chart-bar"></i> Reports</a>
-            <a href="activity-log.html" class="nav-item"><i class="fas fa-history"></i> Activity Log</a>
-            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
-            <a href="profile.html" class="nav-item"><i class="fas fa-user-circle"></i> Profile</a>
-            <a href="#" class="nav-item" onclick="adminLogout()" style="margin-top: 40px; color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </nav>
+      <div class="sidebar-header">
+        EASYPIE ADMIN
+        <i class="fas fa-times sidebar-close" onclick="toggleSidebar()"></i>
+      </div>
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-item active"
+          ><i class="fas fa-th-large"></i> Dashboard</a
+        >
+        <a href="users.html" class="nav-item"
+          ><i class="fas fa-users"></i> Users</a
+        >
+        <a href="referrals.html" class="nav-item"
+          ><i class="fas fa-user-friends"></i> Referrals</a
+        >
+        <a href="deposits.html" class="nav-item"
+          ><i class="fas fa-arrow-down"></i> Deposits</a
+        >
+        <a href="withdrawals.html" class="nav-item"
+          ><i class="fas fa-arrow-up"></i> Withdrawals</a
+        >
+        <a href="transactions.html" class="nav-item"
+          ><i class="fas fa-exchange-alt"></i> Transactions</a
+        >
+        <a href="investments.html" class="nav-item"
+          ><i class="fas fa-rocket"></i> Investments</a
+        >
+        <a href="plans.html" class="nav-item"
+          ><i class="fas fa-layer-group"></i> Investment Plans</a
+        >
+        <a href="earnings.html" class="nav-item"
+          ><i class="fas fa-coins"></i> Earnings</a
+        >
+        <a href="giftcodes.html" class="nav-item"
+          ><i class="fas fa-gift"></i> Gift Codes</a
+        >
+        <a href="support.html" class="nav-item"
+          ><i class="fas fa-headset"></i> Support Tickets</a
+        >
+        <a href="notifications.html" class="nav-item"
+          ><i class="fas fa-bell"></i> Notifications</a
+        >
+        <a href="reports.html" class="nav-item"
+          ><i class="fas fa-chart-bar"></i> Reports</a
+        >
+        <a href="activity-log.html" class="nav-item"
+          ><i class="fas fa-history"></i> Activity Log</a
+        >
+        <a href="settings.html" class="nav-item"
+          ><i class="fas fa-cog"></i> Settings</a
+        >
+        <a href="profile.html" class="nav-item"
+          ><i class="fas fa-user-circle"></i> Profile</a
+        >
+        <a
+          href="#"
+          class="nav-item"
+          onclick="adminLogout()"
+          style="margin-top: 40px; color: var(--danger)"
+          ><i class="fas fa-sign-out-alt"></i> Logout</a
+        >
+      </nav>
     </aside>
 
     <main>
-        <!-- Header -->
-        <header>
-            <div class="header-left">
-                <i class="fas fa-bars menu-toggle" onclick="toggleSidebar()"></i>
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
-                </div>
-            </div>
-            <div class="admin-profile">
-                <div style="text-align: right;" id="adminInfo">
-                    <p style="font-size: 13px; font-weight: 700;" id="adminName">Admin User</p>
-                    <p style="font-size: 11px; color: var(--text-muted);">Super Admin</p>
-                </div>
-                <div class="admin-avatar"></div>
-            </div>
-        </header>
-
-        <!-- Content -->
-        <div class="dashboard-content">
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-info"><p>Total Users</p><h2 id="countUsers">...</h2></div>
-                    <i class="fas fa-users stat-icon"></i>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info"><p>Total Deposits</p><h2 id="countDeposits">...</h2></div>
-                    <i class="fas fa-wallet stat-icon"></i>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info"><p>Active Investments</p><h2 id="countInvestments">...</h2></div>
-                    <i class="fas fa-rocket stat-icon"></i>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info"><p>Paid Earnings</p><h2 id="countEarnings">...</h2></div>
-                    <i class="fas fa-chart-line stat-icon"></i>
-                </div>
-            </div>
-
-            <!-- Analytics Row -->
-            <div class="charts-row">
-                <div class="chart-container">
-                    <h3>Deposit vs Withdrawal Trends</h3>
-                    <canvas id="revenueChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h3>User Registration Activity</h3>
-                    <canvas id="userChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Tables Section -->
-            <div class="table-section">
-                <div class="table-header">
-                    <h3>Pending Approvals</h3>
-                    <a href="deposits.html" style="color: var(--accent-color); font-size: 13px; text-decoration: none;">View All</a>
-                </div>
-
-                <!-- Mobile: stacked cards -->
-                <div class="mobile-approval-list" id="pendingCardList"></div>
-
-                <!-- >=640px: real table -->
-                <table>
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Amount</th>
-                            <th>Type</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pendingTableBody">
-                        <!-- Dynamic Rows -->
-                    </tbody>
-                </table>
-            </div>
+      <!-- Header -->
+      <header>
+        <div class="header-left">
+          <i class="fas fa-bars menu-toggle" onclick="toggleSidebar()"></i>
+          <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." />
+          </div>
         </div>
+        <div class="admin-profile">
+          <div style="text-align: right" id="adminInfo">
+            <p style="font-size: 13px; font-weight: 700" id="adminName">
+              Admin User
+            </p>
+            <p style="font-size: 11px; color: var(--text-muted)">Super Admin</p>
+          </div>
+          <div class="admin-avatar"></div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="dashboard-content">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <p>Total Users</p>
+              <h2 id="countUsers">...</h2>
+            </div>
+            <i class="fas fa-users stat-icon"></i>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <p>Total Deposits</p>
+              <h2 id="countDeposits">...</h2>
+            </div>
+            <i class="fas fa-wallet stat-icon"></i>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <p>Active Investments</p>
+              <h2 id="countInvestments">...</h2>
+            </div>
+            <i class="fas fa-rocket stat-icon"></i>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <p>Paid Earnings</p>
+              <h2 id="countEarnings">...</h2>
+            </div>
+            <i class="fas fa-chart-line stat-icon"></i>
+          </div>
+        </div>
+
+        <!-- Analytics Row -->
+        <div class="charts-row">
+          <div class="chart-container">
+            <h3>Deposit vs Withdrawal Trends</h3>
+            <canvas id="revenueChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>User Registration Activity</h3>
+            <canvas id="userChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Tables Section -->
+        <div class="table-section">
+          <div class="table-header">
+            <h3>Pending Approvals</h3>
+            <a
+              href="deposits.html"
+              style="
+                color: var(--accent-color);
+                font-size: 13px;
+                text-decoration: none;
+              "
+              >View All</a
+            >
+          </div>
+
+          <!-- Mobile: stacked cards -->
+          <div class="mobile-approval-list" id="pendingCardList"></div>
+
+          <!-- >=640px: real table -->
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="pendingTableBody">
+              <!-- Dynamic Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </main>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        async function initAdmin() {
-            const { data: { session } } = await supabase.auth.getSession();
+      async function initAdmin() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-            if (!session) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Verify Admin Privileges
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('full_name, is_admin')
-                .eq('id', session.user.id)
-                .single();
-
-            if (!profile || !profile.is_admin) {
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
-                return;
-            }
-
-            document.getElementById('adminName').innerText = profile.full_name;
-            document.getElementById('authOverlay').style.display = 'none';
-
-            loadDashboardData();
-            setupRealtime();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
         }
 
-        async function loadDashboardData() {
-            // Summary Stats
-            const { count: users } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-            const { count: invest } = await supabase.from('investments').select('*', { count: 'exact', head: true }).eq('status', 'active');
+        // Verify Admin Privileges
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, is_admin")
+          .eq("id", session.user.id)
+          .single();
 
-            document.getElementById('countUsers').innerText = users || 0;
-            document.getElementById('countInvestments').innerText = invest || 0;
-
-            const { data: deposits } = await supabase.from('transactions').select('amount').eq('type', 'deposit');
-            const totalDep = deposits?.reduce((a, b) => a + parseFloat(b.amount), 0) || 0;
-            document.getElementById('countDeposits').innerText = `₦${totalDep.toLocaleString()}`;
-
-            const { data: earnings } = await supabase.from('transactions').select('amount').eq('type', 'earning');
-            const totalEar = earnings?.reduce((a, b) => a + parseFloat(b.amount), 0) || 0;
-            document.getElementById('countEarnings').innerText = `₦${totalEar.toLocaleString()}`;
-
-            loadPendingApprovals();
-            initCharts();
+        if (!profile || !profile.is_admin) {
+          await supabase.auth.signOut();
+          window.location.href = "login.html";
+          return;
         }
 
-        async function loadPendingApprovals() {
-            const { data } = await supabase
-                .from('deposits')
-                .select('*, profiles(full_name)')
-                .eq('status', 'pending')
-                .limit(5);
+        document.getElementById("adminName").innerText = profile.full_name;
+        document.getElementById("authOverlay").style.display = "none";
 
-            const tableBody = document.getElementById('pendingTableBody');
-            const cardList = document.getElementById('pendingCardList');
-            tableBody.innerHTML = '';
-            cardList.innerHTML = '';
+        loadDashboardData();
+        setupRealtime();
+      }
 
-            if (!data || data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--text-muted);">No pending requests.</td></tr>';
-                cardList.innerHTML = '<div class="approval-empty">No pending requests.</div>';
-                return;
-            }
+      async function loadDashboardData() {
+        // Summary Stats
+        const { count: users } = await supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true });
+        const { count: invest } = await supabase
+          .from("investments")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "active");
 
-            data.forEach(item => {
-                const name = item.profiles.full_name;
-                const amount = parseFloat(item.amount).toLocaleString();
-                const date = new Date(item.created_at).toLocaleDateString();
+        document.getElementById("countUsers").innerText = users || 0;
+        document.getElementById("countInvestments").innerText = invest || 0;
 
-                // Desktop table row
-                const row = document.createElement('tr');
-                row.innerHTML = `
+        const { data: deposits } = await supabase
+          .from("transactions")
+          .select("amount")
+          .eq("type", "deposit");
+        const totalDep =
+          deposits?.reduce((a, b) => a + parseFloat(b.amount), 0) || 0;
+        document.getElementById("countDeposits").innerText =
+          `₦${totalDep.toLocaleString()}`;
+
+        const { data: earnings } = await supabase
+          .from("transactions")
+          .select("amount")
+          .eq("type", "earning");
+        const totalEar =
+          earnings?.reduce((a, b) => a + parseFloat(b.amount), 0) || 0;
+        document.getElementById("countEarnings").innerText =
+          `₦${totalEar.toLocaleString()}`;
+
+        loadPendingApprovals();
+        initCharts();
+      }
+
+      async function loadPendingApprovals() {
+        const { data } = await supabase
+          .from("deposits")
+          .select("*, profiles(full_name)")
+          .eq("status", "pending")
+          .limit(5);
+
+        const tableBody = document.getElementById("pendingTableBody");
+        const cardList = document.getElementById("pendingCardList");
+        tableBody.innerHTML = "";
+        cardList.innerHTML = "";
+
+        if (!data || data.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--text-muted);">No pending requests.</td></tr>';
+          cardList.innerHTML =
+            '<div class="approval-empty">No pending requests.</div>';
+          return;
+        }
+
+        data.forEach((item) => {
+          const name = item.profiles.full_name;
+          const amount = parseFloat(item.amount).toLocaleString();
+          const date = new Date(item.created_at).toLocaleDateString();
+
+          // Desktop table row
+          const row = document.createElement("tr");
+          row.innerHTML = `
                     <td>${name}</td>
                     <td><b>₦${amount}</b></td>
                     <td>Deposit</td>
@@ -603,12 +819,12 @@
                     <td><span class="status-pill pill-pending">Pending</span></td>
                     <td><button class="action-btn" onclick="location.href='deposits.html'">Review</button></td>
                 `;
-                tableBody.appendChild(row);
+          tableBody.appendChild(row);
 
-                // Mobile stacked card
-                const card = document.createElement('div');
-                card.className = 'approval-card';
-                card.innerHTML = `
+          // Mobile stacked card
+          const card = document.createElement("div");
+          card.className = "approval-card";
+          card.innerHTML = `
                     <div class="approval-row">
                         <span class="approval-user">${name}</span>
                         <span class="status-pill pill-pending">Pending</span>
@@ -627,75 +843,80 @@
                     </div>
                     <button class="action-btn" onclick="location.href='deposits.html'">Review</button>
                 `;
-                cardList.appendChild(card);
-            });
+          cardList.appendChild(card);
+        });
+      }
+
+      let revenueChartInstance, userChartInstance;
+
+      function initCharts() {
+        const revCtx = document.getElementById("revenueChart").getContext("2d");
+        if (revenueChartInstance) revenueChartInstance.destroy();
+        revenueChartInstance = new Chart(revCtx, {
+          type: "line",
+          data: {
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            datasets: [
+              {
+                label: "Deposits",
+                data: [12000, 19000, 3000, 5000, 20000, 30000, 45000],
+                borderColor: "#3b82f6",
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { display: false } },
+          },
+        });
+
+        const userCtx = document.getElementById("userChart").getContext("2d");
+        if (userChartInstance) userChartInstance.destroy();
+        userChartInstance = new Chart(userCtx, {
+          type: "bar",
+          data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+            datasets: [
+              {
+                label: "New Users",
+                data: [50, 120, 90, 200, 150],
+                backgroundColor: "#10b981",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+
+      function setupRealtime() {
+        supabase
+          .channel("admin-dashboard")
+          .on("postgres_changes", { event: "*", schema: "public" }, () => {
+            loadDashboardData();
+          })
+          .subscribe();
+      }
+
+      window.toggleSidebar = () => {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarBackdrop").classList.toggle("active");
+      };
+
+      window.adminLogout = async () => {
+        if (confirm("Sign out of Admin Dashboard?")) {
+          await supabase.auth.signOut();
+          window.location.href = "login.html";
         }
+      };
 
-        let revenueChartInstance, userChartInstance;
-
-        function initCharts() {
-            const revCtx = document.getElementById('revenueChart').getContext('2d');
-            if (revenueChartInstance) revenueChartInstance.destroy();
-            revenueChartInstance = new Chart(revCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Deposits',
-                        data: [12000, 19000, 3000, 5000, 20000, 30000, 45000],
-                        borderColor: '#3b82f6',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { display: false } }
-                }
-            });
-
-            const userCtx = document.getElementById('userChart').getContext('2d');
-            if (userChartInstance) userChartInstance.destroy();
-            userChartInstance = new Chart(userCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                    datasets: [{
-                        label: 'New Users',
-                        data: [50, 120, 90, 200, 150],
-                        backgroundColor: '#10b981'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function setupRealtime() {
-            supabase.channel('admin-dashboard')
-            .on('postgres_changes', { event: '*', schema: 'public' }, () => {
-                loadDashboardData();
-            })
-            .subscribe();
-        }
-
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebarBackdrop').classList.toggle('active');
-        };
-
-        window.adminLogout = async () => {
-            if (confirm("Sign out of Admin Dashboard?")) {
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
-            }
-        };
-
-        window.addEventListener('DOMContentLoaded', initAdmin);
+      window.addEventListener("DOMContentLoaded", initAdmin);
     </script>
-</body>
+  </body>
 </html>

@@ -1,553 +1,596 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Admin Portal Login | EASYPIE</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #060b13;
-            --secondary-bg: #0a0f1a;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --card-bg: rgba(17, 24, 39, 0.75);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --transition: all 0.3s ease;
-        }
+      :root {
+        --primary-bg: #060b13;
+        --secondary-bg: #0a0f1a;
+        --accent-color: #3b82f6;
+        --accent-hover: #2563eb;
+        --card-bg: rgba(17, 24, 39, 0.75);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --transition: all 0.3s ease;
+      }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 70%);
-        }
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow-x: hidden;
+        background-image: radial-gradient(
+          circle at 50% 0%,
+          rgba(59, 130, 246, 0.12),
+          transparent 70%
+        );
+      }
 
-        .container {
-            width: 90%;
-            max-width: 440px;
-            margin: 0 auto;
-        }
+      .container {
+        width: 90%;
+        max-width: 440px;
+        margin: 0 auto;
+      }
 
-        /* --- Header --- */
-        header {
-            padding: 24px 0;
-            border-bottom: 1px solid var(--glass-border);
-            background: rgba(6, 11, 19, 0.85);
-            backdrop-filter: blur(10px);
-        }
+      /* --- Header --- */
+      header {
+        padding: 24px 0;
+        border-bottom: 1px solid var(--glass-border);
+        background: rgba(6, 11, 19, 0.85);
+        backdrop-filter: blur(10px);
+      }
 
-        .header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .admin-logo {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--accent-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            letter-spacing: 0.5px;
-        }
+      .admin-logo {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--accent-color);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 0.5px;
+      }
 
-        .badge-portal {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--accent-color);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            text-transform: uppercase;
-        }
+      .badge-portal {
+        background: rgba(59, 130, 246, 0.15);
+        color: var(--accent-color);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        text-transform: uppercase;
+      }
 
-        /* --- Main Login Area --- */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 30px 0;
-        }
+      /* --- Main Login Area --- */
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 30px 0;
+      }
 
+      .login-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        padding: 32px 24px;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        margin-bottom: 20px;
+      }
+
+      .welcome-head {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .welcome-head i {
+        font-size: 36px;
+        color: var(--accent-color);
+        margin-bottom: 12px;
+        display: inline-block;
+      }
+
+      .welcome-head h1 {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .welcome-head p {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      /* --- Alert Messages --- */
+      #alertBox {
+        display: none;
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .alert-error {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .alert-success {
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      /* --- Form Styling --- */
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .input-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 14px 15px 14px 44px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        color: white;
+        font-size: 14px;
+        transition: var(--transition);
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        background: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      }
+
+      .btn-admin-login {
+        width: 100%;
+        padding: 15px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .btn-admin-login:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+      }
+
+      .btn-admin-login:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .back-website-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .back-website-link:hover {
+        color: var(--text-main);
+      }
+
+      /* --- Quick Information Card --- */
+      .security-info-card {
+        background: rgba(10, 15, 26, 0.7);
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        padding: 18px;
+      }
+
+      .info-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .info-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .info-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .info-text h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      .info-text p {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      /* --- Footer --- */
+      footer {
+        padding: 24px 0;
+        border-top: 1px solid var(--glass-border);
+        background: var(--secondary-bg);
+        text-align: center;
+      }
+
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 10px;
+      }
+
+      .footer-links a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 12px;
+        transition: var(--transition);
+      }
+
+      .footer-links a:hover {
+        color: var(--accent-color);
+      }
+
+      .copyright {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+      }
+
+      /* --- Spinner --- */
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.9s ease-in-out infinite;
+        display: none;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (min-width: 640px) {
         .login-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            padding: 32px 24px;
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-            margin-bottom: 20px;
+          padding: 40px 32px;
         }
-
-        .welcome-head {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .welcome-head i {
-            font-size: 36px;
-            color: var(--accent-color);
-            margin-bottom: 12px;
-            display: inline-block;
-        }
-
-        .welcome-head h1 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .welcome-head p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        /* --- Alert Messages --- */
-        #alertBox {
-            display: none;
-            padding: 12px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        .alert-error {
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        /* --- Form Styling --- */
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 15px 14px 44px;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: white;
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        }
-
-        .btn-admin-login {
-            width: 100%;
-            padding: 15px;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-admin-login:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-        }
-
-        .btn-admin-login:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .back-website-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 13px;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .back-website-link:hover {
-            color: var(--text-main);
-        }
-
-        /* --- Quick Information Card --- */
-        .security-info-card {
-            background: rgba(10, 15, 26, 0.7);
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            padding: 18px;
-        }
-
-        .info-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .info-text h4 {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .info-text p {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* --- Footer --- */
-        footer {
-            padding: 24px 0;
-            border-top: 1px solid var(--glass-border);
-            background: var(--secondary-bg);
-            text-align: center;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 18px;
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 12px;
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover {
-            color: var(--accent-color);
-        }
-
-        .copyright {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.35);
-        }
-
-        /* --- Spinner --- */
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.9s ease-in-out infinite;
-            display: none;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (min-width: 640px) {
-            .login-card {
-                padding: 40px 32px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <div class="container header-flex">
-            <a href="../index.html" class="admin-logo">
-                <i class="fas fa-shield-alt"></i> EASYPIE
-            </a>
-            <span class="badge-portal">Admin Portal</span>
-        </div>
+      <div class="container header-flex">
+        <a href="../index.html" class="admin-logo">
+          <i class="fas fa-shield-alt"></i> EASYPIE
+        </a>
+        <span class="badge-portal">Admin Portal</span>
+      </div>
     </header>
 
     <main>
-        <div class="container">
-            <div class="login-card">
-                <div class="welcome-head">
-                    <i class="fas fa-user-shield"></i>
-                    <h1>Administrator Access</h1>
-                    <p>Enter your credentials to access the management portal</p>
-                </div>
+      <div class="container">
+        <div class="login-card">
+          <div class="welcome-head">
+            <i class="fas fa-user-shield"></i>
+            <h1>Administrator Access</h1>
+            <p>Enter your credentials to access the management portal</p>
+          </div>
 
-                <div id="alertBox"></div>
+          <div id="alertBox"></div>
 
-                <form id="adminLoginForm">
-                    <div class="form-group">
-                        <label for="adminEmail">Admin Email Address</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="adminEmail" class="form-control" placeholder="admin@easypie.com" required autocomplete="email">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="adminPassword">Password</label>
-                        <div class="input-wrapper">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="adminPassword" class="form-control" placeholder="••••••••••••" required autocomplete="current-password">
-                        </div>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="btn-admin-login">
-                        <span id="btnText">Login to Admin Portal</span>
-                        <div class="spinner" id="btnSpinner"></div>
-                    </button>
-                </form>
-
-                <a href="../index.html" class="back-website-link">
-                    <i class="fas fa-arrow-left"></i> Back to Main Website
-                </a>
+          <form id="adminLoginForm">
+            <div class="form-group">
+              <label for="adminEmail">Admin Email Address</label>
+              <div class="input-wrapper">
+                <i class="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  id="adminEmail"
+                  class="form-control"
+                  placeholder="admin@easypie.com"
+                  required
+                  autocomplete="email"
+                />
+              </div>
             </div>
 
-            <div class="security-info-card">
-                <div class="info-row">
-                    <div class="info-icon"><i class="fas fa-lock"></i></div>
-                    <div class="info-text">
-                        <h4>Secure Administrator Access</h4>
-                        <p>End-to-end encrypted session authentication</p>
-                    </div>
-                </div>
-                <div class="info-row">
-                    <div class="info-icon"><i class="fas fa-user-check"></i></div>
-                    <div class="info-text">
-                        <h4>Authorized Personnel Only</h4>
-                        <p>Unauthorized access attempts are blocked and reported</p>
-                    </div>
-                </div>
-                <div class="info-row">
-                    <div class="info-icon"><i class="fas fa-history"></i></div>
-                    <div class="info-text">
-                        <h4>All Admin Activities Are Logged</h4>
-                        <p>System actions, logins, and approvals are audited</p>
-                    </div>
-                </div>
+            <div class="form-group">
+              <label for="adminPassword">Password</label>
+              <div class="input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input
+                  type="password"
+                  id="adminPassword"
+                  class="form-control"
+                  placeholder="••••••••••••"
+                  required
+                  autocomplete="current-password"
+                />
+              </div>
             </div>
+
+            <button type="submit" id="submitBtn" class="btn-admin-login">
+              <span id="btnText">Login to Admin Portal</span>
+              <div class="spinner" id="btnSpinner"></div>
+            </button>
+          </form>
+
+          <a href="../index.html" class="back-website-link">
+            <i class="fas fa-arrow-left"></i> Back to Main Website
+          </a>
         </div>
+
+        <div class="security-info-card">
+          <div class="info-row">
+            <div class="info-icon"><i class="fas fa-lock"></i></div>
+            <div class="info-text">
+              <h4>Secure Administrator Access</h4>
+              <p>End-to-end encrypted session authentication</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon"><i class="fas fa-user-check"></i></div>
+            <div class="info-text">
+              <h4>Authorized Personnel Only</h4>
+              <p>Unauthorized access attempts are blocked and reported</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon"><i class="fas fa-history"></i></div>
+            <div class="info-text">
+              <h4>All Admin Activities Are Logged</h4>
+              <p>System actions, logins, and approvals are audited</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <footer>
-        <div class="container">
-            <div class="footer-links">
-                <a href="../index.html">EASYPIE Home</a>
-                <a href="../terms.html">Terms of Service</a>
-                <a href="../support.html">Support</a>
-            </div>
-            <p class="copyright">&copy; 2026 EASYPIE Admin Portal. All Rights Reserved.</p>
+      <div class="container">
+        <div class="footer-links">
+          <a href="../index.html">EASYPIE Home</a>
+          <a href="../terms.html">Terms of Service</a>
+          <a href="../support.html">Support</a>
         </div>
+        <p class="copyright">
+          &copy; 2026 EASYPIE Admin Portal. All Rights Reserved.
+        </p>
+      </div>
     </footer>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        const form = document.getElementById('adminLoginForm');
-        const alertBox = document.getElementById('alertBox');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const btnSpinner = document.getElementById('btnSpinner');
+      const form = document.getElementById("adminLoginForm");
+      const alertBox = document.getElementById("alertBox");
+      const submitBtn = document.getElementById("submitBtn");
+      const btnText = document.getElementById("btnText");
+      const btnSpinner = document.getElementById("btnSpinner");
 
-        async function checkExistingAdminSession() {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session && session.user) {
-                    const isAdmin = await verifyAdminRole(session.user.id);
-                    if (isAdmin) {
-                        window.location.href = 'index.html';
-                    }
-                }
-            } catch (err) {
-                console.error("Session verification error:", err);
+      async function checkExistingAdminSession() {
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session && session.user) {
+            const isAdmin = await verifyAdminRole(session.user.id);
+            if (isAdmin) {
+              window.location.href = "index.html";
             }
+          }
+        } catch (err) {
+          console.error("Session verification error:", err);
+        }
+      }
+
+      async function verifyAdminRole(userId) {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", userId)
+          .single();
+
+        if (error || !profile) {
+          return false;
+        }
+        return Boolean(profile.is_admin);
+      }
+
+      async function logAdminActivity(userId, actionDescription) {
+        try {
+          const userAgent = navigator.userAgent || "Unknown Device";
+          await supabase.from("admin_logs").insert([
+            {
+              admin_id: userId,
+              action: actionDescription,
+              device_info: userAgent,
+              created_at: new Date().toISOString(),
+            },
+          ]);
+        } catch (logErr) {
+          // Non-blocking catch if admin_logs table is not yet created
+          console.warn("Audit logging skipped:", logErr);
+        }
+      }
+
+      function showAlert(message, type = "error") {
+        alertBox.innerText = message;
+        alertBox.className = type === "error" ? "alert-error" : "alert-success";
+        alertBox.style.display = "block";
+      }
+
+      function clearAlert() {
+        alertBox.style.display = "none";
+      }
+
+      function setLoading(isLoading) {
+        submitBtn.disabled = isLoading;
+        btnText.style.display = isLoading ? "none" : "block";
+        btnSpinner.style.display = isLoading ? "block" : "none";
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearAlert();
+
+        const email = document.getElementById("adminEmail").value.trim();
+        const password = document.getElementById("adminPassword").value;
+
+        if (!email || !password) {
+          showAlert("Please enter your admin email and password.");
+          return;
         }
 
-        async function verifyAdminRole(userId) {
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('is_admin')
-                .eq('id', userId)
-                .single();
+        setLoading(true);
 
-            if (error || !profile) {
-                return false;
-            }
-            return Boolean(profile.is_admin);
+        try {
+          // 1. Authenticate user
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+          });
+
+          if (error || !data.user) {
+            throw new Error(
+              "Invalid login credentials. Please verify your admin email and password.",
+            );
+          }
+
+          // 2. Verify administrator role
+          const isAdmin = await verifyAdminRole(data.user.id);
+
+          if (!isAdmin) {
+            // Deny access and sign out immediately
+            await supabase.auth.signOut();
+            throw new Error(
+              "Access Denied: Your account does not have Administrator privileges.",
+            );
+          }
+
+          // 3. Log activity and redirect
+          await logAdminActivity(
+            data.user.id,
+            "Admin successfully logged in to Portal.",
+          );
+          showAlert(
+            "Authentication successful. Redirecting to Admin Dashboard...",
+            "success",
+          );
+
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 800);
+        } catch (err) {
+          showAlert(err.message || "An error occurred during authentication.");
+          setLoading(false);
         }
+      });
 
-        async function logAdminActivity(userId, actionDescription) {
-            try {
-                const userAgent = navigator.userAgent || 'Unknown Device';
-                await supabase.from('admin_logs').insert([{
-                    admin_id: userId,
-                    action: actionDescription,
-                    device_info: userAgent,
-                    created_at: new Date().toISOString()
-                }]);
-            } catch (logErr) {
-                // Non-blocking catch if admin_logs table is not yet created
-                console.warn("Audit logging skipped:", logErr);
-            }
-        }
-
-        function showAlert(message, type = 'error') {
-            alertBox.innerText = message;
-            alertBox.className = type === 'error' ? 'alert-error' : 'alert-success';
-            alertBox.style.display = 'block';
-        }
-
-        function clearAlert() {
-            alertBox.style.display = 'none';
-        }
-
-        function setLoading(isLoading) {
-            submitBtn.disabled = isLoading;
-            btnText.style.display = isLoading ? 'none' : 'block';
-            btnSpinner.style.display = isLoading ? 'block' : 'none';
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearAlert();
-
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value;
-
-            if (!email || !password) {
-                showAlert("Please enter your admin email and password.");
-                return;
-            }
-
-            setLoading(true);
-
-            try {
-                // 1. Authenticate user
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (error || !data.user) {
-                    throw new Error("Invalid login credentials. Please verify your admin email and password.");
-                }
-
-                // 2. Verify administrator role
-                const isAdmin = await verifyAdminRole(data.user.id);
-
-                if (!isAdmin) {
-                    // Deny access and sign out immediately
-                    await supabase.auth.signOut();
-                    throw new Error("Access Denied: Your account does not have Administrator privileges.");
-                }
-
-                // 3. Log activity and redirect
-                await logAdminActivity(data.user.id, "Admin successfully logged in to Portal.");
-                showAlert("Authentication successful. Redirecting to Admin Dashboard...", "success");
-
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 800);
-
-            } catch (err) {
-                showAlert(err.message || "An error occurred during authentication.");
-                setLoading(false);
-            }
-        });
-
-        window.addEventListener('DOMContentLoaded', checkExistingAdminSession);
+      window.addEventListener("DOMContentLoaded", checkExistingAdminSession);
     </script>
-</body>
+  </body>
 </html>

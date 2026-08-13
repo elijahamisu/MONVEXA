@@ -1,17 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Administrator Activity Log | EASYPIE Admin</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Icons & Export Libs -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
@@ -19,352 +28,746 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #060b13;
-            --secondary-bg: #0a0f1a;
-            --sidebar-bg: #0d121f;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.4);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --sidebar-width: 260px;
-        }
+      :root {
+        --primary-bg: #060b13;
+        --secondary-bg: #0a0f1a;
+        --sidebar-bg: #0d121f;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.4);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --sidebar-width: 260px;
+      }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
 
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
 
-        /* --- Sidebar --- */
+      /* --- Sidebar --- */
+      aside {
+        width: var(--sidebar-width);
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--glass-border);
+        position: fixed;
+        height: 100vh;
+        left: -260px;
+        transition: 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
+      aside.active {
+        left: 0;
+      }
+
+      .nav-item {
+        padding: 12px 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s;
+      }
+      .nav-item:hover,
+      .nav-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+        border-left: 4px solid var(--accent-color);
+      }
+
+      /* --- Main Content --- */
+      main {
+        flex: 1;
+        margin-left: 0;
+        transition: 0.3s;
+        width: 100%;
+      }
+
+      header {
+        height: 70px;
+        background: var(--secondary-bg);
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
+
+      .container {
+        padding: 20px;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+
+      /* --- Stats Row --- */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+      .stat-card {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+      .stat-card p {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .stat-card h3 {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      /* --- Toolbar --- */
+      .toolbar {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      .search-box {
+        flex: 1;
+        min-width: 250px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        padding: 10px 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .search-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .filter-select {
+        background: var(--secondary-bg);
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        font-size: 13px;
+        outline: none;
+      }
+
+      .btn-prime {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* --- Table --- */
+      .table-container {
+        background: var(--card-bg);
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1200px;
+      }
+      th {
+        text-align: left;
+        padding: 18px 15px;
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--glass-border);
+        letter-spacing: 1px;
+      }
+      td {
+        padding: 15px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--glass-border);
+        vertical-align: middle;
+      }
+
+      .admin-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .admin-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 10px;
+      }
+
+      .action-tag {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 8px;
+        text-transform: capitalize;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-color);
+      }
+      .status-pill {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .status-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+
+      .btn-view {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.2s;
+      }
+      .btn-view:hover {
+        color: var(--accent-color);
+      }
+
+      /* --- Modal --- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+      }
+      .modal-content {
+        background: var(--sidebar-bg);
+        width: 100%;
+        max-width: 800px;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: var(--sidebar-bg);
+        z-index: 10;
+      }
+      .modal-body {
+        padding: 25px;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+      .info-card {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+      .info-card h4 {
+        font-size: 12px;
+        color: var(--accent-color);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 8px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 13px;
+      }
+      .detail-row span {
+        color: var(--text-muted);
+      }
+      .detail-row b {
+        color: white;
+        word-break: break-all;
+        text-align: right;
+        margin-left: 10px;
+      }
+
+      /* Timeline */
+      .timeline {
+        margin-top: 30px;
+      }
+      .timeline-header {
+        font-size: 14px;
+        margin-bottom: 20px;
+        color: var(--text-muted);
+      }
+      .timeline-item {
+        border-left: 2px solid var(--glass-border);
+        padding-left: 20px;
+        margin-left: 10px;
+        position: relative;
+        padding-bottom: 20px;
+      }
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -7px;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        border: 2px solid var(--sidebar-bg);
+      }
+
+      /* Pagination */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-top: 25px;
+      }
+      .btn-page {
+        background: var(--card-bg);
+        color: white;
+        border: 1px solid var(--glass-border);
+        padding: 8px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .btn-page:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      /* --- Utilities --- */
+      @media (min-width: 1024px) {
         aside {
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--glass-border);
-            position: fixed; height: 100vh;
-            left: -260px; transition: 0.3s ease; z-index: 1000;
-            display: flex; flex-direction: column;
+          left: 0;
         }
-        aside.active { left: 0; }
-
-        .nav-item {
-            padding: 12px 25px; display: flex; align-items: center; gap: 15px;
-            color: var(--text-muted); text-decoration: none; font-size: 14px; transition: 0.3s;
+        main {
+          margin-left: var(--sidebar-width);
         }
-        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); border-left: 4px solid var(--accent-color); }
-
-        /* --- Main Content --- */
-        main { flex: 1; margin-left: 0; transition: 0.3s; width: 100%; }
-        
-        header {
-            height: 70px; background: var(--secondary-bg); border-bottom: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; position: sticky; top: 0; z-index: 900;
+      }
+      .overlay-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-bg);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .spinner {
+        width: 25px;
+        height: 25px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: var(--accent-color);
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
-
-        /* --- Stats Row --- */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px; margin-bottom: 25px;
+      /* Print Style */
+      @media print {
+        body * {
+          visibility: hidden;
         }
-        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 18px; border: 1px solid var(--glass-border); }
-        .stat-card p { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
-        .stat-card h3 { font-size: 22px; font-weight: 700; }
-
-        /* --- Toolbar --- */
-        .toolbar {
-            background: var(--card-bg); padding: 15px; border-radius: 15px;
-            border: 1px solid var(--glass-border); margin-bottom: 20px;
-            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        #modalPrintArea,
+        #modalPrintArea * {
+          visibility: visible;
         }
-        .search-box { flex: 1; min-width: 250px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 10px 15px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
-        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 14px; }
-        
-        .filter-select {
-            background: var(--secondary-bg); color: white; padding: 10px; border-radius: 10px;
-            border: 1px solid var(--glass-border); font-size: 13px; outline: none;
+        #modalPrintArea {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          color: black;
+          background: white;
+          padding: 40px;
         }
-
-        .btn-prime { background: var(--accent-color); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-
-        /* --- Table --- */
-        .table-container { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--glass-border); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th { text-align: left; padding: 18px 15px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); letter-spacing: 1px; }
-        td { padding: 15px; font-size: 13px; border-bottom: 1px solid var(--glass-border); vertical-align: middle; }
-        
-        .admin-cell { display: flex; align-items: center; gap: 10px; }
-        .admin-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; }
-
-        .action-tag { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; text-transform: capitalize; background: rgba(59, 130, 246, 0.1); color: var(--accent-color); }
-        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .status-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-
-        .btn-view { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; transition: 0.2s; }
-        .btn-view:hover { color: var(--accent-color); }
-
-        /* --- Modal --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: var(--sidebar-bg); width: 100%; max-width: 800px; border-radius: 24px; border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; }
-        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--sidebar-bg); z-index: 10; }
-        .modal-body { padding: 25px; }
-
-        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .info-card { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 18px; border: 1px solid var(--glass-border); }
-        .info-card h4 { font-size: 12px; color: var(--accent-color); margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px; }
-        
-        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
-        .detail-row span { color: var(--text-muted); }
-        .detail-row b { color: white; word-break: break-all; text-align: right; margin-left: 10px; }
-
-        /* Timeline */
-        .timeline { margin-top: 30px; }
-        .timeline-header { font-size: 14px; margin-bottom: 20px; color: var(--text-muted); }
-        .timeline-item { border-left: 2px solid var(--glass-border); padding-left: 20px; margin-left: 10px; position: relative; padding-bottom: 20px; }
-        .timeline-item::before { content: ''; position: absolute; left: -7px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-color); border: 2px solid var(--sidebar-bg); }
-
-        /* Pagination */
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 25px; }
-        .btn-page { background: var(--card-bg); color: white; border: 1px solid var(--glass-border); padding: 8px 15px; border-radius: 10px; cursor: pointer; }
-        .btn-page:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* --- Utilities --- */
-        @media (min-width: 1024px) { aside { left: 0; } main { margin-left: var(--sidebar-width); } }
-        .overlay-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary-bg); z-index: 3000; display: flex; align-items: center; justify-content: center; }
-        .spinner { width: 25px; height: 25px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Print Style */
-        @media print {
-            body * { visibility: hidden; }
-            #modalPrintArea, #modalPrintArea * { visibility: visible; }
-            #modalPrintArea { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white; padding: 40px; }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="loader" class="overlay-loader">
-        <div class="spinner"></div>
+      <div class="spinner"></div>
     </div>
 
     <!-- Sidebar -->
     <aside id="sidebar">
-        <div style="padding: 30px 25px; font-size: 20px; font-weight: 800; color: var(--accent-color);">EASYPIE ADMIN</div>
-        <nav style="flex:1">
-            <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
-            <a href="deposits.html" class="nav-item"><i class="fas fa-arrow-down"></i> Deposits</a>
-            <a href="withdrawals.html" class="nav-item"><i class="fas fa-arrow-up"></i> Withdrawals</a>
-            <a href="investments.html" class="nav-item"><i class="fas fa-rocket"></i> Investments</a>
-            <a href="earnings.html" class="nav-item"><i class="fas fa-chart-line"></i> Earnings</a>
-            <a href="referrals.html" class="nav-item"><i class="fas fa-users-viewfinder"></i> Referrals</a>
-            <a href="giftcodes.html" class="nav-item"><i class="fas fa-gift"></i> Gift Codes</a>
-            <a href="transactions.html" class="nav-item"><i class="fas fa-exchange-alt"></i> Transactions</a>
-            <a href="notifications.html" class="nav-item"><i class="fas fa-bell"></i> Notifications</a>
-            <a href="support.html" class="nav-item"><i class="fas fa-headset"></i> Support Tickets</a>
-            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
-            <a href="activity-log.html" class="nav-item active"><i class="fas fa-history"></i> Activity Log</a>
-        </nav>
-        <a href="#" onclick="adminLogout()" class="nav-item" style="color: var(--danger); border-top: 1px solid var(--glass-border);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <div
+        style="
+          padding: 30px 25px;
+          font-size: 20px;
+          font-weight: 800;
+          color: var(--accent-color);
+        "
+      >
+        EASYPIE ADMIN
+      </div>
+      <nav style="flex: 1">
+        <a href="index.html" class="nav-item"
+          ><i class="fas fa-th-large"></i> Dashboard</a
+        >
+        <a href="users.html" class="nav-item"
+          ><i class="fas fa-users"></i> Users</a
+        >
+        <a href="deposits.html" class="nav-item"
+          ><i class="fas fa-arrow-down"></i> Deposits</a
+        >
+        <a href="withdrawals.html" class="nav-item"
+          ><i class="fas fa-arrow-up"></i> Withdrawals</a
+        >
+        <a href="investments.html" class="nav-item"
+          ><i class="fas fa-rocket"></i> Investments</a
+        >
+        <a href="earnings.html" class="nav-item"
+          ><i class="fas fa-chart-line"></i> Earnings</a
+        >
+        <a href="referrals.html" class="nav-item"
+          ><i class="fas fa-users-viewfinder"></i> Referrals</a
+        >
+        <a href="giftcodes.html" class="nav-item"
+          ><i class="fas fa-gift"></i> Gift Codes</a
+        >
+        <a href="transactions.html" class="nav-item"
+          ><i class="fas fa-exchange-alt"></i> Transactions</a
+        >
+        <a href="notifications.html" class="nav-item"
+          ><i class="fas fa-bell"></i> Notifications</a
+        >
+        <a href="support.html" class="nav-item"
+          ><i class="fas fa-headset"></i> Support Tickets</a
+        >
+        <a href="settings.html" class="nav-item"
+          ><i class="fas fa-cog"></i> Settings</a
+        >
+        <a href="activity-log.html" class="nav-item active"
+          ><i class="fas fa-history"></i> Activity Log</a
+        >
+      </nav>
+      <a
+        href="#"
+        onclick="adminLogout()"
+        class="nav-item"
+        style="color: var(--danger); border-top: 1px solid var(--glass-border)"
+        ><i class="fas fa-sign-out-alt"></i> Logout</a
+      >
     </aside>
 
     <main>
-        <header>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <i class="fas fa-bars" style="cursor:pointer; color:var(--text-muted)" onclick="document.getElementById('sidebar').classList.toggle('active')"></i>
-                <h2 style="font-size: 18px;">Administrator Audit Logs</h2>
-            </div>
-            <div id="adminProfile" style="display:flex; align-items:center; gap:10px;">
-                <span id="adminName" style="font-size: 12px; font-weight: 600;">Admin</span>
-                <div class="admin-avatar">A</div>
-            </div>
-        </header>
-
-        <div class="container">
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card"><p>Total Actions</p><h3 id="statTotal">0</h3></div>
-                <div class="stat-card"><p>Actions Today</p><h3 id="statToday" style="color: var(--accent-color);">0</h3></div>
-                <div class="stat-card"><p>Active Admins</p><h3 id="statAdmins">0</h3></div>
-                <div class="stat-card"><p>Last System Action</p><h3 id="statLast" style="font-size:14px">...</h3></div>
-            </div>
-
-            <!-- Toolbar -->
-            <div class="toolbar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="logSearch" placeholder="Search admin, action, ID, or IP...">
-                </div>
-                <select class="filter-select" id="actionFilter">
-                    <option value="all">All Modules</option>
-                    <option value="login">Logins</option>
-                    <option value="user">User Management</option>
-                    <option value="finance">Financial Approvals</option>
-                    <option value="settings">Settings Changes</option>
-                    <option value="gift">Gift Codes</option>
-                </select>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-prime" onclick="exportLogCSV()"><i class="fas fa-file-csv"></i> CSV</button>
-                    <button class="btn-prime" onclick="exportLogPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-                </div>
-            </div>
-
-            <!-- Table -->
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Activity ID</th>
-                            <th>Administrator</th>
-                            <th>Action</th>
-                            <th>Description</th>
-                            <th>Date & Time</th>
-                            <th>IP Address</th>
-                            <th>Status</th>
-                            <th>View</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logTableBody">
-                        <!-- Content -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="pagination">
-                <button class="btn-page" id="prevPage"><i class="fas fa-chevron-left"></i></button>
-                <span id="pageInfo">Page 1 of 1</span>
-                <button class="btn-page" id="nextPage"><i class="fas fa-chevron-right"></i></button>
-            </div>
+      <header>
+        <div style="display: flex; align-items: center; gap: 15px">
+          <i
+            class="fas fa-bars"
+            style="cursor: pointer; color: var(--text-muted)"
+            onclick="
+              document.getElementById('sidebar').classList.toggle('active')
+            "
+          ></i>
+          <h2 style="font-size: 18px">Administrator Audit Logs</h2>
         </div>
+        <div
+          id="adminProfile"
+          style="display: flex; align-items: center; gap: 10px"
+        >
+          <span id="adminName" style="font-size: 12px; font-weight: 600"
+            >Admin</span
+          >
+          <div class="admin-avatar">A</div>
+        </div>
+      </header>
+
+      <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p>Total Actions</p>
+            <h3 id="statTotal">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Actions Today</p>
+            <h3 id="statToday" style="color: var(--accent-color)">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Active Admins</p>
+            <h3 id="statAdmins">0</h3>
+          </div>
+          <div class="stat-card">
+            <p>Last System Action</p>
+            <h3 id="statLast" style="font-size: 14px">...</h3>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="logSearch"
+              placeholder="Search admin, action, ID, or IP..."
+            />
+          </div>
+          <select class="filter-select" id="actionFilter">
+            <option value="all">All Modules</option>
+            <option value="login">Logins</option>
+            <option value="user">User Management</option>
+            <option value="finance">Financial Approvals</option>
+            <option value="settings">Settings Changes</option>
+            <option value="gift">Gift Codes</option>
+          </select>
+          <div style="display: flex; gap: 10px">
+            <button class="btn-prime" onclick="exportLogCSV()">
+              <i class="fas fa-file-csv"></i> CSV
+            </button>
+            <button class="btn-prime" onclick="exportLogPDF()">
+              <i class="fas fa-file-pdf"></i> PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Activity ID</th>
+                <th>Administrator</th>
+                <th>Action</th>
+                <th>Description</th>
+                <th>Date & Time</th>
+                <th>IP Address</th>
+                <th>Status</th>
+                <th>View</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+              <!-- Content -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <button class="btn-page" id="prevPage">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span id="pageInfo">Page 1 of 1</span>
+          <button class="btn-page" id="nextPage">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
     </main>
 
     <!-- Detail Modal -->
     <div class="modal-overlay" id="logModal">
-        <div class="modal-content" id="modalPrintArea">
-            <div class="modal-header">
-                <h3>Detailed Audit Report</h3>
-                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer"></i>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Log Details -->
-            </div>
+      <div class="modal-content" id="modalPrintArea">
+        <div class="modal-header">
+          <h3>Detailed Audit Report</h3>
+          <i
+            class="fas fa-times"
+            onclick="closeModal()"
+            style="cursor: pointer"
+          ></i>
         </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Log Details -->
+        </div>
+      </div>
     </div>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let auditData = [];
-        let filteredLogs = [];
-        let currentPage = 1;
-        const perPage = 20;
+      let auditData = [];
+      let filteredLogs = [];
+      let currentPage = 1;
+      const perPage = 20;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-            if (!profile?.is_admin) { window.location.href = '../login.html'; return; }
-            
-            document.getElementById('adminName').innerText = profile.full_name;
-            document.getElementById('loader').style.display = 'none';
-
-            await fetchLogs();
-            setupRealtime();
-            setupEventListeners();
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
         }
 
-        async function fetchLogs() {
-            const { data, error } = await supabase
-                .from('admin_logs')
-                .select('*, profiles:admin_id(full_name, username, email)')
-                .order('created_at', { ascending: false });
-
-            if (data) {
-                auditData = data;
-                applyFilters();
-                updateStats();
-            }
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        if (!profile?.is_admin) {
+          window.location.href = "../login.html";
+          return;
         }
 
-        function updateStats() {
-            document.getElementById('statTotal').innerText = auditData.length;
-            const todayStr = new Date().toDateString();
-            document.getElementById('statToday').innerText = auditData.filter(l => new Date(l.created_at).toDateString() === todayStr).length;
-            document.getElementById('statAdmins').innerText = [...new Set(auditData.map(l => l.admin_id))].length;
-            if (auditData.length > 0) {
-                const last = new Date(auditData[0].created_at);
-                document.getElementById('statLast').innerText = `${last.toLocaleDateString()} ${last.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-            }
+        document.getElementById("adminName").innerText = profile.full_name;
+        document.getElementById("loader").style.display = "none";
+
+        await fetchLogs();
+        setupRealtime();
+        setupEventListeners();
+      }
+
+      async function fetchLogs() {
+        const { data, error } = await supabase
+          .from("admin_logs")
+          .select("*, profiles:admin_id(full_name, username, email)")
+          .order("created_at", { ascending: false });
+
+        if (data) {
+          auditData = data;
+          applyFilters();
+          updateStats();
         }
+      }
 
-        function renderTable() {
-            const body = document.getElementById('logTableBody');
-            body.innerHTML = '';
-            
-            const start = (currentPage - 1) * perPage;
-            const end = start + perPage;
-            const paginated = filteredLogs.slice(start, end);
+      function updateStats() {
+        document.getElementById("statTotal").innerText = auditData.length;
+        const todayStr = new Date().toDateString();
+        document.getElementById("statToday").innerText = auditData.filter(
+          (l) => new Date(l.created_at).toDateString() === todayStr,
+        ).length;
+        document.getElementById("statAdmins").innerText = [
+          ...new Set(auditData.map((l) => l.admin_id)),
+        ].length;
+        if (auditData.length > 0) {
+          const last = new Date(auditData[0].created_at);
+          document.getElementById("statLast").innerText =
+            `${last.toLocaleDateString()} ${last.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+        }
+      }
 
-            paginated.forEach(l => {
-                const date = new Date(l.created_at);
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><span style="font-family:monospace; font-size:11px; color:var(--text-muted)">${l.id.slice(0,8)}</span></td>
+      function renderTable() {
+        const body = document.getElementById("logTableBody");
+        body.innerHTML = "";
+
+        const start = (currentPage - 1) * perPage;
+        const end = start + perPage;
+        const paginated = filteredLogs.slice(start, end);
+
+        paginated.forEach((l) => {
+          const date = new Date(l.created_at);
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td><span style="font-family:monospace; font-size:11px; color:var(--text-muted)">${l.id.slice(0, 8)}</span></td>
                     <td>
                         <div class="admin-cell">
-                            <div class="admin-avatar">${l.profiles ? l.profiles.full_name.charAt(0) : '?'}</div>
+                            <div class="admin-avatar">${l.profiles ? l.profiles.full_name.charAt(0) : "?"}</div>
                             <div>
-                                <p style="font-weight:700">${l.profiles ? l.profiles.full_name : 'System'}</p>
-                                <p style="font-size:10px; color:var(--text-muted)">@${l.profiles ? l.profiles.username : 'auto'}</p>
+                                <p style="font-weight:700">${l.profiles ? l.profiles.full_name : "System"}</p>
+                                <p style="font-size:10px; color:var(--text-muted)">@${l.profiles ? l.profiles.username : "auto"}</p>
                             </div>
                         </div>
                     </td>
-                    <td><span class="action-tag">${l.action.split(' ')[0]}</span></td>
+                    <td><span class="action-tag">${l.action.split(" ")[0]}</span></td>
                     <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${l.action}</td>
                     <td>${date.toLocaleDateString()}<br><span style="font-size:10px; color:var(--text-muted)">${date.toLocaleTimeString()}</span></td>
-                    <td style="font-family:monospace; font-size:12px">${l.ip_address || '127.0.0.1'}</td>
+                    <td style="font-family:monospace; font-size:12px">${l.ip_address || "127.0.0.1"}</td>
                     <td><span class="status-pill status-success">Success</span></td>
                     <td><button class="btn-view" onclick="viewLog('${l.id}')"><i class="fas fa-eye"></i></button></td>
                 `;
-                body.appendChild(row);
-            });
+          body.appendChild(row);
+        });
 
-            const totalPages = Math.ceil(filteredLogs.length / perPage) || 1;
-            document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages}`;
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage >= totalPages;
-        }
+        const totalPages = Math.ceil(filteredLogs.length / perPage) || 1;
+        document.getElementById("pageInfo").innerText =
+          `Page ${currentPage} of ${totalPages}`;
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled =
+          currentPage >= totalPages;
+      }
 
-        window.viewLog = (id) => {
-            const l = auditData.find(x => x.id === id);
-            const body = document.getElementById('modalBody');
-            body.innerHTML = `
+      window.viewLog = (id) => {
+        const l = auditData.find((x) => x.id === id);
+        const body = document.getElementById("modalBody");
+        body.innerHTML = `
                 <div class="detail-grid">
                     <div class="info-card">
                         <h4>Administrator Information</h4>
-                        <div class="detail-row"><span>Full Name</span><b>${l.profiles ? l.profiles.full_name : 'System'}</b></div>
-                        <div class="detail-row"><span>Username</span><b>@${l.profiles ? l.profiles.username : 'auto'}</b></div>
-                        <div class="detail-row"><span>Admin ID</span><b>${l.admin_id.slice(0,12)}</b></div>
+                        <div class="detail-row"><span>Full Name</span><b>${l.profiles ? l.profiles.full_name : "System"}</b></div>
+                        <div class="detail-row"><span>Username</span><b>@${l.profiles ? l.profiles.username : "auto"}</b></div>
+                        <div class="detail-row"><span>Admin ID</span><b>${l.admin_id.slice(0, 12)}</b></div>
                     </div>
                     <div class="info-card">
                         <h4>Audit Information</h4>
                         <div class="detail-row"><span>Activity ID</span><b>${l.id}</b></div>
-                        <div class="detail-row"><span>IP Address</span><b>${l.ip_address || '127.0.0.1'}</b></div>
-                        <div class="detail-row"><span>Device</span><b>${l.device_info || 'Unknown'}</b></div>
+                        <div class="detail-row"><span>IP Address</span><b>${l.ip_address || "127.0.0.1"}</b></div>
+                        <div class="detail-row"><span>Device</span><b>${l.device_info || "Unknown"}</b></div>
                         <div class="detail-row"><span>Status</span><b class="status-pill status-success">Verified</b></div>
                     </div>
                 </div>
@@ -372,7 +775,7 @@
                 <div class="info-card" style="margin-top:20px; border-left:4px solid var(--accent-color)">
                     <h4 style="border:none">Action Description</h4>
                     <p style="font-size:15px; line-height:1.6; color:white">${l.action}</p>
-                    <p style="font-size:11px; color:var(--text-muted); margin-top:10px">Target Record ID: ${l.target_id || 'N/A'}</p>
+                    <p style="font-size:11px; color:var(--text-muted); margin-top:10px">Target Record ID: ${l.target_id || "N/A"}</p>
                 </div>
 
                 <div class="timeline">
@@ -392,81 +795,111 @@
                     <button class="btn-prime" style="flex:1; background:#333" onclick="closeModal()">Close Audit</button>
                 </div>
             `;
-            document.getElementById('logModal').style.display = 'flex';
-        };
+        document.getElementById("logModal").style.display = "flex";
+      };
 
-        function applyFilters() {
-            const query = document.getElementById('logSearch').value.toLowerCase();
-            const module = document.getElementById('actionFilter').value;
+      function applyFilters() {
+        const query = document.getElementById("logSearch").value.toLowerCase();
+        const module = document.getElementById("actionFilter").value;
 
-            filteredLogs = auditData.filter(l => {
-                const matchSearch = l.action.toLowerCase().includes(query) || 
-                                    (l.profiles && l.profiles.full_name.toLowerCase().includes(query)) ||
-                                    l.id.includes(query) ||
-                                    (l.ip_address && l.ip_address.includes(query));
-                
-                let matchModule = true;
-                if (module !== 'all') {
-                    matchModule = l.action.toLowerCase().includes(module);
-                }
+        filteredLogs = auditData.filter((l) => {
+          const matchSearch =
+            l.action.toLowerCase().includes(query) ||
+            (l.profiles &&
+              l.profiles.full_name.toLowerCase().includes(query)) ||
+            l.id.includes(query) ||
+            (l.ip_address && l.ip_address.includes(query));
 
-                return matchSearch && matchModule;
-            });
-            currentPage = 1;
+          let matchModule = true;
+          if (module !== "all") {
+            matchModule = l.action.toLowerCase().includes(module);
+          }
+
+          return matchSearch && matchModule;
+        });
+        currentPage = 1;
+        renderTable();
+      }
+
+      window.exportLogCSV = () => {
+        let csv = "ID,Admin,Action,Date,IP\n";
+        filteredLogs.forEach((l) => {
+          csv += `${l.id},${l.profiles ? l.profiles.full_name : "System"},${l.action},${l.created_at},${l.ip_address || ""}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `EASYPIE_Audit_Log_${Date.now()}.csv`;
+        a.click();
+      };
+
+      window.exportLogPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text("EASYPIE - Administrator Audit Log", 14, 20);
+        doc.setFontSize(10);
+        doc.text(`Generated on ${new Date().toLocaleString()}`, 14, 28);
+
+        const rows = filteredLogs
+          .slice(0, 50)
+          .map((l) => [
+            new Date(l.created_at).toLocaleDateString(),
+            l.profiles ? l.profiles.full_name : "System",
+            l.action,
+            l.ip_address || "-",
+          ]);
+
+        doc.autoTable({
+          startY: 35,
+          head: [["Date", "Admin", "Action", "IP"]],
+          body: rows,
+        });
+
+        doc.save(`EASYPIE_Audit_${Date.now()}.pdf`);
+      };
+
+      function setupEventListeners() {
+        document
+          .getElementById("logSearch")
+          .addEventListener("input", applyFilters);
+        document
+          .getElementById("actionFilter")
+          .addEventListener("change", applyFilters);
+        document.getElementById("prevPage").onclick = () => {
+          if (currentPage > 1) {
+            currentPage--;
             renderTable();
-        }
-
-        window.exportLogCSV = () => {
-            let csv = 'ID,Admin,Action,Date,IP\n';
-            filteredLogs.forEach(l => {
-                csv += `${l.id},${l.profiles ? l.profiles.full_name : 'System'},${l.action},${l.created_at},${l.ip_address || ''}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `EASYPIE_Audit_Log_${Date.now()}.csv`;
-            a.click();
+          }
         };
-
-        window.exportLogPDF = () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFontSize(16);
-            doc.text("EASYPIE - Administrator Audit Log", 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generated on ${new Date().toLocaleString()}`, 14, 28);
-            
-            const rows = filteredLogs.slice(0, 50).map(l => [
-                new Date(l.created_at).toLocaleDateString(),
-                l.profiles ? l.profiles.full_name : 'System',
-                l.action,
-                l.ip_address || '-'
-            ]);
-
-            doc.autoTable({
-                startY: 35,
-                head: [['Date', 'Admin', 'Action', 'IP']],
-                body: rows,
-            });
-
-            doc.save(`EASYPIE_Audit_${Date.now()}.pdf`);
+        document.getElementById("nextPage").onclick = () => {
+          if (currentPage * perPage < filteredLogs.length) {
+            currentPage++;
+            renderTable();
+          }
         };
+      }
 
-        function setupEventListeners() {
-            document.getElementById('logSearch').addEventListener('input', applyFilters);
-            document.getElementById('actionFilter').addEventListener('change', applyFilters);
-            document.getElementById('prevPage').onclick = () => { if(currentPage > 1) { currentPage--; renderTable(); }};
-            document.getElementById('nextPage').onclick = () => { if(currentPage * perPage < filteredLogs.length) { currentPage++; renderTable(); }};
-        }
+      function setupRealtime() {
+        supabase
+          .channel("audit-chan")
+          .on(
+            "postgres_changes",
+            { event: "INSERT", schema: "public", table: "admin_logs" },
+            fetchLogs,
+          )
+          .subscribe();
+      }
 
-        function setupRealtime() {
-            supabase.channel('audit-chan').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'admin_logs' }, fetchLogs).subscribe();
-        }
+      window.closeModal = () =>
+        (document.getElementById("logModal").style.display = "none");
+      window.adminLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      };
 
-        window.closeModal = () => document.getElementById('logModal').style.display = 'none';
-        window.adminLogout = async () => { await supabase.auth.signOut(); window.location.href = 'login.html'; };
-
-        window.addEventListener('DOMContentLoaded', init);
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

@@ -9,31 +9,34 @@ The application uses **Vite** for a high-performance frontend, **Supabase** for 
 ## 🚀 Features
 
 ### User Features
-*   **Secure Authentication:** Quick registration and login (No KYC required).
-*   **Personal Dashboard:** Real-time tracking of wallet balance, active investments, and earnings.
-*   **Investment Plans:** Browse and subscribe to various Naira-based profit packages.
-*   **Daily Earnings:** Profits are calculated and credited automatically at **12:00 AM (Africa/Lagos)**.
-*   **Flexible Wallet:** Invest directly from your available balance or deposit via Kuda Bank.
-*   **Kuda Bank Integration:** Exclusive, simplified deposit system using Kuda Bank.
-*   **Referral Program:** Earn commissions by inviting friends using a unique referral link.
-*   **Gift Codes:** Redeem promotional codes for instant wallet bonuses.
-*   **Notifications:** Real-time alerts for every transaction, earning, and system update.
-*   **Transaction History:** Detailed logs for all financial activities.
+
+- **Secure Authentication:** Quick registration and login (No KYC required).
+- **Personal Dashboard:** Real-time tracking of wallet balance, active investments, and earnings.
+- **Investment Plans:** Browse and subscribe to various Naira-based profit packages.
+- **Daily Earnings:** Profits are calculated and credited automatically at **12:00 AM (Africa/Lagos)**.
+- **Flexible Wallet:** Invest directly from your available balance or deposit via Kuda Bank.
+- **Kuda Bank Integration:** Exclusive, simplified deposit system using Kuda Bank.
+- **Referral Program:** Earn commissions by inviting friends using a unique referral link.
+- **Gift Codes:** Redeem promotional codes for instant wallet bonuses.
+- **Notifications:** Real-time alerts for every transaction, earning, and system update.
+- **Transaction History:** Detailed logs for all financial activities.
 
 ### Platform Features
-*   **Welcome Bonus:** ₦500 credited automatically to all new users.
-*   **Referral Rewards:** 20% commission on qualifying referral activities (Configurable).
-*   **Mobile-First Design:** Optimized for a premium experience on smartphones.
-*   **Supabase Realtime:** Instant UI updates without requiring page refreshes.
+
+- **Welcome Bonus:** ₦500 credited automatically to all new users.
+- **Referral Rewards:** 20% commission on qualifying referral activities (Configurable).
+- **Mobile-First Design:** Optimized for a premium experience on smartphones.
+- **Supabase Realtime:** Instant UI updates without requiring page refreshes.
 
 ### Administrator Features
-*   **Admin Console:** High-level overview of platform performance and statistics.
-*   **User Management:** Activate, suspend, or ban accounts and view user profiles.
-*   **Financial Approvals:** Review and process deposit and withdrawal requests.
-*   **Investment Control:** Monitor active cycles and pause/resume earnings.
-*   **Broadcast System:** Send notifications or announcements to the entire user base.
-*   **System Settings:** Manage bank details, reward percentages, and maintenance mode.
-*   **Audit Logs:** Permanent records of all administrative actions for security.
+
+- **Admin Console:** High-level overview of platform performance and statistics.
+- **User Management:** Activate, suspend, or ban accounts and view user profiles.
+- **Financial Approvals:** Review and process deposit and withdrawal requests.
+- **Investment Control:** Monitor active cycles and pause/resume earnings.
+- **Broadcast System:** Send notifications or announcements to the entire user base.
+- **System Settings:** Manage bank details, reward percentages, and maintenance mode.
+- **Audit Logs:** Permanent records of all administrative actions for security.
 
 ---
 
@@ -58,31 +61,33 @@ EASYPIE/
 
 ## 🛠️ Requirements
 
-*   **Node.js:** version 20.x or higher
-*   **npm:** Package manager (included with Node)
-*   **Supabase:** A free or pro project for the backend
-*   **Vercel:** Account for hosting and deployment
-*   **Git:** For version control
+- **Node.js:** version 20.x or higher
+- **npm:** Package manager (included with Node)
+- **Supabase:** A free or pro project for the backend
+- **Vercel:** Account for hosting and deployment
+- **Git:** For version control
 
 ---
 
 ## 🔧 Installation
 
 1.  **Clone the Repository:**
+
     ```bash
     git clone https://github.com/yourusername/easypie.git
     cd easypie
     ```
 
 2.  **Install Dependencies:**
+
     ```bash
     npm install
     ```
 
 3.  **Environment Setup:**
-    *   Copy `.env.example` to a new file named `.env`.
-    *   Input your **Supabase URL** and **Anon Key**.
-    *   Configure your Kuda Bank details and Telegram community link.
+    - Copy `.env.example` to a new file named `.env`.
+    - Input your **Supabase URL** and **Anon Key**.
+    - Configure your Kuda Bank details and Telegram community link.
 
 4.  **Start Development Server:**
     ```bash
@@ -95,15 +100,15 @@ EASYPIE/
 
 The project requires the following keys to be set in your `.env` file or deployment dashboard:
 
-| Variable | Description |
-| :--- | :--- |
-| `VITE_SUPABASE_URL` | Your unique Supabase Project URL. |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase Public API Key. |
-| `VITE_APP_NAME` | EASYPIE |
-| `VITE_APP_TIMEZONE` | Africa/Lagos |
-| `VITE_WELCOME_BONUS` | 500 |
-| `VITE_KUDA_ACCOUNT_NUMBER`| Your registered Kuda account for deposits. |
-| `VITE_TELEGRAM_GROUP` | Your community invitation link. |
+| Variable                   | Description                                |
+| :------------------------- | :----------------------------------------- |
+| `VITE_SUPABASE_URL`        | Your unique Supabase Project URL.          |
+| `VITE_SUPABASE_ANON_KEY`   | Your Supabase Public API Key.              |
+| `VITE_APP_NAME`            | EASYPIE                                    |
+| `VITE_APP_TIMEZONE`        | Africa/Lagos                               |
+| `VITE_WELCOME_BONUS`       | 500                                        |
+| `VITE_KUDA_ACCOUNT_NUMBER` | Your registered Kuda account for deposits. |
+| `VITE_TELEGRAM_GROUP`      | Your community invitation link.            |
 
 ---
 
@@ -129,18 +134,18 @@ This project is designed to be deployed on **Vercel** with zero configuration (`
 
 ## 🛡️ Security
 
-*   **No Hardcoded Secrets:** All credentials are managed via environment variables.
-*   **RLS (Row Level Security):** Ensure RLS is enabled in Supabase so users can only access their own data.
-*   **Admin Protection:** The admin module includes strict role-based verification.
-*   **Input Validation:** All financial inputs are validated on both the client and server side.
+- **No Hardcoded Secrets:** All credentials are managed via environment variables.
+- **RLS (Row Level Security):** Ensure RLS is enabled in Supabase so users can only access their own data.
+- **Admin Protection:** The admin module includes strict role-based verification.
+- **Input Validation:** All financial inputs are validated on both the client and server side.
 
 ---
 
 ## ❓ Troubleshooting
 
-*   **404 on subpages:** Ensure `vite.config.js` includes all HTML files in the `rollupOptions.input` section.
-*   **Balance not updating:** Verify that Supabase Realtime is enabled for the `wallets` table.
-*   **Build Errors:** Ensure you are using Node.js version 20 or higher.
+- **404 on subpages:** Ensure `vite.config.js` includes all HTML files in the `rollupOptions.input` section.
+- **Balance not updating:** Verify that Supabase Realtime is enabled for the `wallets` table.
+- **Build Errors:** Ensure you are using Node.js version 20 or higher.
 
 ---
 
@@ -155,4 +160,5 @@ This project is licensed under the **MIT License**.
 For technical assistance or business inquiries, please visit the **Support Center** within the platform or contact us via our **Telegram Community**.
 
 ---
-*© 2024 EASYPIE. All Rights Reserved.*
+
+_© 2024 EASYPIE. All Rights Reserved._

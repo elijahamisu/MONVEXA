@@ -1,17 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Earnings | EASYPIE - Premium Investment</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Charts.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,325 +29,587 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #0a0e17;
-            --secondary-bg: #111827;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.6);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --gold: #f59e0b;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --nav-height: 70px;
+      :root {
+        --primary-bg: #0a0e17;
+        --secondary-bg: #111827;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.6);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --gold: #f59e0b;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --nav-height: 70px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        padding-bottom: calc(var(--nav-height) + 30px);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .container {
+        width: 92%;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* --- Header --- */
+      header {
+        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        background: rgba(10, 14, 23, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 100;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .back-btn {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mini-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      /* --- Info Card --- */
+      .info-card {
+        background: rgba(59, 130, 246, 0.05);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        padding: 15px;
+        border-radius: 15px;
+        margin: 20px 0;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .info-card i {
+        color: var(--accent-color);
+        margin-top: 3px;
+      }
+      .info-card p {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      /* --- Main Earnings Card --- */
+      .earnings-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 25px;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        margin-bottom: 25px;
+      }
+      .earnings-card p {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+      }
+      .earnings-card h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--success);
+      }
+      .earnings-card .timer {
+        font-size: 11px;
+        margin-top: 15px;
+        color: var(--warning);
+      }
+
+      /* --- Stats Grid --- */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 25px;
+      }
+      .stat-box {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid var(--glass-border);
+      }
+      .stat-box p {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+      }
+      .stat-box h4 {
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      /* --- Chart Section --- */
+      .chart-container {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 25px;
+      }
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .chart-header h3 {
+        font-size: 15px;
+      }
+
+      /* --- Filters --- */
+      .filter-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+      }
+      .tab {
+        white-space: nowrap;
+        padding: 6px 15px;
+        border-radius: 20px;
+        background: var(--secondary-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .tab.active {
+        background: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+      }
+
+      /* --- Active Progress --- */
+      .active-inv-card {
+        background: var(--secondary-bg);
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 15px;
+      }
+      .inv-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .inv-header h4 {
+        font-size: 14px;
+      }
+      .inv-header span {
+        font-size: 12px;
+        color: var(--success);
+        font-weight: 700;
+      }
+
+      .progress-container {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .progress-bar {
+        height: 100%;
+        background: var(--accent-color);
+        border-radius: 10px;
+        transition: 0.5s;
+      }
+      .progress-info {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+
+      /* --- History List --- */
+      .history-item {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .hist-info h5 {
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+      .hist-info p {
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+      .hist-amount {
+        text-align: right;
+      }
+      .hist-amount h4 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--success);
+      }
+      .hist-amount span {
+        font-size: 9px;
+        font-weight: 800;
+        color: var(--success);
+        text-transform: uppercase;
+      }
+
+      /* --- Empty State --- */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+      }
+      .empty-state i {
+        font-size: 40px;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+        opacity: 0.3;
+      }
+      .empty-state p {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+      }
+      .btn-prime {
+        padding: 12px 25px;
+        background: var(--accent-color);
+        color: white;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-block;
+      }
+
+      /* --- Bottom Nav --- */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(17, 24, 39, 0.95);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid var(--glass-border);
+        z-index: 1000;
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 10px;
+      }
+      .nav-item.active {
+        color: var(--accent-color);
+      }
+      .nav-item i {
+        font-size: 18px;
+      }
+
+      /* --- Skeleton --- */
+      .skeleton {
+        background: #1f2937;
+        border-radius: 15px;
+        animation: pulse 1.5s infinite;
+        height: 60px;
+        margin-bottom: 10px;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
         }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            padding-bottom: calc(var(--nav-height) + 30px);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container { width: 92%; max-width: 800px; margin: 0 auto; }
-
-        /* --- Header --- */
-        header {
-            padding: 20px 0;
-            position: sticky; top: 0;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .header-flex { display: flex; justify-content: space-between; align-items: center; }
-
-        .back-btn {
-            color: white; text-decoration: none; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .mini-avatar {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: var(--accent-color);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px;
-        }
-
-        /* --- Info Card --- */
-        .info-card {
-            background: rgba(59, 130, 246, 0.05);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            padding: 15px; border-radius: 15px; margin: 20px 0;
-            display: flex; gap: 12px; align-items: flex-start;
-        }
-        .info-card i { color: var(--accent-color); margin-top: 3px; }
-        .info-card p { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
-
-        /* --- Main Earnings Card --- */
-        .earnings-card {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 25px; border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin-bottom: 25px;
-        }
-        .earnings-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
-        .earnings-card h1 { font-size: 32px; font-weight: 800; color: var(--success); }
-        .earnings-card .timer { font-size: 11px; margin-top: 15px; color: var(--warning); }
-
-        /* --- Stats Grid --- */
-        .stats-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px;
-        }
-        .stat-box {
-            background: var(--card-bg); padding: 15px;
-            border-radius: 15px; border: 1px solid var(--glass-border);
-        }
-        .stat-box p { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
-        .stat-box h4 { font-size: 15px; font-weight: 700; }
-
-        /* --- Chart Section --- */
-        .chart-container {
-            background: var(--card-bg); padding: 20px; border-radius: 20px;
-            border: 1px solid var(--glass-border); margin-bottom: 25px;
-        }
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .chart-header h3 { font-size: 15px; }
-
-        /* --- Filters --- */
-        .filter-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab {
-            white-space: nowrap; padding: 6px 15px; border-radius: 20px;
-            background: var(--secondary-bg); border: 1px solid var(--glass-border);
-            color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer;
-        }
-        .tab.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
-
-        /* --- Active Progress --- */
-        .active-inv-card {
-            background: var(--secondary-bg); padding: 18px; border-radius: 18px;
-            border: 1px solid var(--glass-border); margin-bottom: 15px;
-        }
-        .inv-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
-        .inv-header h4 { font-size: 14px; }
-        .inv-header span { font-size: 12px; color: var(--success); font-weight: 700; }
-        
-        .progress-container { height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--accent-color); border-radius: 10px; transition: 0.5s; }
-        .progress-info { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--text-muted); }
-
-        /* --- History List --- */
-        .history-item {
-            background: var(--card-bg); padding: 15px; border-radius: 15px;
-            border: 1px solid var(--glass-border); margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .hist-info h5 { font-size: 13px; margin-bottom: 4px; }
-        .hist-info p { font-size: 10px; color: var(--text-muted); }
-        .hist-amount { text-align: right; }
-        .hist-amount h4 { font-size: 14px; font-weight: 700; color: var(--success); }
-        .hist-amount span { font-size: 9px; font-weight: 800; color: var(--success); text-transform: uppercase; }
-
-        /* --- Empty State --- */
-        .empty-state { text-align: center; padding: 40px 20px; }
-        .empty-state i { font-size: 40px; color: var(--text-muted); margin-bottom: 15px; opacity: 0.3; }
-        .empty-state p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-        .btn-prime { padding: 12px 25px; background: var(--accent-color); color: white; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block; }
-
-        /* --- Bottom Nav --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: var(--nav-height); background: rgba(17, 24, 39, 0.95);
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            border-top: 1px solid var(--glass-border); z-index: 1000;
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 4px; color: var(--text-muted);
-            text-decoration: none; font-size: 10px;
-        }
-        .nav-item.active { color: var(--accent-color); }
-        .nav-item i { font-size: 18px; }
-
-        /* --- Skeleton --- */
-        .skeleton { background: #1f2937; border-radius: 15px; animation: pulse 1.5s infinite; height: 60px; margin-bottom: 10px; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <div class="container header-flex">
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Earnings</a>
-            <div class="profile-area">
-                <a href="notifications.html" style="color: white; font-size: 18px; margin-right: 12px;"><i class="fas fa-bell"></i></a>
-                <div class="mini-avatar" id="userAvatar">U</div>
-            </div>
+      <div class="container header-flex">
+        <a href="dashboard.html" class="back-btn"
+          ><i class="fas fa-arrow-left"></i> Earnings</a
+        >
+        <div class="profile-area">
+          <a
+            href="notifications.html"
+            style="color: white; font-size: 18px; margin-right: 12px"
+            ><i class="fas fa-bell"></i
+          ></a>
+          <div class="mini-avatar" id="userAvatar">U</div>
         </div>
+      </div>
     </header>
 
     <main class="container">
-        <!-- Info -->
-        <div class="info-card">
-            <i class="fas fa-clock"></i>
-            <p>Profits are calculated and credited automatically every day at <b>12:00 AM Africa/Lagos</b>. Active investments generate earnings until completion.</p>
+      <!-- Info -->
+      <div class="info-card">
+        <i class="fas fa-clock"></i>
+        <p>
+          Profits are calculated and credited automatically every day at
+          <b>12:00 AM Africa/Lagos</b>. Active investments generate earnings
+          until completion.
+        </p>
+      </div>
+
+      <!-- Total Earnings Card -->
+      <section class="earnings-card">
+        <p>Total Profits Earned</p>
+        <h1 id="totalEarnings">₦0.00</h1>
+        <div class="timer">
+          <i class="fas fa-hourglass-half"></i> Next credit in:
+          <span id="nextCreditTimer">...</span>
+        </div>
+      </section>
+
+      <!-- Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-box">
+          <p>Today's Earnings</p>
+          <h4 id="todayEarnings">₦0.00</h4>
+        </div>
+        <div class="stat-box">
+          <p>Yesterday</p>
+          <h4 id="yesterdayEarnings">₦0.00</h4>
+        </div>
+        <div class="stat-box">
+          <p>Active Plans</p>
+          <h4 id="activePlans">0</h4>
+        </div>
+        <div class="stat-box">
+          <p>Wallet Balance</p>
+          <h4 id="walletBal">₦0.00</h4>
+        </div>
+        <div class="stat-box">
+          <p>Referral Bonus</p>
+          <h4 id="refBonus">₦0.00</h4>
+        </div>
+        <div class="stat-box">
+          <p>Welcome Bonus</p>
+          <h4 id="welcomeBonus">₦500.00</h4>
+        </div>
+      </section>
+
+      <!-- Earnings Chart -->
+      <section class="chart-container">
+        <div class="chart-header">
+          <h3>Earnings Growth</h3>
+          <i class="fas fa-chart-line" style="color: var(--accent-color)"></i>
+        </div>
+        <canvas id="earningsChart" height="200"></canvas>
+      </section>
+
+      <!-- Active Investment Progress -->
+      <section id="activeInvSection">
+        <h3 style="font-size: 16px; margin-bottom: 15px">Active Generation</h3>
+        <div id="activeInvList">
+          <div class="skeleton"></div>
+        </div>
+      </section>
+
+      <!-- History with Filter -->
+      <section style="margin-top: 30px">
+        <h3 style="font-size: 16px; margin-bottom: 15px">Earnings History</h3>
+
+        <div class="filter-tabs">
+          <button class="tab active" onclick="filterData('all', this)">
+            All Time
+          </button>
+          <button class="tab" onclick="filterData('today', this)">Today</button>
+          <button class="tab" onclick="filterData('week', this)">
+            This Week
+          </button>
+          <button class="tab" onclick="filterData('month', this)">
+            This Month
+          </button>
         </div>
 
-        <!-- Total Earnings Card -->
-        <section class="earnings-card">
-            <p>Total Profits Earned</p>
-            <h1 id="totalEarnings">₦0.00</h1>
-            <div class="timer">
-                <i class="fas fa-hourglass-half"></i> Next credit in: <span id="nextCreditTimer">...</span>
-            </div>
-        </section>
-
-        <!-- Stats Grid -->
-        <section class="stats-grid">
-            <div class="stat-box"><p>Today's Earnings</p><h4 id="todayEarnings">₦0.00</h4></div>
-            <div class="stat-box"><p>Yesterday</p><h4 id="yesterdayEarnings">₦0.00</h4></div>
-            <div class="stat-box"><p>Active Plans</p><h4 id="activePlans">0</h4></div>
-            <div class="stat-box"><p>Wallet Balance</p><h4 id="walletBal">₦0.00</h4></div>
-            <div class="stat-box"><p>Referral Bonus</p><h4 id="refBonus">₦0.00</h4></div>
-            <div class="stat-box"><p>Welcome Bonus</p><h4 id="welcomeBonus">₦500.00</h4></div>
-        </section>
-
-        <!-- Earnings Chart -->
-        <section class="chart-container">
-            <div class="chart-header">
-                <h3>Earnings Growth</h3>
-                <i class="fas fa-chart-line" style="color: var(--accent-color);"></i>
-            </div>
-            <canvas id="earningsChart" height="200"></canvas>
-        </section>
-
-        <!-- Active Investment Progress -->
-        <section id="activeInvSection">
-            <h3 style="font-size: 16px; margin-bottom: 15px;">Active Generation</h3>
-            <div id="activeInvList">
-                <div class="skeleton"></div>
-            </div>
-        </section>
-
-        <!-- History with Filter -->
-        <section style="margin-top: 30px;">
-            <h3 style="font-size: 16px; margin-bottom: 15px;">Earnings History</h3>
-            
-            <div class="filter-tabs">
-                <button class="tab active" onclick="filterData('all', this)">All Time</button>
-                <button class="tab" onclick="filterData('today', this)">Today</button>
-                <button class="tab" onclick="filterData('week', this)">This Week</button>
-                <button class="tab" onclick="filterData('month', this)">This Month</button>
-            </div>
-
-            <div id="historyList">
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-            </div>
-        </section>
+        <div id="historyList">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
+      </section>
     </main>
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">
-            <i class="fas fa-th-large"></i><span>Home</span>
-        </a>
-        <a href="plans.html" class="nav-item">
-            <i class="fas fa-layer-group"></i><span>Plans</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i><span>Wallet</span>
-        </a>
-        <a href="earnings.html" class="nav-item active">
-            <i class="fas fa-chart-bar"></i><span>Earnings</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user-circle"></i><span>Profile</span>
-        </a>
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-th-large"></i><span>Home</span>
+      </a>
+      <a href="plans.html" class="nav-item">
+        <i class="fas fa-layer-group"></i><span>Plans</span>
+      </a>
+      <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i><span>Wallet</span>
+      </a>
+      <a href="earnings.html" class="nav-item active">
+        <i class="fas fa-chart-bar"></i><span>Earnings</span>
+      </a>
+      <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i><span>Profile</span>
+      </a>
     </nav>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
-        let earningsData = [];
-        let chartInstance = null;
+      let currentUser = null;
+      let earningsData = [];
+      let chartInstance = null;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
+        }
+        currentUser = session.user;
 
-            await loadProfile();
-            await loadAllData();
-            startTimer();
+        await loadProfile();
+        await loadAllData();
+        startTimer();
+      }
+
+      async function loadProfile() {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", currentUser.id)
+          .single();
+        if (data)
+          document.getElementById("userAvatar").innerText = data.full_name
+            .charAt(0)
+            .toUpperCase();
+      }
+
+      async function loadAllData() {
+        // 1. Load Wallet
+        const { data: wallet } = await supabase
+          .from("wallets")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .single();
+        if (wallet)
+          document.getElementById("walletBal").innerText =
+            `₦${parseFloat(wallet.balance).toLocaleString()}`;
+
+        // 2. Load Earnings Transactions
+        const { data: txs } = await supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (txs) {
+          earningsData = txs.filter((t) => t.type === "earning");
+
+          // Calculate summaries
+          const total = earningsData.reduce(
+            (s, t) => s + parseFloat(t.amount),
+            0,
+          );
+          document.getElementById("totalEarnings").innerText =
+            `₦${total.toLocaleString()}`;
+
+          const todayStr = new Date().toDateString();
+          const todayVal = earningsData
+            .filter((t) => new Date(t.created_at).toDateString() === todayStr)
+            .reduce((s, t) => s + parseFloat(t.amount), 0);
+          document.getElementById("todayEarnings").innerText =
+            `₦${todayVal.toLocaleString()}`;
+
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yestStr = yesterday.toDateString();
+          const yestVal = earningsData
+            .filter((t) => new Date(t.created_at).toDateString() === yestStr)
+            .reduce((s, t) => s + parseFloat(t.amount), 0);
+          document.getElementById("yesterdayEarnings").innerText =
+            `₦${yestVal.toLocaleString()}`;
+
+          const refVal = txs
+            .filter((t) => t.type === "referral")
+            .reduce((s, t) => s + parseFloat(t.amount), 0);
+          document.getElementById("refBonus").innerText =
+            `₦${refVal.toLocaleString()}`;
+
+          renderHistory(earningsData);
+          initChart(earningsData);
         }
 
-        async function loadProfile() {
-            const { data } = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
-            if (data) document.getElementById('userAvatar').innerText = data.full_name.charAt(0).toUpperCase();
-        }
+        // 3. Load Active Investments
+        const { data: invs } = await supabase
+          .from("investments")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .eq("status", "active");
+        const invList = document.getElementById("activeInvList");
+        invList.innerHTML = "";
 
-        async function loadAllData() {
-            // 1. Load Wallet
-            const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', currentUser.id).single();
-            if (wallet) document.getElementById('walletBal').innerText = `₦${parseFloat(wallet.balance).toLocaleString()}`;
+        if (invs && invs.length > 0) {
+          document.getElementById("activePlans").innerText = invs.length;
+          invs.forEach((inv) => {
+            const created = new Date(inv.created_at);
+            const end = new Date(inv.end_date);
+            const totalDays = Math.ceil(
+              (end - created) / (1000 * 60 * 60 * 24),
+            );
+            const daysPassed = Math.ceil(
+              (new Date() - created) / (1000 * 60 * 60 * 24),
+            );
+            const percent = Math.min(
+              Math.round((daysPassed / totalDays) * 100),
+              100,
+            );
 
-            // 2. Load Earnings Transactions
-            const { data: txs } = await supabase.from('transactions').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-            
-            if (txs) {
-                earningsData = txs.filter(t => t.type === 'earning');
-                
-                // Calculate summaries
-                const total = earningsData.reduce((s, t) => s + parseFloat(t.amount), 0);
-                document.getElementById('totalEarnings').innerText = `₦${total.toLocaleString()}`;
-
-                const todayStr = new Date().toDateString();
-                const todayVal = earningsData.filter(t => new Date(t.created_at).toDateString() === todayStr).reduce((s, t) => s + parseFloat(t.amount), 0);
-                document.getElementById('todayEarnings').innerText = `₦${todayVal.toLocaleString()}`;
-
-                const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                const yestStr = yesterday.toDateString();
-                const yestVal = earningsData.filter(t => new Date(t.created_at).toDateString() === yestStr).reduce((s, t) => s + parseFloat(t.amount), 0);
-                document.getElementById('yesterdayEarnings').innerText = `₦${yestVal.toLocaleString()}`;
-
-                const refVal = txs.filter(t => t.type === 'referral').reduce((s, t) => s + parseFloat(t.amount), 0);
-                document.getElementById('refBonus').innerText = `₦${refVal.toLocaleString()}`;
-
-                renderHistory(earningsData);
-                initChart(earningsData);
-            }
-
-            // 3. Load Active Investments
-            const { data: invs } = await supabase.from('investments').select('*').eq('user_id', currentUser.id).eq('status', 'active');
-            const invList = document.getElementById('activeInvList');
-            invList.innerHTML = '';
-            
-            if (invs && invs.length > 0) {
-                document.getElementById('activePlans').innerText = invs.length;
-                invs.forEach(inv => {
-                    const created = new Date(inv.created_at);
-                    const end = new Date(inv.end_date);
-                    const totalDays = Math.ceil((end - created) / (1000*60*60*24));
-                    const daysPassed = Math.ceil((new Date() - created) / (1000*60*60*24));
-                    const percent = Math.min(Math.round((daysPassed / totalDays) * 100), 100);
-
-                    const card = document.createElement('div');
-                    card.className = 'active-inv-card';
-                    card.innerHTML = `
+            const card = document.createElement("div");
+            card.className = "active-inv-card";
+            card.innerHTML = `
                         <div class="inv-header">
                             <h4>${inv.plan_name}</h4>
                             <span>+₦${parseFloat(inv.daily_profit).toLocaleString()} / day</span>
@@ -349,117 +620,135 @@
                             <span>${percent}% Complete</span>
                         </div>
                     `;
-                    invList.appendChild(card);
-                });
-            } else {
-                invList.innerHTML = `<div class="empty-state"><i class="fas fa-receipt"></i><p>No active investments.</p><a href="plans.html" class="btn-prime">Invest Now</a></div>`;
-            }
+            invList.appendChild(card);
+          });
+        } else {
+          invList.innerHTML = `<div class="empty-state"><i class="fas fa-receipt"></i><p>No active investments.</p><a href="plans.html" class="btn-prime">Invest Now</a></div>`;
         }
+      }
 
-        function renderHistory(data) {
-            const list = document.getElementById('historyList');
-            list.innerHTML = '';
-            if (data.length === 0) {
-                list.innerHTML = `<p style="text-align:center; padding:20px; font-size:12px; color:var(--text-muted);">No history for this period.</p>`;
-                return;
-            }
-            data.forEach(t => {
-                const date = new Date(t.created_at);
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
+      function renderHistory(data) {
+        const list = document.getElementById("historyList");
+        list.innerHTML = "";
+        if (data.length === 0) {
+          list.innerHTML = `<p style="text-align:center; padding:20px; font-size:12px; color:var(--text-muted);">No history for this period.</p>`;
+          return;
+        }
+        data.forEach((t) => {
+          const date = new Date(t.created_at);
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.innerHTML = `
                     <div class="hist-info">
-                        <h5>${t.description || 'Daily Profit'}</h5>
-                        <p>${date.toLocaleDateString()} • ${date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
+                        <h5>${t.description || "Daily Profit"}</h5>
+                        <p>${date.toLocaleDateString()} • ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
                     </div>
                     <div class="hist-amount">
                         <h4>+₦${parseFloat(t.amount).toLocaleString()}</h4>
                         <span>CREDITED</span>
                     </div>
                 `;
-                list.appendChild(item);
-            });
+          list.appendChild(item);
+        });
+      }
+
+      function initChart(data) {
+        const ctx = document.getElementById("earningsChart").getContext("2d");
+
+        // Group by last 7 days
+        const labels = [];
+        const values = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dStr = d.toDateString();
+          labels.push(d.toLocaleDateString([], { weekday: "short" }));
+          const val = data
+            .filter((t) => new Date(t.created_at).toDateString() === dStr)
+            .reduce((s, t) => s + parseFloat(t.amount), 0);
+          values.push(val);
         }
 
-        function initChart(data) {
-            const ctx = document.getElementById('earningsChart').getContext('2d');
-            
-            // Group by last 7 days
-            const labels = [];
-            const values = [];
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(); d.setDate(d.getDate() - i);
-                const dStr = d.toDateString();
-                labels.push(d.toLocaleDateString([], {weekday:'short'}));
-                const val = data.filter(t => new Date(t.created_at).toDateString() === dStr).reduce((s, t) => s + parseFloat(t.amount), 0);
-                values.push(val);
-            }
+        if (chartInstance) chartInstance.destroy();
 
-            if(chartInstance) chartInstance.destroy();
-            
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Profit (₦)',
-                        data: values,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#3b82f6'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { display: false },
-                        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10 } } }
-                    }
-                }
-            });
+        chartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Profit (₦)",
+                data: values,
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: "#3b82f6",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { display: false },
+              x: {
+                grid: { display: false },
+                ticks: { color: "#9ca3af", font: { size: 10 } },
+              },
+            },
+          },
+        });
+      }
+
+      window.filterData = (type, btn) => {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+
+        let filtered = earningsData;
+        const now = new Date();
+
+        if (type === "today") {
+          filtered = earningsData.filter(
+            (t) => new Date(t.created_at).toDateString() === now.toDateString(),
+          );
+        } else if (type === "week") {
+          const weekAgo = new Date();
+          weekAgo.setDate(now.getDate() - 7);
+          filtered = earningsData.filter(
+            (t) => new Date(t.created_at) >= weekAgo,
+          );
+        } else if (type === "month") {
+          const monthAgo = new Date();
+          monthAgo.setMonth(now.getMonth() - 1);
+          filtered = earningsData.filter(
+            (t) => new Date(t.created_at) >= monthAgo,
+          );
         }
+        renderHistory(filtered);
+      };
 
-        window.filterData = (type, btn) => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            
-            let filtered = earningsData;
-            const now = new Date();
-
-            if (type === 'today') {
-                filtered = earningsData.filter(t => new Date(t.created_at).toDateString() === now.toDateString());
-            } else if (type === 'week') {
-                const weekAgo = new Date(); weekAgo.setDate(now.getDate() - 7);
-                filtered = earningsData.filter(t => new Date(t.created_at) >= weekAgo);
-            } else if (type === 'month') {
-                const monthAgo = new Date(); monthAgo.setMonth(now.getMonth() - 1);
-                filtered = earningsData.filter(t => new Date(t.created_at) >= monthAgo);
-            }
-            renderHistory(filtered);
-        };
-
-        function startTimer() {
-            const timerEl = document.getElementById('nextCreditTimer');
-            function update() {
-                const now = new Date();
-                const next = new Date();
-                next.setHours(24, 0, 0, 0); // Midnight
-                const diff = next - now;
-                const h = Math.floor(diff / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                timerEl.innerText = `${h}h ${m}m ${s}s`;
-            }
-            setInterval(update, 1000);
-            update();
+      function startTimer() {
+        const timerEl = document.getElementById("nextCreditTimer");
+        function update() {
+          const now = new Date();
+          const next = new Date();
+          next.setHours(24, 0, 0, 0); // Midnight
+          const diff = next - now;
+          const h = Math.floor(diff / 3600000);
+          const m = Math.floor((diff % 3600000) / 60000);
+          const s = Math.floor((diff % 60000) / 1000);
+          timerEl.innerText = `${h}h ${m}m ${s}s`;
         }
+        setInterval(update, 1000);
+        update();
+      }
 
-        window.addEventListener('DOMContentLoaded', init);
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

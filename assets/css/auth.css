@@ -6,221 +6,250 @@
 
 /* --- Layout --- */
 .auth-page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 0;
-    background-image: 
-        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 40%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  background-image:
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(59, 130, 246, 0.08) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(245, 158, 11, 0.05) 0%,
+      transparent 40%
+    );
 }
 
 .auth-container {
-    width: 100%;
-    max-width: 480px;
-    padding: 0 15px;
+  width: 100%;
+  max-width: 480px;
+  padding: 0 15px;
 }
 
 .auth-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    padding: 35px 25px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    animation: authFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 35px 25px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: authFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* --- Branding & Typography --- */
 .auth-header {
-    text-align: center;
-    margin-bottom: 30px;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .auth-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--accent-color);
-    margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent-color);
+  margin-bottom: 12px;
 }
 
 .auth-title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-main);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-main);
 }
 
 .auth-subtitle {
-    font-size: 14px;
-    color: var(--text-muted);
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
 /* --- Form Components --- */
 .auth-form .input-group {
-    position: relative;
-    margin-bottom: 20px;
+  position: relative;
+  margin-bottom: 20px;
 }
 
 .auth-form .input-group i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-dim);
-    font-size: 16px;
-    transition: var(--transition);
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  font-size: 16px;
+  transition: var(--transition);
 }
 
 .auth-form .form-control {
-    padding-left: 48px; /* Room for icon */
-    padding-right: 48px; /* Room for password toggle */
-    height: 54px;
+  padding-left: 48px; /* Room for icon */
+  padding-right: 48px; /* Room for password toggle */
+  height: 54px;
 }
 
 .auth-form .form-control:focus + i {
-    color: var(--accent-color);
+  color: var(--accent-color);
 }
 
 /* Password Toggle */
 .password-toggle {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    cursor: pointer;
-    padding: 10px;
-    font-size: 16px;
-    z-index: 5;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 10px;
+  font-size: 16px;
+  z-index: 5;
 }
 
 .password-toggle:hover {
-    color: var(--text-main);
+  color: var(--text-main);
 }
 
 /* --- Password Strength Indicator --- */
 .strength-meter {
-    height: 4px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    margin-top: -15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    overflow: hidden;
+  height: 4px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  margin-top: -15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .strength-bar {
-    height: 100%;
-    width: 0;
-    transition: width 0.4s ease, background-color 0.4s ease;
+  height: 100%;
+  width: 0;
+  transition:
+    width 0.4s ease,
+    background-color 0.4s ease;
 }
 
 /* --- Validation Messaging --- */
 .validation-msg {
-    font-size: 12px;
-    margin-top: 5px;
-    display: none;
-    align-items: center;
-    gap: 5px;
+  font-size: 12px;
+  margin-top: 5px;
+  display: none;
+  align-items: center;
+  gap: 5px;
 }
 
-.validation-msg.error { color: var(--danger); display: flex; }
-.validation-msg.success { color: var(--success); display: flex; }
+.validation-msg.error {
+  color: var(--danger);
+  display: flex;
+}
+.validation-msg.success {
+  color: var(--success);
+  display: flex;
+}
 
 /* --- Informational Cards --- */
 .bonus-alert-card {
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.2);
-    border-radius: var(--radius-md);
-    padding: 15px;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-md);
+  padding: 15px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .bonus-alert-card i {
-    font-size: 20px;
-    color: var(--gold);
+  font-size: 20px;
+  color: var(--gold);
 }
 
 .bonus-alert-card p {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gold);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
 }
 
 /* --- Action Buttons --- */
 .btn-auth {
-    height: 54px;
-    font-size: 16px;
-    margin-top: 10px;
+  height: 54px;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
 .auth-footer {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 14px;
-    color: var(--text-muted);
+  text-align: center;
+  margin-top: 25px;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
 .auth-footer a {
-    color: var(--accent-color);
-    font-weight: 700;
+  color: var(--accent-color);
+  font-weight: 700;
 }
 
 /* --- Telegram Modal Styling --- */
 .modal-overlay.active {
-    display: flex !important;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
+  display: flex !important;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
 }
 
 .modal-card.scale-in {
-    animation: modalScaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: modalScaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* --- Animations --- */
 @keyframes authFadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes modalScaleIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 480px) {
-    .auth-card {
-        padding: 30px 20px;
-        border-radius: var(--radius-md);
-    }
-    
-    .auth-title {
-        font-size: 20px;
-    }
+  .auth-card {
+    padding: 30px 20px;
+    border-radius: var(--radius-md);
+  }
+
+  .auth-title {
+    font-size: 20px;
+  }
 }
 
 /* High Contrast / Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-    .auth-card, .modal-card {
-        animation: none;
-    }
+  .auth-card,
+  .modal-card {
+    animation: none;
+  }
 }
 
 /* Admin specific overrides if needed */
 .admin-login-card {
-    border-top: 4px solid var(--accent-color);
+  border-top: 4px solid var(--accent-color);
 }

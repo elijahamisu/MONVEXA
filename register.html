@@ -1,615 +1,733 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register | EASYPIE - Premium Naira Investment</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #0a0e17;
-            --secondary-bg: #111827;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --card-bg: rgba(31, 41, 55, 0.7);
-            --error: #ef4444;
-            --success: #10b981;
-            --gold: #f59e0b;
-            --transition: all 0.3s ease;
-        }
+      :root {
+        --primary-bg: #0a0e17;
+        --secondary-bg: #111827;
+        --accent-color: #3b82f6;
+        --accent-hover: #2563eb;
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --card-bg: rgba(31, 41, 55, 0.7);
+        --error: #ef4444;
+        --success: #10b981;
+        --gold: #f59e0b;
+        --transition: all 0.3s ease;
+      }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
 
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
 
-        /* --- Header --- */
-        header {
-            padding: 20px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+      /* --- Header --- */
+      header {
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(10, 14, 23, 0.8);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
 
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            width: 90%;
-            margin: 0 auto;
-        }
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        width: 90%;
+        margin: 0 auto;
+      }
 
-        .logo {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+      .logo {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--accent-color);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-        .nav-btns {
-            display: flex;
-            gap: 15px;
-        }
+      .nav-btns {
+        display: flex;
+        gap: 15px;
+      }
 
-        .nav-btn {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
+      .nav-btn {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: var(--transition);
+      }
 
-        .nav-btn:hover {
-            color: var(--text-main);
-        }
+      .nav-btn:hover {
+        color: var(--text-main);
+      }
 
-        /* --- Registration Section --- */
-        .reg-section {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 50px 0;
-            background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.05), transparent);
-        }
+      /* --- Registration Section --- */
+      .reg-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 0;
+        background: radial-gradient(
+          circle at top left,
+          rgba(59, 130, 246, 0.05),
+          transparent
+        );
+      }
 
-        .container {
-            width: 90%;
-            max-width: 550px;
-            margin: 0 auto;
-        }
+      .container {
+        width: 90%;
+        max-width: 550px;
+        margin: 0 auto;
+      }
 
-        .reg-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
+      .reg-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(15px);
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
 
-        .header-text {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+      .header-text {
+        text-align: center;
+        margin-bottom: 30px;
+      }
 
-        .header-text h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #fff, var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+      .header-text h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        background: linear-gradient(to right, #fff, var(--accent-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
-        .header-text p {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
+      .header-text p {
+        color: var(--text-muted);
+        font-size: 14px;
+      }
 
-        .bonus-badge {
-            display: inline-block;
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--gold);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 10px;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
+      .bonus-badge {
+        display: inline-block;
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--gold);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 10px;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
 
-        /* --- Form Styling --- */
+      /* --- Form Styling --- */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .full-width {
+        grid-column: span 2;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .input-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 42px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        transition: var(--transition);
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+      }
+
+      .btn-reg {
+        width: 100%;
+        padding: 14px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .btn-reg:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+      }
+
+      .btn-reg:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .login-prompt {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .login-prompt a {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      /* --- Feedback Messages --- */
+      #status-msg {
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 20px;
+        display: none;
+        text-align: center;
+      }
+
+      .msg-error {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--error);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+      }
+
+      .msg-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      /* --- Telegram Modal --- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(8px);
+      }
+
+      .modal-card {
+        background: var(--secondary-bg);
+        padding: 40px;
+        border-radius: 30px;
+        width: 90%;
+        max-width: 450px;
+        text-align: center;
+        border: 1px solid var(--accent-color);
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      @keyframes popIn {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modal-card i {
+        font-size: 60px;
+        color: #229ed9;
+        margin-bottom: 20px;
+      }
+
+      .modal-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      /* --- Footer --- */
+      footer {
+        padding: 30px 0;
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-muted);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* --- Spinner --- */
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s infinite linear;
+        display: none;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 600px) {
         .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+          grid-template-columns: 1fr;
         }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
         .full-width {
-            grid-column: span 2;
+          grid-column: span 1;
         }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-muted);
+        .reg-card {
+          padding: 30px 20px;
         }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px 12px 42px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-
-        .btn-reg {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-reg:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-        }
-
-        .btn-reg:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .login-prompt {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .login-prompt a {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        /* --- Feedback Messages --- */
-        #status-msg {
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            display: none;
-            text-align: center;
-        }
-
-        .msg-error {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .msg-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        /* --- Telegram Modal --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            backdrop-filter: blur(8px);
-        }
-
-        .modal-card {
-            background: var(--secondary-bg);
-            padding: 40px;
-            border-radius: 30px;
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
-            border: 1px solid var(--accent-color);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-card i {
-            font-size: 60px;
-            color: #229ED9;
-            margin-bottom: 20px;
-        }
-
-        .modal-btns {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 30px;
-        }
-
-        /* --- Footer --- */
-        footer {
-            padding: 30px 0;
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* --- Spinner --- */
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s infinite linear;
-            display: none;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
-            .reg-card { padding: 30px 20px; }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <i class="fas fa-pie-chart"></i> EASYPIE
-            </a>
-            <div class="nav-btns">
-                <a href="index.html" class="nav-btn">Home</a>
-                <a href="login.html" class="nav-btn" style="color: var(--accent-color);">Login</a>
-            </div>
+      <div class="nav-container">
+        <a href="index.html" class="logo">
+          <i class="fas fa-pie-chart"></i> EASYPIE
+        </a>
+        <div class="nav-btns">
+          <a href="index.html" class="nav-btn">Home</a>
+          <a
+            href="login.html"
+            class="nav-btn"
+            style="color: var(--accent-color)"
+            >Login</a
+          >
         </div>
+      </div>
     </header>
 
     <main class="reg-section">
-        <div class="container">
-            <div class="reg-card">
-                <div class="header-text">
-                    <h1>Create Your Account</h1>
-                    <p>Start earning daily from your investments.</p>
-                    <div class="bonus-badge">
-                        <i class="fas fa-gift"></i> ₦500 WELCOME BONUS INCLUDED
-                    </div>
-                </div>
-
-                <div id="status-msg"></div>
-
-                <form id="regForm">
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="fullName">Full Name</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-user"></i>
-                                <input type="text" id="fullName" class="form-control" placeholder="John Doe" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-at"></i>
-                                <input type="text" id="username" class="form-control" placeholder="johndoe123" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-phone"></i>
-                                <input type="tel" id="phone" class="form-control" placeholder="08012345678" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="email">Email Address</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-envelope"></i>
-                                <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-lock"></i>
-                                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirm Password</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-shield-halved"></i>
-                                <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label for="referralCode">Referral Code (Optional)</label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-users"></i>
-                                <input type="text" id="referralCode" class="form-control" placeholder="Enter code if any">
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" id="regBtn" class="btn-reg">
-                        <span id="btnText">Create My Account</span>
-                        <div class="spinner" id="btnSpinner"></div>
-                    </button>
-                </form>
-
-                <p class="login-prompt">
-                    Already have an account? <a href="login.html">Login Here</a>
-                </p>
+      <div class="container">
+        <div class="reg-card">
+          <div class="header-text">
+            <h1>Create Your Account</h1>
+            <p>Start earning daily from your investments.</p>
+            <div class="bonus-badge">
+              <i class="fas fa-gift"></i> ₦500 WELCOME BONUS INCLUDED
             </div>
+          </div>
+
+          <div id="status-msg"></div>
+
+          <form id="regForm">
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label for="fullName">Full Name</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-user"></i>
+                  <input
+                    type="text"
+                    id="fullName"
+                    class="form-control"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-at"></i>
+                  <input
+                    type="text"
+                    id="username"
+                    class="form-control"
+                    placeholder="johndoe123"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-phone"></i>
+                  <input
+                    type="tel"
+                    id="phone"
+                    class="form-control"
+                    placeholder="08012345678"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-envelope"></i>
+                  <input
+                    type="email"
+                    id="email"
+                    class="form-control"
+                    placeholder="john@example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-lock"></i>
+                  <input
+                    type="password"
+                    id="password"
+                    class="form-control"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-shield-halved"></i>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    class="form-control"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="referralCode">Referral Code (Optional)</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-users"></i>
+                  <input
+                    type="text"
+                    id="referralCode"
+                    class="form-control"
+                    placeholder="Enter code if any"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="regBtn" class="btn-reg">
+              <span id="btnText">Create My Account</span>
+              <div class="spinner" id="btnSpinner"></div>
+            </button>
+          </form>
+
+          <p class="login-prompt">
+            Already have an account? <a href="login.html">Login Here</a>
+          </p>
         </div>
+      </div>
     </main>
 
     <!-- Welcome Modal -->
     <div class="modal-overlay" id="welcomeModal">
-        <div class="modal-card">
-            <i class="fab fa-telegram"></i>
-            <h2 style="margin-bottom: 15px;">🎉 Welcome to EASYPIE!</h2>
-            <p style="color: var(--text-muted); line-height: 1.6;">
-                Your account is ready and your <b>₦500 Welcome Bonus</b> has been credited! Join our Telegram community for updates, support, and special offers.
-            </p>
-            <div class="modal-btns">
-                <a href="https://t.me/+soUYHDmaOZBmM2U0" target="_blank" class="btn-reg" id="joinTeleBtn">
-                    Join Telegram Community
-                </a>
-                <button class="nav-btn" style="background:none; border:none; cursor:pointer; margin-top:10px;" id="toDashboardBtn">
-                    Continue to Dashboard
-                </button>
-            </div>
+      <div class="modal-card">
+        <i class="fab fa-telegram"></i>
+        <h2 style="margin-bottom: 15px">🎉 Welcome to EASYPIE!</h2>
+        <p style="color: var(--text-muted); line-height: 1.6">
+          Your account is ready and your <b>₦500 Welcome Bonus</b> has been
+          credited! Join our Telegram community for updates, support, and
+          special offers.
+        </p>
+        <div class="modal-btns">
+          <a
+            href="https://t.me/+soUYHDmaOZBmM2U0"
+            target="_blank"
+            class="btn-reg"
+            id="joinTeleBtn"
+          >
+            Join Telegram Community
+          </a>
+          <button
+            class="nav-btn"
+            style="
+              background: none;
+              border: none;
+              cursor: pointer;
+              margin-top: 10px;
+            "
+            id="toDashboardBtn"
+          >
+            Continue to Dashboard
+          </button>
         </div>
+      </div>
     </div>
 
     <footer>
-        <div style="margin-bottom: 15px;">
-            <a href="index.html" class="nav-btn" style="margin: 0 10px;">Home</a>
-            <a href="login.html" class="nav-btn" style="margin: 0 10px;">Login</a>
-            <a href="support.html" class="nav-btn" style="margin: 0 10px;">Support</a>
-            <a href="terms.html" class="nav-btn" style="margin: 0 10px;">Terms</a>
-        </div>
-        <p>&copy; 2024 EASYPIE. All Rights Reserved.</p>
+      <div style="margin-bottom: 15px">
+        <a href="index.html" class="nav-btn" style="margin: 0 10px">Home</a>
+        <a href="login.html" class="nav-btn" style="margin: 0 10px">Login</a>
+        <a href="support.html" class="nav-btn" style="margin: 0 10px"
+          >Support</a
+        >
+        <a href="terms.html" class="nav-btn" style="margin: 0 10px">Terms</a>
+      </div>
+      <p>&copy; 2024 EASYPIE. All Rights Reserved.</p>
     </footer>
 
     <script type="module">
-        // Import env vars
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const BONUS_AMT = parseInt(import.meta.env.VITE_WELCOME_BONUS) || 500;
+      // Import env vars
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const BONUS_AMT = parseInt(import.meta.env.VITE_WELCOME_BONUS) || 500;
 
-        // Fail loudly and clearly if env vars are missing (e.g. not set in the deploy
-        // platform's environment settings), instead of letting Supabase throw a vague
-        // error later that renders as "{}" in the UI.
-        if (!SB_URL || !SB_KEY) {
-            console.error('Missing Supabase environment variables. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your deploy platform, not just your local .env file.');
+      // Fail loudly and clearly if env vars are missing (e.g. not set in the deploy
+      // platform's environment settings), instead of letting Supabase throw a vague
+      // error later that renders as "{}" in the UI.
+      if (!SB_URL || !SB_KEY) {
+        console.error(
+          "Missing Supabase environment variables. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your deploy platform, not just your local .env file.",
+        );
+      }
+
+      // Initialize Supabase
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
+      const regForm = document.getElementById("regForm");
+      const statusMsg = document.getElementById("status-msg");
+      const regBtn = document.getElementById("regBtn");
+      const btnSpinner = document.getElementById("btnSpinner");
+      const btnText = document.getElementById("btnText");
+      const welcomeModal = document.getElementById("welcomeModal");
+
+      // Auto-fill the referral code field if the person arrived via a referral
+      // link (e.g. register.html?ref=SOMECODE).
+      (function prefillReferralCode() {
+        const params = new URLSearchParams(window.location.search);
+        const refFromUrl = params.get("ref");
+        if (refFromUrl) {
+          const referralInput = document.getElementById("referralCode");
+          referralInput.value = refFromUrl;
         }
+      })();
 
-        // Initialize Supabase
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-
-        const regForm = document.getElementById('regForm');
-        const statusMsg = document.getElementById('status-msg');
-        const regBtn = document.getElementById('regBtn');
-        const btnSpinner = document.getElementById('btnSpinner');
-        const btnText = document.getElementById('btnText');
-        const welcomeModal = document.getElementById('welcomeModal');
-
-        // Auto-fill the referral code field if the person arrived via a referral
-        // link (e.g. register.html?ref=SOMECODE).
-        (function prefillReferralCode() {
-            const params = new URLSearchParams(window.location.search);
-            const refFromUrl = params.get('ref');
-            if (refFromUrl) {
-                const referralInput = document.getElementById('referralCode');
-                referralInput.value = refFromUrl;
-            }
-        })();
-
-        // Turns any thrown value (real Error, Supabase error object, plain object,
-        // or string) into a readable message instead of printing "{}" or "undefined".
-        function getErrorMessage(err) {
-            if (!err) return 'Something went wrong. Please try again.';
-            if (typeof err === 'string') return err;
-            if (err.message) return err.message;
-            if (err.error_description) return err.error_description;
-            if (err.error) return err.error;
-            try {
-                const asString = JSON.stringify(err);
-                return asString && asString !== '{}' ? asString : 'Something went wrong. Please try again.';
-            } catch {
-                return 'Something went wrong. Please try again.';
-            }
+      // Turns any thrown value (real Error, Supabase error object, plain object,
+      // or string) into a readable message instead of printing "{}" or "undefined".
+      function getErrorMessage(err) {
+        if (!err) return "Something went wrong. Please try again.";
+        if (typeof err === "string") return err;
+        if (err.message) return err.message;
+        if (err.error_description) return err.error_description;
+        if (err.error) return err.error;
+        try {
+          const asString = JSON.stringify(err);
+          return asString && asString !== "{}"
+            ? asString
+            : "Something went wrong. Please try again.";
+        } catch {
+          return "Something went wrong. Please try again.";
         }
+      }
 
-        regForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Collect fields
-            const fullName = document.getElementById('fullName').value.trim();
-            const username = document.getElementById('username').value.trim().toLowerCase();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const referralCode = document.getElementById('referralCode').value.trim();
+      regForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-            // Reset UI
-            showStatus('', '');
-            setLoading(true);
+        // Collect fields
+        const fullName = document.getElementById("fullName").value.trim();
+        const username = document
+          .getElementById("username")
+          .value.trim()
+          .toLowerCase();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+        const referralCode = document
+          .getElementById("referralCode")
+          .value.trim();
 
-            try {
-                // 1. Validation
-                if (password !== confirmPassword) throw new Error("Passwords do not match.");
-                if (password.length < 6) throw new Error("Password must be at least 6 characters.");
-                
-                // 2. Check if username exists.
-                // Use maybeSingle() instead of single(): single() throws a PostgREST
-                // error whenever zero rows come back, which is the normal case for an
-                // available username — that error was very likely what was landing in
-                // the catch block below as an empty-looking object.
-                const { data: existingUser, error: userCheckErr } = await supabase
-                    .from('profiles')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle();
+        // Reset UI
+        showStatus("", "");
+        setLoading(true);
 
-                if (userCheckErr) throw new Error("Couldn't verify username right now. Please try again.");
-                if (existingUser) throw new Error("Username already taken. Please choose another.");
+        try {
+          // 1. Validation
+          if (password !== confirmPassword)
+            throw new Error("Passwords do not match.");
+          if (password.length < 6)
+            throw new Error("Password must be at least 6 characters.");
 
-                // 3. Signup Auth
-                const { data: authData, error: authErr } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: { data: { full_name: fullName, username: username, referral_by: referralCode ? referralCode.toLowerCase() : null } }
-                });
+          // 2. Check if username exists.
+          // Use maybeSingle() instead of single(): single() throws a PostgREST
+          // error whenever zero rows come back, which is the normal case for an
+          // available username — that error was very likely what was landing in
+          // the catch block below as an empty-looking object.
+          const { data: existingUser, error: userCheckErr } = await supabase
+            .from("profiles")
+            .select("username")
+            .eq("username", username)
+            .maybeSingle();
 
-                if (authErr) throw authErr;
-                const user = authData.user;
+          if (userCheckErr)
+            throw new Error(
+              "Couldn't verify username right now. Please try again.",
+            );
+          if (existingUser)
+            throw new Error("Username already taken. Please choose another.");
 
-                if (user) {
-                    // Profile, wallet, and the welcome-bonus transaction are all created
-                    // automatically by the handle_new_user database trigger the moment
-                    // signUp() succeeds above — no need to insert them again here (doing
-                    // so would fail with a duplicate-key error since those rows already
-                    // exist by the time we get here).
+          // 3. Signup Auth
+          const { data: authData, error: authErr } = await supabase.auth.signUp(
+            {
+              email,
+              password,
+              options: {
+                data: {
+                  full_name: fullName,
+                  username: username,
+                  referral_by: referralCode ? referralCode.toLowerCase() : null,
+                },
+              },
+            },
+          );
 
-                    // The trigger doesn't set the phone number, so save it separately.
-                    // Not treated as fatal — the account already exists at this point.
-                    const { error: phoneErr } = await supabase
-                        .from('profiles')
-                        .update({ phone })
-                        .eq('id', user.id);
-                    if (phoneErr) console.error('Could not save phone number:', phoneErr);
+          if (authErr) throw authErr;
+          const user = authData.user;
 
-                    welcomeModal.style.display = 'flex';
-                }
+          if (user) {
+            // Profile, wallet, and the welcome-bonus transaction are all created
+            // automatically by the handle_new_user database trigger the moment
+            // signUp() succeeds above — no need to insert them again here (doing
+            // so would fail with a duplicate-key error since those rows already
+            // exist by the time we get here).
 
-            } catch (err) {
-                console.error('Registration error:', err);
-                showStatus(getErrorMessage(err), 'error');
-                setLoading(false);
-            }
+            // The trigger doesn't set the phone number, so save it separately.
+            // Not treated as fatal — the account already exists at this point.
+            const { error: phoneErr } = await supabase
+              .from("profiles")
+              .update({ phone })
+              .eq("id", user.id);
+            if (phoneErr)
+              console.error("Could not save phone number:", phoneErr);
+
+            welcomeModal.style.display = "flex";
+          }
+        } catch (err) {
+          console.error("Registration error:", err);
+          showStatus(getErrorMessage(err), "error");
+          setLoading(false);
+        }
+      });
+
+      function showStatus(text, type) {
+        if (!text) {
+          statusMsg.style.display = "none";
+          return;
+        }
+        statusMsg.innerText = text;
+        statusMsg.className = type === "error" ? "msg-error" : "msg-success";
+        statusMsg.style.display = "block";
+        statusMsg.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      function setLoading(loading) {
+        regBtn.disabled = loading;
+        btnSpinner.style.display = loading ? "block" : "none";
+        btnText.style.display = loading ? "none" : "block";
+      }
+
+      // Modal Logic
+      document
+        .getElementById("toDashboardBtn")
+        .addEventListener("click", () => {
+          window.location.href = "dashboard.html";
         });
 
-        function showStatus(text, type) {
-            if (!text) {
-                statusMsg.style.display = 'none';
-                return;
-            }
-            statusMsg.innerText = text;
-            statusMsg.className = type === 'error' ? 'msg-error' : 'msg-success';
-            statusMsg.style.display = 'block';
-            statusMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function setLoading(loading) {
-            regBtn.disabled = loading;
-            btnSpinner.style.display = loading ? 'block' : 'none';
-            btnText.style.display = loading ? 'none' : 'block';
-        }
-
-        // Modal Logic
-        document.getElementById('toDashboardBtn').addEventListener('click', () => {
-            window.location.href = 'dashboard.html';
-        });
-
-        document.getElementById('joinTeleBtn').addEventListener('click', () => {
-            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-        });
-
+      document.getElementById("joinTeleBtn").addEventListener("click", () => {
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1000);
+      });
     </script>
-</body>
+  </body>
 </html>

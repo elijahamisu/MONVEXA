@@ -1,543 +1,889 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Withdraw Funds | EASYPIE</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #0a0e17;
-            --secondary-bg: #111827;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.6);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --nav-height: 70px;
+      :root {
+        --primary-bg: #0a0e17;
+        --secondary-bg: #111827;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.6);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --nav-height: 70px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        padding-bottom: calc(var(--nav-height) + 30px);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .container {
+        width: 92%;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* --- Header --- */
+      header {
+        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        background: rgba(10, 14, 23, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 100;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .back-btn {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mini-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      /* --- Wallet Summary Cards --- */
+      .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 20px 0;
+      }
+
+      .summary-card {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+
+      .summary-card p {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      .summary-card h4 {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      /* --- Notices (pending + restriction) --- */
+      .pending-notice {
+        display: none;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: var(--warning);
+        padding: 14px 16px;
+        border-radius: 16px;
+        font-size: 12.5px;
+        line-height: 1.5;
+        margin-bottom: 18px;
+      }
+      .pending-notice i {
+        margin-right: 8px;
+      }
+
+      .restriction-notice {
+        display: none;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--danger);
+        padding: 14px 16px;
+        border-radius: 16px;
+        font-size: 12.5px;
+        line-height: 1.5;
+        margin-bottom: 18px;
+      }
+      .restriction-notice i {
+        margin-right: 8px;
+      }
+
+      /* --- Withdrawal Form --- */
+      .withdraw-section {
+        background: var(--secondary-bg);
+        padding: 25px;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 25px;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+
+      .input-box {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .input-box i {
+        color: var(--accent-color);
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+      }
+      .input-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        width: 100%;
+        font-size: 15px;
+        font-weight: 500;
+        outline: none;
+      }
+      .input-box input:disabled {
+        opacity: 0.5;
+      }
+
+      .balance-info {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 5px;
+        text-align: right;
+      }
+
+      .fee-breakdown {
+        display: none;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin: -6px 0 18px;
+        font-size: 12.5px;
+      }
+      .fee-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        color: var(--text-muted);
+      }
+      .fee-row-total {
+        border-top: 1px solid var(--glass-border);
+        margin-top: 4px;
+        padding-top: 8px;
+        color: var(--text-main);
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+      }
+      .btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-cancel {
+        width: 100%;
+        padding: 12px;
+        background: transparent;
+        color: var(--text-muted);
+        border: none;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      /* --- Withdrawal History --- */
+      .history-section h3 {
+        font-size: 16px;
+        margin-bottom: 15px;
+      }
+
+      .history-item {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .hist-info h5 {
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+      .hist-info p {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .hist-status {
+        text-align: right;
+      }
+      .hist-status h4 {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .badge {
+        font-size: 9px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+      }
+      .pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+      .approved {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+      .rejected {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+      }
+
+      /* --- Empty State --- */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: var(--card-bg);
+        border-radius: 20px;
+        border: 1px dashed var(--glass-border);
+      }
+      .empty-state i {
+        font-size: 40px;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+      .empty-state p {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+      }
+
+      /* --- Bottom Nav --- */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(17, 24, 39, 0.95);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid var(--glass-border);
+        z-index: 1000;
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 10px;
+      }
+
+      .nav-item.active {
+        color: var(--accent-color);
+      }
+      .nav-item i {
+        font-size: 18px;
+      }
+
+      /* --- Loading Spinner --- */
+      .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+        display: none;
+        margin: 0 auto;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+      /* --- Skeleton --- */
+      .skeleton {
+        height: 60px;
+        background: #1f2937;
+        border-radius: 15px;
+        animation: pulse 1.5s infinite;
+        margin-bottom: 10px;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.5;
         }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            padding-bottom: calc(var(--nav-height) + 30px);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container { width: 92%; max-width: 600px; margin: 0 auto; }
-
-        /* --- Header --- */
-        header {
-            padding: 20px 0;
-            position: sticky; top: 0;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .header-flex { display: flex; justify-content: space-between; align-items: center; }
-
-        .back-btn {
-            color: white; text-decoration: none; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .mini-avatar {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: var(--accent-color);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px;
-        }
-
-        /* --- Wallet Summary Cards --- */
-        .summary-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;
-        }
-
-        .summary-card {
-            background: var(--card-bg); padding: 15px; border-radius: 18px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .summary-card p { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .summary-card h4 { font-size: 16px; font-weight: 700; }
-
-        /* --- Notices (pending + restriction) --- */
-        .pending-notice {
-            display: none;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: var(--warning);
-            padding: 14px 16px;
-            border-radius: 16px;
-            font-size: 12.5px;
-            line-height: 1.5;
-            margin-bottom: 18px;
-        }
-        .pending-notice i { margin-right: 8px; }
-
-        .restriction-notice {
-            display: none;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--danger);
-            padding: 14px 16px;
-            border-radius: 16px;
-            font-size: 12.5px;
-            line-height: 1.5;
-            margin-bottom: 18px;
-        }
-        .restriction-notice i { margin-right: 8px; }
-
-        /* --- Withdrawal Form --- */
-        .withdraw-section {
-            background: var(--secondary-bg); padding: 25px; border-radius: 24px;
-            border: 1px solid var(--glass-border); margin-bottom: 25px;
-        }
-
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
-
-        .input-box {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 14px; display: flex; align-items: center;
-            gap: 10px;
-        }
-
-        .input-box i { color: var(--accent-color); font-size: 16px; width: 20px; text-align: center; }
-        .input-box input {
-            background: transparent; border: none; color: white; width: 100%;
-            font-size: 15px; font-weight: 500; outline: none;
-        }
-        .input-box input:disabled { opacity: 0.5; }
-
-        .balance-info {
-            font-size: 12px; color: var(--text-muted); margin-top: 5px; text-align: right;
-        }
-
-        .fee-breakdown {
-            display: none;
-            background: rgba(0,0,0,0.25);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin: -6px 0 18px;
-            font-size: 12.5px;
-        }
-        .fee-row { display: flex; justify-content: space-between; padding: 4px 0; color: var(--text-muted); }
-        .fee-row-total { border-top: 1px solid var(--glass-border); margin-top: 4px; padding-top: 8px; color: var(--text-main); font-weight: 700; font-size: 14px; }
-
-        .btn-submit {
-            width: 100%; padding: 16px; background: var(--accent-color);
-            color: white; border: none; border-radius: 15px; font-weight: 700;
-            font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px;
-        }
-        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-cancel {
-            width: 100%; padding: 12px; background: transparent;
-            color: var(--text-muted); border: none; font-size: 14px;
-            cursor: pointer; margin-top: 10px;
-        }
-
-        /* --- Withdrawal History --- */
-        .history-section h3 { font-size: 16px; margin-bottom: 15px; }
-        
-        .history-item {
-            background: var(--card-bg); padding: 15px; border-radius: 15px;
-            border: 1px solid var(--glass-border); margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .hist-info h5 { font-size: 14px; margin-bottom: 4px; }
-        .hist-info p { font-size: 11px; color: var(--text-muted); }
-
-        .hist-status { text-align: right; }
-        .hist-status h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-        
-        .badge {
-            font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase;
-        }
-        .pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .approved { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
-        /* --- Empty State --- */
-        .empty-state {
-            text-align: center; padding: 40px 20px;
-            background: var(--card-bg); border-radius: 20px; border: 1px dashed var(--glass-border);
-        }
-        .empty-state i { font-size: 40px; color: var(--text-muted); margin-bottom: 15px; opacity: 0.5; }
-        .empty-state p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-
-        /* --- Bottom Nav --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: var(--nav-height); background: rgba(17, 24, 39, 0.95);
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            border-top: 1px solid var(--glass-border); z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 4px; color: var(--text-muted);
-            text-decoration: none; font-size: 10px;
-        }
-
-        .nav-item.active { color: var(--accent-color); }
-        .nav-item i { font-size: 18px; }
-
-        /* --- Loading Spinner --- */
-        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s infinite linear; display: none; margin: 0 auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- Skeleton --- */
-        .skeleton { height: 60px; background: #1f2937; border-radius: 15px; animation: pulse 1.5s infinite; margin-bottom: 10px; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <header>
-        <div class="container header-flex">
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Withdraw</a>
-            <div class="profile-area">
-                <a href="notifications.html" style="color: white; font-size: 18px; margin-right: 12px;"><i class="fas fa-bell"></i></a>
-                <div class="mini-avatar" id="userAvatar">U</div>
-            </div>
+      <div class="container header-flex">
+        <a href="dashboard.html" class="back-btn"
+          ><i class="fas fa-arrow-left"></i> Withdraw</a
+        >
+        <div class="profile-area">
+          <a
+            href="notifications.html"
+            style="color: white; font-size: 18px; margin-right: 12px"
+            ><i class="fas fa-bell"></i
+          ></a>
+          <div class="mini-avatar" id="userAvatar">U</div>
         </div>
+      </div>
     </header>
 
     <main class="container">
-        <!-- Wallet Overview -->
-        <div class="summary-grid">
-            <div class="summary-card">
-                <p>Available Balance</p>
-                <h4 id="availableBal">₦0.00</h4>
-            </div>
-            <div class="summary-card">
-                <p>Pending Withdrawal</p>
-                <h4 id="pendingBal" style="color: var(--warning);">₦0.00</h4>
-            </div>
-            <div class="summary-card">
-                <p>Total Withdrawn</p>
-                <h4 id="totalWithdrawn">₦0.00</h4>
-            </div>
-            <div class="summary-card">
-                <p>Total Earnings</p>
-                <h4 id="totalEarnings">₦0.00</h4>
-            </div>
+      <!-- Wallet Overview -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <p>Available Balance</p>
+          <h4 id="availableBal">₦0.00</h4>
         </div>
-
-        <!-- Hard restriction notice: locked platform-wide OR no active plan. Takes priority over pending-notice. -->
-        <div class="restriction-notice" id="restrictionNotice">
-            <i class="fas fa-lock"></i><span id="restrictionText"></span>
+        <div class="summary-card">
+          <p>Pending Withdrawal</p>
+          <h4 id="pendingBal" style="color: var(--warning)">₦0.00</h4>
         </div>
-
-        <!-- Pending Withdrawal Notice -->
-        <div class="pending-notice" id="pendingNotice">
-            <i class="fas fa-circle-info"></i><span id="pendingNoticeText"></span>
+        <div class="summary-card">
+          <p>Total Withdrawn</p>
+          <h4 id="totalWithdrawn">₦0.00</h4>
         </div>
+        <div class="summary-card">
+          <p>Total Earnings</p>
+          <h4 id="totalEarnings">₦0.00</h4>
+        </div>
+      </div>
 
-        <!-- Withdrawal Form -->
-        <section class="withdraw-section">
-            <form id="withdrawForm">
-                <div class="form-group">
-                    <label>Withdrawal Amount (Min ₦1,000)</label>
-                    <div class="input-box">
-                        <i>₦</i>
-                        <input type="number" id="withdrawAmount" placeholder="1000" min="1000" required>
-                    </div>
-                    <div class="balance-info">Withdrawable: <span id="withdrawableText">₦0.00</span></div>
-                </div>
+      <!-- Hard restriction notice: locked platform-wide OR no active plan. Takes priority over pending-notice. -->
+      <div class="restriction-notice" id="restrictionNotice">
+        <i class="fas fa-lock"></i><span id="restrictionText"></span>
+      </div>
 
-                <div class="fee-breakdown" id="feeBreakdown">
-                    <div class="fee-row"><span>Withdrawal Charge (15%)</span><span id="feeAmountText">₦0.00</span></div>
-                    <div class="fee-row fee-row-total"><span>You'll Receive</span><span id="netAmountText">₦0.00</span></div>
-                </div>
+      <!-- Pending Withdrawal Notice -->
+      <div class="pending-notice" id="pendingNotice">
+        <i class="fas fa-circle-info"></i><span id="pendingNoticeText"></span>
+      </div>
 
-                <div class="form-group">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <label style="margin-bottom:0;">Bank Name</label>
-                        <span id="savedDetailsBadge" style="display:none; font-size:11px; color:var(--success);"><i class="fas fa-check-circle"></i> Using saved details</span>
-                    </div>
-                    <div class="input-box">
-                        <i class="fas fa-university"></i>
-                        <input type="text" id="bankName" placeholder="e.g. GTBank" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Account Number</label>
-                    <div class="input-box">
-                        <i class="fas fa-hashtag"></i>
-                        <input type="number" id="accountNumber" placeholder="0123456789" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Account Name</label>
-                    <div class="input-box">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="accountName" placeholder="John Doe" required>
-                    </div>
-                    <div class="balance-info" style="text-align:left; margin-top:8px;">
-                        <a href="#" id="saveDetailsLink" style="color: var(--accent-color); text-decoration:none;"><i class="fas fa-save"></i> Save these details for next time</a>
-                        <span id="saveDetailsStatus" style="display:none; color: var(--success); margin-left:8px;"><i class="fas fa-check"></i> Saved</span>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    <span id="btnText">Submit Withdrawal</span>
-                    <div class="spinner" id="btnSpinner"></div>
-                </button>
-                <button type="button" class="btn-cancel" onclick="window.location.href='dashboard.html'">Cancel</button>
-            </form>
-        </section>
-
-        <!-- History -->
-        <section class="history-section">
-            <h3>Withdrawal History</h3>
-            <div id="withdrawList">
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
+      <!-- Withdrawal Form -->
+      <section class="withdraw-section">
+        <form id="withdrawForm">
+          <div class="form-group">
+            <label>Withdrawal Amount (Min ₦1,000)</label>
+            <div class="input-box">
+              <i>₦</i>
+              <input
+                type="number"
+                id="withdrawAmount"
+                placeholder="1000"
+                min="1000"
+                required
+              />
             </div>
-        </section>
+            <div class="balance-info">
+              Withdrawable: <span id="withdrawableText">₦0.00</span>
+            </div>
+          </div>
 
-        <!-- Quick Actions -->
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px;">
-            <a href="wallet.html" class="summary-card" style="text-decoration:none; color:white; text-align:center;"><i class="fas fa-wallet"></i><br><span style="font-size:12px;">Wallet</span></a>
-            <a href="deposit.html" class="summary-card" style="text-decoration:none; color:white; text-align:center;"><i class="fas fa-plus-circle"></i><br><span style="font-size:12px;">Deposit</span></a>
-            <a href="investment.html" class="summary-card" style="text-decoration:none; color:white; text-align:center;"><i class="fas fa-rocket"></i><br><span style="font-size:12px;">Invest</span></a>
-            <a href="transactions.html" class="summary-card" style="text-decoration:none; color:white; text-align:center;"><i class="fas fa-list"></i><br><span style="font-size:12px;">History</span></a>
+          <div class="fee-breakdown" id="feeBreakdown">
+            <div class="fee-row">
+              <span>Withdrawal Charge (15%)</span
+              ><span id="feeAmountText">₦0.00</span>
+            </div>
+            <div class="fee-row fee-row-total">
+              <span>You'll Receive</span><span id="netAmountText">₦0.00</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+              "
+            >
+              <label style="margin-bottom: 0">Bank Name</label>
+              <span
+                id="savedDetailsBadge"
+                style="display: none; font-size: 11px; color: var(--success)"
+                ><i class="fas fa-check-circle"></i> Using saved details</span
+              >
+            </div>
+            <div class="input-box">
+              <i class="fas fa-university"></i>
+              <input
+                type="text"
+                id="bankName"
+                placeholder="e.g. GTBank"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Account Number</label>
+            <div class="input-box">
+              <i class="fas fa-hashtag"></i>
+              <input
+                type="number"
+                id="accountNumber"
+                placeholder="0123456789"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Account Name</label>
+            <div class="input-box">
+              <i class="fas fa-user"></i>
+              <input
+                type="text"
+                id="accountName"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+            <div class="balance-info" style="text-align: left; margin-top: 8px">
+              <a
+                href="#"
+                id="saveDetailsLink"
+                style="color: var(--accent-color); text-decoration: none"
+                ><i class="fas fa-save"></i> Save these details for next time</a
+              >
+              <span
+                id="saveDetailsStatus"
+                style="display: none; color: var(--success); margin-left: 8px"
+                ><i class="fas fa-check"></i> Saved</span
+              >
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span id="btnText">Submit Withdrawal</span>
+            <div class="spinner" id="btnSpinner"></div>
+          </button>
+          <button
+            type="button"
+            class="btn-cancel"
+            onclick="window.location.href = 'dashboard.html'"
+          >
+            Cancel
+          </button>
+        </form>
+      </section>
+
+      <!-- History -->
+      <section class="history-section">
+        <h3>Withdrawal History</h3>
+        <div id="withdrawList">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
         </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          margin-top: 20px;
+        "
+      >
+        <a
+          href="wallet.html"
+          class="summary-card"
+          style="text-decoration: none; color: white; text-align: center"
+          ><i class="fas fa-wallet"></i><br /><span style="font-size: 12px"
+            >Wallet</span
+          ></a
+        >
+        <a
+          href="deposit.html"
+          class="summary-card"
+          style="text-decoration: none; color: white; text-align: center"
+          ><i class="fas fa-plus-circle"></i><br /><span style="font-size: 12px"
+            >Deposit</span
+          ></a
+        >
+        <a
+          href="investment.html"
+          class="summary-card"
+          style="text-decoration: none; color: white; text-align: center"
+          ><i class="fas fa-rocket"></i><br /><span style="font-size: 12px"
+            >Invest</span
+          ></a
+        >
+        <a
+          href="transactions.html"
+          class="summary-card"
+          style="text-decoration: none; color: white; text-align: center"
+          ><i class="fas fa-list"></i><br /><span style="font-size: 12px"
+            >History</span
+          ></a
+        >
+      </div>
     </main>
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">
-            <i class="fas fa-th-large"></i><span>Home</span>
-        </a>
-        <a href="plans.html" class="nav-item">
-            <i class="fas fa-layer-group"></i><span>Plans</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i><span>Wallet</span>
-        </a>
-        <a href="withdraw.html" class="nav-item active">
-            <i class="fas fa-arrow-circle-down"></i><span>Withdraw</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user-circle"></i><span>Profile</span>
-        </a>
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-th-large"></i><span>Home</span>
+      </a>
+      <a href="plans.html" class="nav-item">
+        <i class="fas fa-layer-group"></i><span>Plans</span>
+      </a>
+      <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i><span>Wallet</span>
+      </a>
+      <a href="withdraw.html" class="nav-item active">
+        <i class="fas fa-arrow-circle-down"></i><span>Withdraw</span>
+      </a>
+      <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i><span>Profile</span>
+      </a>
     </nav>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
-        let availableBalance = 0;   // raw wallet.balance
-        let totalPending = 0;       // sum of this user's pending withdrawal amounts
-        let withdrawableBalance = 0; // balance - totalPending -> what they're actually allowed to request now
+      let currentUser = null;
+      let availableBalance = 0; // raw wallet.balance
+      let totalPending = 0; // sum of this user's pending withdrawal amounts
+      let withdrawableBalance = 0; // balance - totalPending -> what they're actually allowed to request now
 
-        // NEW: platform-wide + per-user restrictions
-        let withdrawalsLocked = false;   // admin has locked all withdrawals platform-wide
-        let hasActivePlan = false;       // user has at least one row in `investments` with status = 'active'
+      // NEW: platform-wide + per-user restrictions
+      let withdrawalsLocked = false; // admin has locked all withdrawals platform-wide
+      let hasActivePlan = false; // user has at least one row in `investments` with status = 'active'
 
-        const WITHDRAWAL_FEE_PERCENT = 15;
+      const WITHDRAWAL_FEE_PERCENT = 15;
 
-        function updateFeeBreakdown() {
-            const amount = parseFloat(document.getElementById('withdrawAmount').value) || 0;
-            const breakdown = document.getElementById('feeBreakdown');
+      function updateFeeBreakdown() {
+        const amount =
+          parseFloat(document.getElementById("withdrawAmount").value) || 0;
+        const breakdown = document.getElementById("feeBreakdown");
 
-            if (amount <= 0) {
-                breakdown.style.display = 'none';
-                return;
-            }
-
-            const fee = amount * (WITHDRAWAL_FEE_PERCENT / 100);
-            const net = amount - fee;
-
-            document.getElementById('feeAmountText').innerText = `₦${fee.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-            document.getElementById('netAmountText').innerText = `₦${net.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-            breakdown.style.display = 'block';
+        if (amount <= 0) {
+          breakdown.style.display = "none";
+          return;
         }
 
-        document.getElementById('withdrawAmount').addEventListener('input', updateFeeBreakdown);
+        const fee = amount * (WITHDRAWAL_FEE_PERCENT / 100);
+        const net = amount - fee;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
+        document.getElementById("feeAmountText").innerText =
+          `₦${fee.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+        document.getElementById("netAmountText").innerText =
+          `₦${net.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+        breakdown.style.display = "block";
+      }
 
-            await loadProfile();
-            await checkRestrictions();   // NEW: must run before the form is usable
-            await loadWalletData();
-            await loadWithdrawHistory();
+      document
+        .getElementById("withdrawAmount")
+        .addEventListener("input", updateFeeBreakdown);
+
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
+        }
+        currentUser = session.user;
+
+        await loadProfile();
+        await checkRestrictions(); // NEW: must run before the form is usable
+        await loadWalletData();
+        await loadWithdrawHistory();
+      }
+
+      async function loadProfile() {
+        const { data } = await supabase
+          .from("profiles")
+          .select(
+            "full_name, saved_bank_name, saved_account_number, saved_account_name",
+          )
+          .eq("id", currentUser.id)
+          .single();
+
+        if (data) {
+          document.getElementById("userAvatar").innerText = data.full_name
+            .charAt(0)
+            .toUpperCase();
+
+          if (
+            data.saved_bank_name ||
+            data.saved_account_number ||
+            data.saved_account_name
+          ) {
+            document.getElementById("bankName").value =
+              data.saved_bank_name || "";
+            document.getElementById("accountNumber").value =
+              data.saved_account_number || "";
+            document.getElementById("accountName").value =
+              data.saved_account_name || "";
+            document.getElementById("savedDetailsBadge").style.display =
+              "inline";
+          }
+        }
+      }
+
+      // NEW: checks the global lock (platform_settings — single-row table) and whether
+      // the user has an active investment
+      async function checkRestrictions() {
+        const [
+          { data: setting, error: settingErr },
+          { count, error: planErr },
+        ] = await Promise.all([
+          supabase
+            .from("platform_settings")
+            .select("withdrawals_locked")
+            .order("id", { ascending: true })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from("investments")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", currentUser.id)
+            .eq("status", "active"),
+        ]);
+
+        if (settingErr) console.error("checkRestrictions (lock):", settingErr);
+        if (planErr) console.error("checkRestrictions (plan):", planErr);
+
+        withdrawalsLocked = setting?.withdrawals_locked === true;
+        hasActivePlan = (count || 0) > 0;
+
+        renderRestriction();
+      }
+
+      // NEW: shows the highest-priority blocking notice and disables the form. Called again
+      // after loadWalletData() indirectly via updatePendingNoticeAndForm() so it always wins.
+      function renderRestriction() {
+        const notice = document.getElementById("restrictionNotice");
+        const text = document.getElementById("restrictionText");
+        const amountInput = document.getElementById("withdrawAmount");
+        const submitBtn = document.getElementById("submitBtn");
+
+        if (withdrawalsLocked) {
+          text.innerText =
+            "Withdrawals are temporarily locked by the admin. Please check back later.";
+        } else if (!hasActivePlan) {
+          text.innerText =
+            "You need at least one active investment plan before you can request a withdrawal.";
+        } else {
+          notice.style.display = "none";
+          return false; // not blocked
         }
 
-        async function loadProfile() {
-            const { data } = await supabase
-                .from('profiles')
-                .select('full_name, saved_bank_name, saved_account_number, saved_account_name')
-                .eq('id', currentUser.id)
-                .single();
+        notice.style.display = "block";
+        document.getElementById("pendingNotice").style.display = "none";
+        amountInput.disabled = true;
+        submitBtn.disabled = true;
+        return true; // blocked
+      }
 
-            if (data) {
-                document.getElementById('userAvatar').innerText = data.full_name.charAt(0).toUpperCase();
+      async function loadWalletData() {
+        const { data: wallet } = await supabase
+          .from("wallets")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .single();
+        availableBalance = wallet ? parseFloat(wallet.balance) : 0;
+        document.getElementById("availableBal").innerText =
+          `₦${availableBalance.toLocaleString()}`;
 
-                if (data.saved_bank_name || data.saved_account_number || data.saved_account_name) {
-                    document.getElementById('bankName').value = data.saved_bank_name || '';
-                    document.getElementById('accountNumber').value = data.saved_account_number || '';
-                    document.getElementById('accountName').value = data.saved_account_name || '';
-                    document.getElementById('savedDetailsBadge').style.display = 'inline';
-                }
-            }
-        }
+        // Calculate pending withdrawals FIRST — that money is already spoken for
+        const { data: pending } = await supabase
+          .from("withdrawals")
+          .select("amount")
+          .eq("user_id", currentUser.id)
+          .eq("status", "pending");
+        totalPending = pending
+          ? pending.reduce((sum, item) => sum + parseFloat(item.amount), 0)
+          : 0;
+        document.getElementById("pendingBal").innerText =
+          `₦${totalPending.toLocaleString()}`;
 
-        // NEW: checks the global lock (platform_settings — single-row table) and whether
-        // the user has an active investment
-        async function checkRestrictions() {
-            const [{ data: setting, error: settingErr }, { count, error: planErr }] = await Promise.all([
-                supabase.from('platform_settings').select('withdrawals_locked').order('id', { ascending: true }).limit(1).maybeSingle(),
-                supabase.from('investments').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('status', 'active')
-            ]);
+        // What they can actually request right now = balance minus what's already tied up pending
+        withdrawableBalance = Math.max(0, availableBalance - totalPending);
+        document.getElementById("withdrawableText").innerText =
+          `₦${withdrawableBalance.toLocaleString()}`;
 
-            if (settingErr) console.error('checkRestrictions (lock):', settingErr);
-            if (planErr) console.error('checkRestrictions (plan):', planErr);
+        updatePendingNoticeAndForm();
 
-            withdrawalsLocked = setting?.withdrawals_locked === true;
-            hasActivePlan = (count || 0) > 0;
+        // Calculate total approved withdrawals
+        const { data: approved } = await supabase
+          .from("withdrawals")
+          .select("amount")
+          .eq("user_id", currentUser.id)
+          .eq("status", "approved");
+        const totalApproved = approved
+          ? approved.reduce((sum, item) => sum + parseFloat(item.amount), 0)
+          : 0;
+        document.getElementById("totalWithdrawn").innerText =
+          `₦${totalApproved.toLocaleString()}`;
 
-            renderRestriction();
-        }
+        // Total Earnings
+        const { data: earnings } = await supabase
+          .from("transactions")
+          .select("amount")
+          .eq("user_id", currentUser.id)
+          .eq("type", "earning");
+        const totalE = earnings
+          ? earnings.reduce((sum, item) => sum + parseFloat(item.amount), 0)
+          : 0;
+        document.getElementById("totalEarnings").innerText =
+          `₦${totalE.toLocaleString()}`;
+      }
 
-        // NEW: shows the highest-priority blocking notice and disables the form. Called again
-        // after loadWalletData() indirectly via updatePendingNoticeAndForm() so it always wins.
-        function renderRestriction() {
-            const notice = document.getElementById('restrictionNotice');
-            const text = document.getElementById('restrictionText');
-            const amountInput = document.getElementById('withdrawAmount');
-            const submitBtn = document.getElementById('submitBtn');
+      function updatePendingNoticeAndForm() {
+        // NEW: if locked or no active plan, that notice wins outright — don't let the
+        // pending-balance logic below re-enable the form.
+        if (renderRestriction()) return;
 
-            if (withdrawalsLocked) {
-                text.innerText = 'Withdrawals are temporarily locked by the admin. Please check back later.';
-            } else if (!hasActivePlan) {
-                text.innerText = 'You need at least one active investment plan before you can request a withdrawal.';
-            } else {
-                notice.style.display = 'none';
-                return false; // not blocked
-            }
+        const notice = document.getElementById("pendingNotice");
+        const noticeText = document.getElementById("pendingNoticeText");
+        const amountInput = document.getElementById("withdrawAmount");
+        const submitBtn = document.getElementById("submitBtn");
 
-            notice.style.display = 'block';
-            document.getElementById('pendingNotice').style.display = 'none';
+        if (totalPending > 0) {
+          notice.style.display = "block";
+          if (withdrawableBalance > 0) {
+            noticeText.innerText = `You have a pending withdrawal of ₦${totalPending.toLocaleString()} awaiting admin approval. You can still withdraw up to ₦${withdrawableBalance.toLocaleString()} from funds not already tied up in that request.`;
+            amountInput.disabled = false;
+            amountInput.max = withdrawableBalance;
+            submitBtn.disabled = false;
+          } else {
+            noticeText.innerText = `You have a pending withdrawal of ₦${totalPending.toLocaleString()} awaiting admin approval. You can't request another withdrawal until it's processed or more funds become available in your wallet.`;
             amountInput.disabled = true;
             submitBtn.disabled = true;
-            return true; // blocked
+          }
+        } else {
+          notice.style.display = "none";
+          amountInput.disabled = false;
+          amountInput.removeAttribute("max");
+          submitBtn.disabled = false;
         }
+      }
 
-        async function loadWalletData() {
-            const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', currentUser.id).single();
-            availableBalance = wallet ? parseFloat(wallet.balance) : 0;
-            document.getElementById('availableBal').innerText = `₦${availableBalance.toLocaleString()}`;
+      async function loadWithdrawHistory() {
+        const { data } = await supabase
+          .from("withdrawals")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+        const list = document.getElementById("withdrawList");
+        list.innerHTML = "";
 
-            // Calculate pending withdrawals FIRST — that money is already spoken for
-            const { data: pending } = await supabase.from('withdrawals').select('amount').eq('user_id', currentUser.id).eq('status', 'pending');
-            totalPending = pending ? pending.reduce((sum, item) => sum + parseFloat(item.amount), 0) : 0;
-            document.getElementById('pendingBal').innerText = `₦${totalPending.toLocaleString()}`;
-
-            // What they can actually request right now = balance minus what's already tied up pending
-            withdrawableBalance = Math.max(0, availableBalance - totalPending);
-            document.getElementById('withdrawableText').innerText = `₦${withdrawableBalance.toLocaleString()}`;
-
-            updatePendingNoticeAndForm();
-
-            // Calculate total approved withdrawals
-            const { data: approved } = await supabase.from('withdrawals').select('amount').eq('user_id', currentUser.id).eq('status', 'approved');
-            const totalApproved = approved ? approved.reduce((sum, item) => sum + parseFloat(item.amount), 0) : 0;
-            document.getElementById('totalWithdrawn').innerText = `₦${totalApproved.toLocaleString()}`;
-
-            // Total Earnings
-            const { data: earnings } = await supabase.from('transactions').select('amount').eq('user_id', currentUser.id).eq('type', 'earning');
-            const totalE = earnings ? earnings.reduce((sum, item) => sum + parseFloat(item.amount), 0) : 0;
-            document.getElementById('totalEarnings').innerText = `₦${totalE.toLocaleString()}`;
-        }
-
-        function updatePendingNoticeAndForm() {
-            // NEW: if locked or no active plan, that notice wins outright — don't let the
-            // pending-balance logic below re-enable the form.
-            if (renderRestriction()) return;
-
-            const notice = document.getElementById('pendingNotice');
-            const noticeText = document.getElementById('pendingNoticeText');
-            const amountInput = document.getElementById('withdrawAmount');
-            const submitBtn = document.getElementById('submitBtn');
-
-            if (totalPending > 0) {
-                notice.style.display = 'block';
-                if (withdrawableBalance > 0) {
-                    noticeText.innerText = `You have a pending withdrawal of ₦${totalPending.toLocaleString()} awaiting admin approval. You can still withdraw up to ₦${withdrawableBalance.toLocaleString()} from funds not already tied up in that request.`;
-                    amountInput.disabled = false;
-                    amountInput.max = withdrawableBalance;
-                    submitBtn.disabled = false;
-                } else {
-                    noticeText.innerText = `You have a pending withdrawal of ₦${totalPending.toLocaleString()} awaiting admin approval. You can't request another withdrawal until it's processed or more funds become available in your wallet.`;
-                    amountInput.disabled = true;
-                    submitBtn.disabled = true;
-                }
-            } else {
-                notice.style.display = 'none';
-                amountInput.disabled = false;
-                amountInput.removeAttribute('max');
-                submitBtn.disabled = false;
-            }
-        }
-
-        async function loadWithdrawHistory() {
-            const { data } = await supabase.from('withdrawals').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-            const list = document.getElementById('withdrawList');
-            list.innerHTML = '';
-
-            if (!data || data.length === 0) {
-                list.innerHTML = `
+        if (!data || data.length === 0) {
+          list.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-history"></i>
                         <p>No withdrawal history found. Start investing to earn profit!</p>
                         <a href="plans.html" class="btn-submit" style="text-decoration:none; display:inline-block; width:auto; padding:10px 20px;">Start Investing</a>
                     </div>
                 `;
-                return;
-            }
+          return;
+        }
 
-            data.forEach(w => {
-                const date = new Date(w.created_at);
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
+        data.forEach((w) => {
+          const date = new Date(w.created_at);
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.innerHTML = `
                     <div class="hist-info">
                         <h5>₦${parseFloat(w.amount).toLocaleString()}</h5>
                         <p>${date.toLocaleDateString()} • ${w.bank_name}</p>
@@ -546,134 +892,180 @@
                         <span class="badge ${w.status}">${w.status}</span>
                     </div>
                 `;
-                list.appendChild(item);
-            });
+          list.appendChild(item);
+        });
+      }
+
+      async function saveBankDetails(showAlert) {
+        const bank = document.getElementById("bankName").value.trim();
+        const accNum = document.getElementById("accountNumber").value.trim();
+        const accName = document.getElementById("accountName").value.trim();
+
+        if (!bank || !accNum || !accName) {
+          if (showAlert)
+            alert(
+              "Please fill in bank name, account number, and account name before saving.",
+            );
+          return;
         }
 
-        async function saveBankDetails(showAlert) {
-            const bank = document.getElementById('bankName').value.trim();
-            const accNum = document.getElementById('accountNumber').value.trim();
-            const accName = document.getElementById('accountName').value.trim();
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            saved_bank_name: bank,
+            saved_account_number: accNum,
+            saved_account_name: accName,
+          })
+          .eq("id", currentUser.id);
 
-            if (!bank || !accNum || !accName) {
-                if (showAlert) alert('Please fill in bank name, account number, and account name before saving.');
-                return;
-            }
-
-            const { error } = await supabase.from('profiles').update({
-                saved_bank_name: bank,
-                saved_account_number: accNum,
-                saved_account_name: accName
-            }).eq('id', currentUser.id);
-
-            if (!error) {
-                document.getElementById('savedDetailsBadge').style.display = 'inline';
-                const status = document.getElementById('saveDetailsStatus');
-                status.style.display = 'inline';
-                setTimeout(() => { status.style.display = 'none'; }, 2500);
-            } else if (showAlert) {
-                alert('Could not save bank details: ' + error.message);
-            }
+        if (!error) {
+          document.getElementById("savedDetailsBadge").style.display = "inline";
+          const status = document.getElementById("saveDetailsStatus");
+          status.style.display = "inline";
+          setTimeout(() => {
+            status.style.display = "none";
+          }, 2500);
+        } else if (showAlert) {
+          alert("Could not save bank details: " + error.message);
         }
+      }
 
-        document.getElementById('saveDetailsLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            saveBankDetails(true);
+      document
+        .getElementById("saveDetailsLink")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          saveBankDetails(true);
         });
 
-        document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+      document
+        .getElementById("withdrawForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-            // NEW: hard client-side guards (real enforcement is a DB trigger — see schema notes)
-            if (withdrawalsLocked) { alert('Withdrawals are currently locked by admin. Please check back later.'); return; }
-            if (!hasActivePlan) { alert('You need at least one active investment plan to request a withdrawal.'); return; }
+          // NEW: hard client-side guards (real enforcement is a DB trigger — see schema notes)
+          if (withdrawalsLocked) {
+            alert(
+              "Withdrawals are currently locked by admin. Please check back later.",
+            );
+            return;
+          }
+          if (!hasActivePlan) {
+            alert(
+              "You need at least one active investment plan to request a withdrawal.",
+            );
+            return;
+          }
 
-            const amount = parseFloat(document.getElementById('withdrawAmount').value);
-            const bank = document.getElementById('bankName').value.trim();
-            const accNum = document.getElementById('accountNumber').value.trim();
-            const accName = document.getElementById('accountName').value.trim();
+          const amount = parseFloat(
+            document.getElementById("withdrawAmount").value,
+          );
+          const bank = document.getElementById("bankName").value.trim();
+          const accNum = document.getElementById("accountNumber").value.trim();
+          const accName = document.getElementById("accountName").value.trim();
 
-            // Validations
-            if (amount < 1000) { alert('Minimum withdrawal is ₦1,000'); return; }
+          // Validations
+          if (amount < 1000) {
+            alert("Minimum withdrawal is ₦1,000");
+            return;
+          }
 
-            if (withdrawableBalance <= 0) {
-                alert('You already have a pending withdrawal covering your full balance. Please wait for it to be processed, or add more funds before requesting another withdrawal.');
-                return;
+          if (withdrawableBalance <= 0) {
+            alert(
+              "You already have a pending withdrawal covering your full balance. Please wait for it to be processed, or add more funds before requesting another withdrawal.",
+            );
+            return;
+          }
+
+          if (amount > withdrawableBalance) {
+            alert(
+              `You have a pending withdrawal of ₦${totalPending.toLocaleString()}. You can only request up to ₦${withdrawableBalance.toLocaleString()} right now.`,
+            );
+            return;
+          }
+
+          if (accNum.length < 10) {
+            alert("Please enter a valid account number");
+            return;
+          }
+
+          const btn = document.getElementById("submitBtn");
+          const txt = document.getElementById("btnText");
+          const spin = document.getElementById("btnSpinner");
+
+          btn.disabled = true;
+          txt.style.display = "none";
+          spin.style.display = "block";
+
+          try {
+            const feeAmount = amount * (WITHDRAWAL_FEE_PERCENT / 100);
+            const netAmount = amount - feeAmount;
+
+            // 1. Create Withdrawal Request
+            // NOTE: the definitive checks (pending balance, platform lock, active-plan requirement)
+            // also live in database triggers on the withdrawals table, so none of this can be
+            // bypassed by calling the API directly.
+            // `amount` stays the gross figure deducted from the wallet; fee_amount/net_amount
+            // record the 15% charge breakdown for admin payout reference.
+            const { error: wErr } = await supabase.from("withdrawals").insert([
+              {
+                user_id: currentUser.id,
+                amount: amount,
+                fee_amount: feeAmount,
+                net_amount: netAmount,
+                bank_name: bank,
+                account_number: accNum,
+                account_name: accName,
+                status: "pending",
+              },
+            ]);
+            if (wErr) throw wErr;
+
+            // 2. Create Transaction Record
+            await supabase.from("transactions").insert([
+              {
+                user_id: currentUser.id,
+                amount: amount,
+                type: "withdrawal",
+                description: `Withdrawal request to ${bank} (15% charge applies, net payout ₦${netAmount.toLocaleString()})`,
+              },
+            ]);
+
+            // 3. Create Notification
+            await supabase.from("notifications").insert([
+              {
+                user_id: currentUser.id,
+                title: "Withdrawal Pending",
+                message: `Your withdrawal request of ₦${amount.toLocaleString()} is pending approval. A 15% charge applies — you'll receive ₦${netAmount.toLocaleString()}.`,
+              },
+            ]);
+
+            alert(
+              "Withdrawal request submitted successfully! It is now awaiting admin approval.",
+            );
+            await saveBankDetails(false);
+            window.location.reload();
+          } catch (err) {
+            console.error(err);
+            // Surface a friendlier message if it was blocked by a DB-level trigger
+            let msg =
+              "An error occurred while processing your request. Please try again.";
+            if (err && err.message) {
+              if (err.message.includes("pending withdrawal")) msg = err.message;
+              else if (err.message.includes("locked")) msg = err.message;
+              else if (
+                err.message.includes("active investment") ||
+                err.message.includes("active plan")
+              )
+                msg = err.message;
             }
-
-            if (amount > withdrawableBalance) {
-                alert(`You have a pending withdrawal of ₦${totalPending.toLocaleString()}. You can only request up to ₦${withdrawableBalance.toLocaleString()} right now.`);
-                return;
-            }
-
-            if (accNum.length < 10) { alert('Please enter a valid account number'); return; }
-
-            const btn = document.getElementById('submitBtn');
-            const txt = document.getElementById('btnText');
-            const spin = document.getElementById('btnSpinner');
-
-            btn.disabled = true;
-            txt.style.display = 'none';
-            spin.style.display = 'block';
-
-            try {
-                const feeAmount = amount * (WITHDRAWAL_FEE_PERCENT / 100);
-                const netAmount = amount - feeAmount;
-
-                // 1. Create Withdrawal Request
-                // NOTE: the definitive checks (pending balance, platform lock, active-plan requirement)
-                // also live in database triggers on the withdrawals table, so none of this can be
-                // bypassed by calling the API directly.
-                // `amount` stays the gross figure deducted from the wallet; fee_amount/net_amount
-                // record the 15% charge breakdown for admin payout reference.
-                const { error: wErr } = await supabase.from('withdrawals').insert([{
-                    user_id: currentUser.id,
-                    amount: amount,
-                    fee_amount: feeAmount,
-                    net_amount: netAmount,
-                    bank_name: bank,
-                    account_number: accNum,
-                    account_name: accName,
-                    status: 'pending'
-                }]);
-                if (wErr) throw wErr;
-
-                // 2. Create Transaction Record
-                await supabase.from('transactions').insert([{
-                    user_id: currentUser.id,
-                    amount: amount,
-                    type: 'withdrawal',
-                    description: `Withdrawal request to ${bank} (15% charge applies, net payout ₦${netAmount.toLocaleString()})`
-                }]);
-
-                // 3. Create Notification
-                await supabase.from('notifications').insert([{
-                    user_id: currentUser.id,
-                    title: 'Withdrawal Pending',
-                    message: `Your withdrawal request of ₦${amount.toLocaleString()} is pending approval. A 15% charge applies — you'll receive ₦${netAmount.toLocaleString()}.`
-                }]);
-
-                alert('Withdrawal request submitted successfully! It is now awaiting admin approval.');
-                await saveBankDetails(false);
-                window.location.reload();
-
-            } catch (err) {
-                console.error(err);
-                // Surface a friendlier message if it was blocked by a DB-level trigger
-                let msg = 'An error occurred while processing your request. Please try again.';
-                if (err && err.message) {
-                    if (err.message.includes('pending withdrawal')) msg = err.message;
-                    else if (err.message.includes('locked')) msg = err.message;
-                    else if (err.message.includes('active investment') || err.message.includes('active plan')) msg = err.message;
-                }
-                alert(msg);
-                btn.disabled = false;
-                txt.style.display = 'block';
-                spin.style.display = 'none';
-            }
+            alert(msg);
+            btn.disabled = false;
+            txt.style.display = "block";
+            spin.style.display = "none";
+          }
         });
 
-        window.addEventListener('DOMContentLoaded', init);
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>

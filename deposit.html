@@ -1,366 +1,629 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Deposit Funds | EASYPIE</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
-            --primary-bg: #0a0e17;
-            --secondary-bg: #111827;
-            --accent-color: #3b82f6;
-            --card-bg: rgba(31, 41, 55, 0.6);
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --nav-height: 70px;
+      :root {
+        --primary-bg: #0a0e17;
+        --secondary-bg: #111827;
+        --accent-color: #3b82f6;
+        --card-bg: rgba(31, 41, 55, 0.6);
+        --text-main: #ffffff;
+        --text-muted: #9ca3af;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --nav-height: 70px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--primary-bg);
+        color: var(--text-main);
+        padding-bottom: calc(var(--nav-height) + 30px);
+        min-height: 100vh;
+      }
+
+      .container {
+        width: 92%;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* --- Header --- */
+      header {
+        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        background: rgba(10, 14, 23, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 100;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .back-btn {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mini-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      /* --- Wallet Summary --- */
+      .summary-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 20px 0;
+      }
+
+      .summary-card {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+      }
+
+      .summary-card p {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      .summary-card h4 {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      /* --- Deposit Form --- */
+      .deposit-section {
+        background: var(--secondary-bg);
+        padding: 25px;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 25px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+      }
+
+      .input-box {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .input-box span {
+        font-weight: 700;
+        color: var(--accent-color);
+      }
+      .input-box input {
+        background: transparent;
+        border: none;
+        color: white;
+        width: 100%;
+        font-size: 18px;
+        font-weight: 700;
+        outline: none;
+      }
+
+      .method-box {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid var(--accent-color);
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Bank Details --- */
+      .bank-details {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        padding: 20px;
+        border-radius: 18px;
+        margin: 20px 0;
+        border: 1px solid var(--glass-border);
+      }
+
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .detail-item:last-child {
+        border: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .detail-item span {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .detail-item h5 {
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .copy-btn {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .instructions {
+        background: rgba(245, 158, 11, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px dashed var(--warning);
+        margin-bottom: 25px;
+      }
+      .instructions li {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        margin-left: 15px;
+      }
+
+      .btn-paid {
+        width: 100%;
+        padding: 16px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .btn-paid:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* --- Deposit History --- */
+      .history-section h3 {
+        font-size: 16px;
+        margin-bottom: 15px;
+      }
+
+      .history-item {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .hist-info h5 {
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+      .hist-info p {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .hist-status {
+        text-align: right;
+      }
+      .hist-status h4 {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .badge {
+        font-size: 9px;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+      }
+      .pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+      .approved {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+      .rejected {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+      }
+
+      /* --- Bottom Nav --- */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(17, 24, 39, 0.95);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid var(--glass-border);
+        z-index: 1000;
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 10px;
+      }
+
+      .nav-item.active {
+        color: var(--accent-color);
+      }
+      .nav-item i {
+        font-size: 18px;
+      }
+
+      /* --- Spinner --- */
+      .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+        display: none;
+        margin: 0 auto;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-main);
-            padding-bottom: calc(var(--nav-height) + 30px);
-            min-height: 100vh;
-        }
-
-        .container { width: 92%; max-width: 600px; margin: 0 auto; }
-
-        /* --- Header --- */
-        header {
-            padding: 20px 0;
-            position: sticky; top: 0;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .header-flex { display: flex; justify-content: space-between; align-items: center; }
-
-        .back-btn {
-            color: white; text-decoration: none; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .mini-avatar {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: var(--accent-color);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px;
-        }
-
-        /* --- Wallet Summary --- */
-        .summary-row {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0;
-        }
-
-        .summary-card {
-            background: var(--card-bg); padding: 15px; border-radius: 18px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .summary-card p { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .summary-card h4 { font-size: 16px; font-weight: 700; }
-
-        /* --- Deposit Form --- */
-        .deposit-section {
-            background: var(--secondary-bg); padding: 25px; border-radius: 24px;
-            border: 1px solid var(--glass-border); margin-bottom: 25px;
-        }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
-
-        .input-box {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 15px; display: flex; align-items: center;
-            gap: 10px;
-        }
-
-        .input-box span { font-weight: 700; color: var(--accent-color); }
-        .input-box input {
-            background: transparent; border: none; color: white; width: 100%;
-            font-size: 18px; font-weight: 700; outline: none;
-        }
-
-        .method-box {
-            background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-color);
-            border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center;
-        }
-
-        /* --- Bank Details --- */
-        .bank-details {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            padding: 20px; border-radius: 18px; margin: 20px 0;
-            border: 1px solid var(--glass-border);
-        }
-
-        .detail-item {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .detail-item:last-child { border: none; margin: 0; padding: 0; }
-
-        .detail-item span { font-size: 11px; color: var(--text-muted); }
-        .detail-item h5 { font-size: 14px; font-weight: 600; }
-
-        .copy-btn {
-            background: var(--accent-color); color: white; border: none;
-            padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;
-            cursor: pointer;
-        }
-
-        .instructions {
-            background: rgba(245, 158, 11, 0.05); border-radius: 12px;
-            padding: 15px; border: 1px dashed var(--warning); margin-bottom: 25px;
-        }
-        .instructions li { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; margin-left: 15px; }
-
-        .btn-paid {
-            width: 100%; padding: 16px; background: var(--accent-color);
-            color: white; border: none; border-radius: 15px; font-weight: 700;
-            font-size: 16px; cursor: pointer; transition: 0.3s;
-        }
-        .btn-paid:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* --- Deposit History --- */
-        .history-section h3 { font-size: 16px; margin-bottom: 15px; }
-        
-        .history-item {
-            background: var(--card-bg); padding: 15px; border-radius: 15px;
-            border: 1px solid var(--glass-border); margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .hist-info h5 { font-size: 14px; margin-bottom: 4px; }
-        .hist-info p { font-size: 11px; color: var(--text-muted); }
-
-        .hist-status { text-align: right; }
-        .hist-status h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-        
-        .badge {
-            font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase;
-        }
-        .pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .approved { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
-        /* --- Bottom Nav --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: var(--nav-height); background: rgba(17, 24, 39, 0.95);
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            border-top: 1px solid var(--glass-border); z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 4px; color: var(--text-muted);
-            text-decoration: none; font-size: 10px;
-        }
-
-        .nav-item.active { color: var(--accent-color); }
-        .nav-item i { font-size: 18px; }
-
-        /* --- Spinner --- */
-        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s infinite linear; display: none; margin: 0 auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- Toast --- */
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--success); color: white; padding: 12px 25px;
-            border-radius: 30px; font-size: 14px; font-weight: 600; display: none;
-            z-index: 3000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
+      /* --- Toast --- */
+      #toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--success);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 600;
+        display: none;
+        z-index: 3000;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="toast">Copied to clipboard!</div>
 
     <header>
-        <div class="container header-flex">
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Deposit</a>
-            <div class="profile-area">
-                <a href="notifications.html" style="color: white; font-size: 18px; margin-right: 12px;"><i class="fas fa-bell"></i></a>
-                <div class="mini-avatar" id="userAvatar">U</div>
-            </div>
+      <div class="container header-flex">
+        <a href="dashboard.html" class="back-btn"
+          ><i class="fas fa-arrow-left"></i> Deposit</a
+        >
+        <div class="profile-area">
+          <a
+            href="notifications.html"
+            style="color: white; font-size: 18px; margin-right: 12px"
+            ><i class="fas fa-bell"></i
+          ></a>
+          <div class="mini-avatar" id="userAvatar">U</div>
         </div>
+      </div>
     </header>
 
     <main class="container">
-        <!-- Summary -->
-        <div class="summary-row">
-            <div class="summary-card">
-                <p>Wallet Balance</p>
-                <h4 id="walletBal">₦0.00</h4>
-            </div>
-            <div class="summary-card">
-                <p>Pending Deposit</p>
-                <h4 id="pendingBal" style="color: var(--warning);">₦0.00</h4>
-            </div>
+      <!-- Summary -->
+      <div class="summary-row">
+        <div class="summary-card">
+          <p>Wallet Balance</p>
+          <h4 id="walletBal">₦0.00</h4>
+        </div>
+        <div class="summary-card">
+          <p>Pending Deposit</p>
+          <h4 id="pendingBal" style="color: var(--warning)">₦0.00</h4>
+        </div>
+      </div>
+
+      <!-- Deposit Interface -->
+      <section class="deposit-section">
+        <div class="form-group">
+          <label>Deposit Amount (₦)</label>
+          <div class="input-box">
+            <span>₦</span>
+            <input
+              type="number"
+              id="depositAmount"
+              placeholder="5,000"
+              min="1000"
+            />
+          </div>
         </div>
 
-        <!-- Deposit Interface -->
-        <section class="deposit-section">
-            <div class="form-group">
-                <label>Deposit Amount (₦)</label>
-                <div class="input-box">
-                    <span>₦</span>
-                    <input type="number" id="depositAmount" placeholder="5,000" min="1000">
-                </div>
+        <div class="form-group">
+          <label>Payment Method</label>
+          <div class="method-box">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <i
+                class="fas fa-university"
+                style="color: var(--accent-color)"
+              ></i>
+              <span style="font-weight: 600; font-size: 14px">Kuda Bank</span>
             </div>
-
-            <div class="form-group">
-                <label>Payment Method</label>
-                <div class="method-box">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i class="fas fa-university" style="color: var(--accent-color);"></i>
-                        <span style="font-weight:600; font-size:14px;">Kuda Bank</span>
-                    </div>
-                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                </div>
-            </div>
-
-            <!-- Kuda Details -->
-            <div class="bank-details">
-                <div class="detail-item">
-                    <div><span>Account Name</span><h5 id="kudaName">Loading...</h5></div>
-                </div>
-                <div class="detail-item">
-                    <div><span>Account Number</span><h5 id="kudaNumber">0000000000</h5></div>
-                    <button class="copy-btn" onclick="copyNumber()">Copy</button>
-                </div>
-                <div class="detail-item">
-                    <div><span>Bank Name</span><h5 id="kudaBank">Kuda Bank</h5></div>
-                </div>
-            </div>
-
-            <div class="instructions">
-                <ul style="list-style: none;">
-                    <li><i class="fas fa-info-circle"></i> Transfer the exact amount to the account above.</li>
-                    <li><i class="fas fa-info-circle"></i> Click <b>"I Have Paid"</b> after the transfer.</li>
-                    <li><i class="fas fa-info-circle"></i> Your wallet will update once confirmed.</li>
-                </ul>
-            </div>
-
-            <button class="btn-paid" id="paidBtn" onclick="submitDeposit()">
-                <span id="btnText">I Have Paid</span>
-                <div class="spinner" id="btnSpinner"></div>
-            </button>
-        </section>
-
-        <!-- History -->
-        <section class="history-section">
-            <h3>Deposit History</h3>
-            <div id="depositList">
-                <!-- Skeleton -->
-                <div class="history-item" style="height: 60px; background: #1f2937;"></div>
-            </div>
-        </section>
-
-        <!-- Extra Actions -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-            <a href="investment.html" class="summary-card" style="text-decoration:none; color:white; text-align:center;"><i class="fas fa-rocket"></i><br><span style="font-size:12px;">Invest</span></a>
-            <a href="withdraw.html" class="summary-card" style="text-decoration:none; color:white; text-align:center;"><i class="fas fa-wallet"></i><br><span style="font-size:12px;">Withdraw</span></a>
+            <i class="fas fa-check-circle" style="color: var(--success)"></i>
+          </div>
         </div>
+
+        <!-- Kuda Details -->
+        <div class="bank-details">
+          <div class="detail-item">
+            <div>
+              <span>Account Name</span>
+              <h5 id="kudaName">Loading...</h5>
+            </div>
+          </div>
+          <div class="detail-item">
+            <div>
+              <span>Account Number</span>
+              <h5 id="kudaNumber">0000000000</h5>
+            </div>
+            <button class="copy-btn" onclick="copyNumber()">Copy</button>
+          </div>
+          <div class="detail-item">
+            <div>
+              <span>Bank Name</span>
+              <h5 id="kudaBank">Kuda Bank</h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="instructions">
+          <ul style="list-style: none">
+            <li>
+              <i class="fas fa-info-circle"></i> Transfer the exact amount to
+              the account above.
+            </li>
+            <li>
+              <i class="fas fa-info-circle"></i> Click
+              <b>"I Have Paid"</b> after the transfer.
+            </li>
+            <li>
+              <i class="fas fa-info-circle"></i> Your wallet will update once
+              confirmed.
+            </li>
+          </ul>
+        </div>
+
+        <button class="btn-paid" id="paidBtn" onclick="submitDeposit()">
+          <span id="btnText">I Have Paid</span>
+          <div class="spinner" id="btnSpinner"></div>
+        </button>
+      </section>
+
+      <!-- History -->
+      <section class="history-section">
+        <h3>Deposit History</h3>
+        <div id="depositList">
+          <!-- Skeleton -->
+          <div
+            class="history-item"
+            style="height: 60px; background: #1f2937"
+          ></div>
+        </div>
+      </section>
+
+      <!-- Extra Actions -->
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          margin-top: 20px;
+        "
+      >
+        <a
+          href="investment.html"
+          class="summary-card"
+          style="text-decoration: none; color: white; text-align: center"
+          ><i class="fas fa-rocket"></i><br /><span style="font-size: 12px"
+            >Invest</span
+          ></a
+        >
+        <a
+          href="withdraw.html"
+          class="summary-card"
+          style="text-decoration: none; color: white; text-align: center"
+          ><i class="fas fa-wallet"></i><br /><span style="font-size: 12px"
+            >Withdraw</span
+          ></a
+        >
+      </div>
     </main>
 
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">
-            <i class="fas fa-th-large"></i><span>Home</span>
-        </a>
-        <a href="plans.html" class="nav-item">
-            <i class="fas fa-layer-group"></i><span>Plans</span>
-        </a>
-        <a href="wallet.html" class="nav-item">
-            <i class="fas fa-wallet"></i><span>Wallet</span>
-        </a>
-        <a href="deposit.html" class="nav-item active">
-            <i class="fas fa-plus-circle"></i><span>Deposit</span>
-        </a>
-        <a href="profile.html" class="nav-item">
-            <i class="fas fa-user-circle"></i><span>Profile</span>
-        </a>
+      <a href="dashboard.html" class="nav-item">
+        <i class="fas fa-th-large"></i><span>Home</span>
+      </a>
+      <a href="plans.html" class="nav-item">
+        <i class="fas fa-layer-group"></i><span>Plans</span>
+      </a>
+      <a href="wallet.html" class="nav-item">
+        <i class="fas fa-wallet"></i><span>Wallet</span>
+      </a>
+      <a href="deposit.html" class="nav-item active">
+        <i class="fas fa-plus-circle"></i><span>Deposit</span>
+      </a>
+      <a href="profile.html" class="nav-item">
+        <i class="fas fa-user-circle"></i><span>Profile</span>
+      </a>
     </nav>
 
     <script type="module">
-        const SB_URL = import.meta.env.VITE_SUPABASE_URL;
-        const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      const SB_URL = import.meta.env.VITE_SUPABASE_URL;
+      const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
+      let currentUser = null;
 
-        async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = 'login.html'; return; }
-            currentUser = session.user;
+      async function init() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+          return;
+        }
+        currentUser = session.user;
 
-            // Load Bank Details from Env
-            document.getElementById('kudaName').innerText = import.meta.env.VITE_KUDA_ACCOUNT_NAME || 'EASYPIE ADMIN';
-            document.getElementById('kudaNumber').innerText = import.meta.env.VITE_KUDA_ACCOUNT_NUMBER || '0123456789';
-            document.getElementById('kudaBank').innerText = import.meta.env.VITE_KUDA_BANK_NAME || 'Kuda Bank';
+        // Load Bank Details from Env
+        document.getElementById("kudaName").innerText =
+          import.meta.env.VITE_KUDA_ACCOUNT_NAME || "EASYPIE ADMIN";
+        document.getElementById("kudaNumber").innerText =
+          import.meta.env.VITE_KUDA_ACCOUNT_NUMBER || "0123456789";
+        document.getElementById("kudaBank").innerText =
+          import.meta.env.VITE_KUDA_BANK_NAME || "Kuda Bank";
 
-            await loadWalletData();
-            await loadDepositHistory();
-            await loadProfile();
+        await loadWalletData();
+        await loadDepositHistory();
+        await loadProfile();
+      }
+
+      async function loadProfile() {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", currentUser.id)
+          .single();
+        if (data)
+          document.getElementById("userAvatar").innerText = data.full_name
+            .charAt(0)
+            .toUpperCase();
+      }
+
+      async function loadWalletData() {
+        const { data: wallet } = await supabase
+          .from("wallets")
+          .select("balance")
+          .eq("user_id", currentUser.id)
+          .single();
+        if (wallet) {
+          document.getElementById("walletBal").innerText =
+            `₦${parseFloat(wallet.balance).toLocaleString()}`;
         }
 
-        async function loadProfile() {
-            const { data } = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
-            if (data) document.getElementById('userAvatar').innerText = data.full_name.charAt(0).toUpperCase();
+        // Calculate pending deposits
+        const { data: pending } = await supabase
+          .from("deposits")
+          .select("amount")
+          .eq("user_id", currentUser.id)
+          .eq("status", "pending");
+        const totalPending = pending
+          ? pending.reduce((sum, item) => sum + parseFloat(item.amount), 0)
+          : 0;
+        document.getElementById("pendingBal").innerText =
+          `₦${totalPending.toLocaleString()}`;
+      }
+
+      async function loadDepositHistory() {
+        const { data } = await supabase
+          .from("deposits")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+        const list = document.getElementById("depositList");
+        list.innerHTML = "";
+
+        if (!data || data.length === 0) {
+          list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">No deposit history found.</p>`;
+          return;
         }
 
-        async function loadWalletData() {
-            const { data: wallet } = await supabase.from('wallets').select('balance').eq('user_id', currentUser.id).single();
-            if (wallet) {
-                document.getElementById('walletBal').innerText = `₦${parseFloat(wallet.balance).toLocaleString()}`;
-            }
-
-            // Calculate pending deposits
-            const { data: pending } = await supabase.from('deposits').select('amount').eq('user_id', currentUser.id).eq('status', 'pending');
-            const totalPending = pending ? pending.reduce((sum, item) => sum + parseFloat(item.amount), 0) : 0;
-            document.getElementById('pendingBal').innerText = `₦${totalPending.toLocaleString()}`;
-        }
-
-        async function loadDepositHistory() {
-            const { data } = await supabase.from('deposits').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-            const list = document.getElementById('depositList');
-            list.innerHTML = '';
-
-            if (!data || data.length === 0) {
-                list.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">No deposit history found.</p>`;
-                return;
-            }
-
-            data.forEach(d => {
-                const date = new Date(d.created_at);
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
+        data.forEach((d) => {
+          const date = new Date(d.created_at);
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.innerHTML = `
                     <div class="hist-info">
                         <h5>₦${parseFloat(d.amount).toLocaleString()}</h5>
                         <p>${date.toLocaleDateString()} • Kuda Bank</p>
@@ -369,67 +632,75 @@
                         <span class="badge ${d.status}">${d.status}</span>
                     </div>
                 `;
-                list.appendChild(item);
-            });
+          list.appendChild(item);
+        });
+      }
+
+      window.copyNumber = () => {
+        const num = document.getElementById("kudaNumber").innerText;
+        navigator.clipboard.writeText(num);
+        const toast = document.getElementById("toast");
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 2000);
+      };
+
+      window.submitDeposit = async () => {
+        const amt = parseFloat(document.getElementById("depositAmount").value);
+        if (!amt || amt < 1000) {
+          alert("Minimum deposit is ₦1,000");
+          return;
         }
 
-        window.copyNumber = () => {
-            const num = document.getElementById('kudaNumber').innerText;
-            navigator.clipboard.writeText(num);
-            const toast = document.getElementById('toast');
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 2000);
-        };
+        const btn = document.getElementById("paidBtn");
+        const txt = document.getElementById("btnText");
+        const spin = document.getElementById("btnSpinner");
 
-        window.submitDeposit = async () => {
-            const amt = parseFloat(document.getElementById('depositAmount').value);
-            if (!amt || amt < 1000) { alert('Minimum deposit is ₦1,000'); return; }
+        btn.disabled = true;
+        txt.style.display = "none";
+        spin.style.display = "block";
 
-            const btn = document.getElementById('paidBtn');
-            const txt = document.getElementById('btnText');
-            const spin = document.getElementById('btnSpinner');
+        try {
+          // 1. Insert Deposit Request
+          const { error: depErr } = await supabase.from("deposits").insert([
+            {
+              user_id: currentUser.id,
+              amount: amt,
+              payment_method: "Kuda Bank",
+              status: "pending",
+            },
+          ]);
+          if (depErr) throw depErr;
 
-            btn.disabled = true;
-            txt.style.display = 'none';
-            spin.style.display = 'block';
+          // 2. Create Transaction Log
+          await supabase.from("transactions").insert([
+            {
+              user_id: currentUser.id,
+              amount: amt,
+              type: "deposit",
+              description: "Deposit via Kuda Bank",
+            },
+          ]);
 
-            try {
-                // 1. Insert Deposit Request
-                const { error: depErr } = await supabase.from('deposits').insert([{
-                    user_id: currentUser.id,
-                    amount: amt,
-                    payment_method: 'Kuda Bank',
-                    status: 'pending'
-                }]);
-                if (depErr) throw depErr;
+          // 3. Create Notification
+          await supabase.from("notifications").insert([
+            {
+              user_id: currentUser.id,
+              title: "Deposit Received",
+              message: `Your deposit of ₦${amt.toLocaleString()} is pending approval.`,
+            },
+          ]);
 
-                // 2. Create Transaction Log
-                await supabase.from('transactions').insert([{
-                    user_id: currentUser.id,
-                    amount: amt,
-                    type: 'deposit',
-                    description: 'Deposit via Kuda Bank'
-                }]);
+          alert("Deposit submitted! We will notify you once it is confirmed.");
+          window.location.reload();
+        } catch (e) {
+          alert("An error occurred. Please try again.");
+          btn.disabled = false;
+          txt.style.display = "block";
+          spin.style.display = "none";
+        }
+      };
 
-                // 3. Create Notification
-                await supabase.from('notifications').insert([{
-                    user_id: currentUser.id,
-                    title: 'Deposit Received',
-                    message: `Your deposit of ₦${amt.toLocaleString()} is pending approval.`
-                }]);
-
-                alert('Deposit submitted! We will notify you once it is confirmed.');
-                window.location.reload();
-
-            } catch (e) {
-                alert('An error occurred. Please try again.');
-                btn.disabled = false;
-                txt.style.display = 'block';
-                spin.style.display = 'none';
-            }
-        };
-
-        window.addEventListener('DOMContentLoaded', init);
+      window.addEventListener("DOMContentLoaded", init);
     </script>
-</body>
+  </body>
 </html>
