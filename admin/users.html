@@ -462,9 +462,9 @@
             </div>
 
             <div class="pagination">
-                <button class="btn-page" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                <button class="btn-page" id="prevPage" aria-label="Previous page"><i class="fas fa-chevron-left"></i></button>
                 <span id="pageInfo" style="font-size: 13px; color: var(--text-muted);">Page 1 of 1</span>
-                <button class="btn-page" id="nextPage"><i class="fas fa-chevron-right"></i></button>
+                <button class="btn-page" id="nextPage" aria-label="Next page"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
     </main>
@@ -474,7 +474,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>User Profile Details</h3>
-                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer; padding:6px;"></i>
+                <button type="button" aria-label="Close modal" onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:6px; font-size:16px;"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" id="modalBody">
             </div>
@@ -613,9 +613,9 @@
                     <td>${joined}</td>
                     <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
                     <td>
-                        <button class="btn-action-icon" onclick="viewUser('${u.id}')" title="View"><i class="fas fa-eye"></i></button>
-                        <button class="btn-action-icon" onclick="toggleSuspend('${u.id}', '${u.status}')" title="${u.status === 'suspended' ? 'Activate' : 'Suspend'}"><i class="fas ${u.status === 'suspended' ? 'fa-user-check' : 'fa-user-slash'}"></i></button>
-                        <button class="btn-action-icon" style="color:var(--danger)" onclick="deleteUser('${u.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                        <button class="btn-action-icon" onclick="viewUser('${u.id}')" title="View" aria-label="View profile for ${u.full_name}"><i class="fas fa-eye"></i></button>
+                        <button class="btn-action-icon" onclick="toggleSuspend('${u.id}', '${u.status}')" title="${u.status === 'suspended' ? 'Activate' : 'Suspend'}" aria-label="${u.status === 'suspended' ? 'Activate' : 'Suspend'} user ${u.full_name}"><i class="fas ${u.status === 'suspended' ? 'fa-user-check' : 'fa-user-slash'}"></i></button>
+                        <button class="btn-action-icon" style="color:var(--danger)" onclick="deleteUser('${u.id}')" title="Delete" aria-label="Delete user ${u.full_name}"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -640,9 +640,9 @@
                         <div><span class="label">ID</span>${u.id.slice(0,8)}</div>
                     </div>
                     <div class="user-card-actions">
-                        <button class="btn-action-icon" onclick="viewUser('${u.id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn-action-icon" onclick="toggleSuspend('${u.id}', '${u.status}')"><i class="fas ${u.status === 'suspended' ? 'fa-user-check' : 'fa-user-slash'}"></i></button>
-                        <button class="btn-action-icon" style="color:var(--danger)" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="btn-action-icon" onclick="viewUser('${u.id}')" title="View" aria-label="View profile for ${u.full_name}"><i class="fas fa-eye"></i></button>
+                        <button class="btn-action-icon" onclick="toggleSuspend('${u.id}', '${u.status}')" title="${u.status === 'suspended' ? 'Activate' : 'Suspend'}" aria-label="${u.status === 'suspended' ? 'Activate' : 'Suspend'} user ${u.full_name}"><i class="fas ${u.status === 'suspended' ? 'fa-user-check' : 'fa-user-slash'}"></i></button>
+                        <button class="btn-action-icon" style="color:var(--danger)" onclick="deleteUser('${u.id}')" title="Delete" aria-label="Delete user ${u.full_name}"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
                 cardList.appendChild(card);
