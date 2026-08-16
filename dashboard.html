@@ -392,9 +392,17 @@
             margin-bottom: 15px;
             opacity: 0.5;
         }
+
+        #toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: var(--success); color: white; padding: 10px 20px;
+            border-radius: 30px; font-size: 13px; font-weight: 600; display: none; z-index: 3000;
+        }
     </style>
 </head>
 <body>
+
+    <div id="toast" role="status" aria-live="polite">Referral code copied!</div>
 
     <header>
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -510,7 +518,7 @@
                 <h4>Refer & Earn</h4>
                 <p>Referral Code: <b id="refCodeText">...</b></p>
             </div>
-            <button onclick="copyRef()" class="icon-btn" style="background: var(--accent-color); border: none;">
+            <button onclick="copyRef()" class="icon-btn" style="background: var(--accent-color); border: none;" aria-label="Copy referral code">
                 <i class="fas fa-copy"></i>
             </button>
         </section>
@@ -744,10 +752,14 @@
             window.location.href = 'login.html';
         };
 
+        let toastTimeout = null;
         window.copyRef = () => {
             const code = window.userRefCode || '...';
             navigator.clipboard.writeText(code);
-            alert('Referral code copied!');
+            const t = document.getElementById('toast');
+            t.style.display = 'block';
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => t.style.display = 'none', 2000);
         };
 
         window.addEventListener('DOMContentLoaded', init);
