@@ -396,6 +396,8 @@
 </head>
 <body>
 
+    <div id="toast" role="status" aria-live="polite" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 600; display: none; z-index: 3000;">Referral code copied!</div>
+
     <header>
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div class="user-info">
@@ -406,11 +408,11 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a href="notifications.html" class="icon-btn">
+                <a href="notifications.html" class="icon-btn" aria-label="Notifications">
                     <i class="fas fa-bell"></i>
                     <div class="notification-dot" id="notifDot"></div>
                 </a>
-                <button class="icon-btn" onclick="logout()">
+                <button class="icon-btn" onclick="logout()" aria-label="Logout" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -510,7 +512,7 @@
                 <h4>Refer & Earn</h4>
                 <p>Referral Code: <b id="refCodeText">...</b></p>
             </div>
-            <button onclick="copyRef()" class="icon-btn" style="background: var(--accent-color); border: none;">
+            <button onclick="copyRef()" class="icon-btn" style="background: var(--accent-color); border: none;" aria-label="Copy referral code" title="Copy referral code">
                 <i class="fas fa-copy"></i>
             </button>
         </section>
@@ -744,10 +746,18 @@
             window.location.href = 'login.html';
         };
 
+        let toastTimeout = null;
         window.copyRef = () => {
             const code = window.userRefCode || '...';
             navigator.clipboard.writeText(code);
-            alert('Referral code copied!');
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.style.display = 'block';
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 2000);
+            }
         };
 
         window.addEventListener('DOMContentLoaded', init);

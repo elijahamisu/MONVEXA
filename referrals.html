@@ -165,13 +165,13 @@
 </head>
 <body>
 
-    <div id="toast">Copied successfully!</div>
+    <div id="toast" role="status" aria-live="polite">Copied successfully!</div>
 
     <header>
         <div class="container header-flex">
             <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Referrals</a>
             <div class="profile-area">
-                <a href="notifications.html" style="color: white; font-size: 18px; margin-right: 12px;"><i class="fas fa-bell"></i></a>
+                <a href="notifications.html" style="color: white; font-size: 18px; margin-right: 12px;" aria-label="Notifications"><i class="fas fa-bell"></i></a>
                 <div class="mini-avatar" id="userAvatar">U</div>
             </div>
         </div>
@@ -182,9 +182,9 @@
             <p>Invite your friends and earn rewards when they invest!</p>
             <div class="code-display" id="refCodeDisplay">...</div>
             <div class="action-btns">
-                <button class="btn-action" onclick="copyCode()"><i class="fas fa-copy"></i> Copy Code</button>
-                <button class="btn-action" onclick="copyLink()"><i class="fas fa-link"></i> Copy Link</button>
-                <button class="btn-action btn-share" onclick="shareLink()"><i class="fas fa-share-alt"></i> Share Referral Link</button>
+                <button class="btn-action" onclick="copyCode()" aria-label="Copy referral code"><i class="fas fa-copy"></i> Copy Code</button>
+                <button class="btn-action" onclick="copyLink()" aria-label="Copy referral link"><i class="fas fa-link"></i> Copy Link</button>
+                <button class="btn-action btn-share" onclick="shareLink()" aria-label="Share referral link"><i class="fas fa-share-alt"></i> Share Referral Link</button>
             </div>
         </section>
 
@@ -344,10 +344,14 @@
             }
         };
 
+        let toastTimeout = null;
         function showToast() {
             const t = document.getElementById('toast');
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
+            if (t) {
+                t.style.display = 'block';
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => t.style.display = 'none', 2000);
+            }
         }
 
         window.addEventListener('DOMContentLoaded', init);
