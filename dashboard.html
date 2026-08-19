@@ -406,12 +406,12 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a href="notifications.html" class="icon-btn">
-                    <i class="fas fa-bell"></i>
+                <a href="notifications.html" class="icon-btn" aria-label="Notifications" title="Notifications">
+                    <i class="fas fa-bell" aria-hidden="true"></i>
                     <div class="notification-dot" id="notifDot"></div>
                 </a>
-                <button class="icon-btn" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
+                <button class="icon-btn" onclick="logout()" aria-label="Log out" title="Log out">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
@@ -510,8 +510,8 @@
                 <h4>Refer & Earn</h4>
                 <p>Referral Code: <b id="refCodeText">...</b></p>
             </div>
-            <button onclick="copyRef()" class="icon-btn" style="background: var(--accent-color); border: none;">
-                <i class="fas fa-copy"></i>
+            <button onclick="copyRef()" class="icon-btn" aria-label="Copy referral code" title="Copy referral code" style="background: var(--accent-color); border: none;">
+                <i class="fas fa-copy" aria-hidden="true"></i>
             </button>
         </section>
 
