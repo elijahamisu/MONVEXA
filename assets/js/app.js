@@ -157,7 +157,8 @@ const showTelegramModal = () => {
             <h2 style="margin-bottom: 10px;">Join Our Community!</h2>
             <p style="color: #9ca3af; font-size: 14px; margin-bottom: 25px;">Get instant updates, investment tips, and 24/7 support in our official Telegram group.</p>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <a href="${ENV.TELEGRAM_LINK}" target="_blank" class="btn-prime" style="background:#229ED9; text-decoration:none; display:block; padding:12px; border-radius:10px; font-weight:700;">Join Telegram Now</a>
+                <a href="${ENV.TELEGRAM_LINK}" target="_blank" class="btn-prime" style="background:#229ED9; text-decoration:none; display:block; padding:12px; border-radius:10px; font-weight:700;">Join Telegram Group</a>
+                <a href="${ENV.TELEGRAM_CHANNEL_LINK}" target="_blank" class="btn-prime" style="background:transparent; border:1px solid #229ED9; color:#229ED9; text-decoration:none; display:block; padding:12px; border-radius:10px; font-weight:700;">Join Telegram Channel</a>
                 <button id="closeTgPopup" style="background:transparent; border:none; color:#9ca3af; cursor:pointer; font-size:13px;">Maybe Later</button>
             </div>
         </div>
