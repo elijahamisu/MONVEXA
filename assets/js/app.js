@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Core Application Controller
+ * MONVEXA - Core Application Controller
  * Handles initialization, authentication guarding, global UI components,
  * and shared utility services.
  */
