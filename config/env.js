@@ -46,7 +46,8 @@ export const ENV = {
     TIMEZONE: import.meta.env.VITE_APP_TIMEZONE || 'Africa/Lagos',
     
     // Community
-    TELEGRAM_LINK: import.meta.env.VITE_TELEGRAM_LINK || 'https://t.me/+soUYHDmaOZBmM2U0',
+    TELEGRAM_LINK: import.meta.env.VITE_TELEGRAM_LINK || 'https://t.me/+jBbRS6HqIjM2YmM8',
+    TELEGRAM_CHANNEL_LINK: import.meta.env.VITE_TELEGRAM_CHANNEL_LINK || 'https://t.me/monvexachannel',
 
     // Bank Details (Kuda)
     KUDA_NAME: import.meta.env.VITE_KUDA_ACCOUNT_NAME || 'MONVEXA ADMIN',
