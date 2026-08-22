@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Deposit Management API
+ * MONVEXA - Deposit Management API
  * Handles Kuda Bank deposit requests, validations, administrator approvals,
  * and automated wallet crediting.
  */
