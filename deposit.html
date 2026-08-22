@@ -449,7 +449,9 @@
                 window.location.reload();
 
             } catch (e) {
-                alert('An error occurred. Please try again.');
+                console.error('Deposit submission failed:', e);
+                const detail = e?.message || e?.error_description || e?.hint || JSON.stringify(e);
+                alert(`Deposit failed: ${detail}`);
                 btn.disabled = false;
                 txt.style.display = 'block';
                 spin.style.display = 'none';
