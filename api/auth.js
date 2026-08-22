@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js';
 // Configuration from Environment Variables
 const SB_URL = import.meta.env.VITE_SUPABASE_URL;
 const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const BONUS_AMOUNT = 500; // Welcome Bonus (₦500)
+const BONUS_AMOUNT = 450; // Welcome Bonus (₦450)
 
 // Initialize Supabase Client
 export const supabase = createClient(SB_URL, SB_KEY);
@@ -51,7 +51,7 @@ export const registerUser = async ({ email, password, fullName, username, phone,
             }]);
             if (profileError) throw profileError;
 
-            // 4. Initialize Wallet with ₦500 Welcome Bonus
+            // 4. Initialize Wallet with ₦450 Welcome Bonus
             const { error: walletError } = await supabase.from('wallets').insert([{
                 user_id: user.id,
                 balance: BONUS_AMOUNT
