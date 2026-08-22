@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Deposit Module
+ * MONVEXA - Deposit Module
  * Manages Kuda Bank deposit requests, dynamic bank info retrieval,
  * real-time status tracking, and deposit history management.
  */
@@ -220,4 +220,4 @@ window.copyNumber = () => {
 // Start logic on load
 document.addEventListener('DOMContentLoaded', initDepositModule);
 
-export { refreshDepositHistory, submitDeposit };
+export { refreshDepositHistory };
