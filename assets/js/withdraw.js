@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Withdrawal Module
+ * MONVEXA - Withdrawal Module
  * Manages withdrawal requests, Kuda Bank profile validation,
  * real-time status tracking, and automated balance restoration.
  */
@@ -278,4 +278,4 @@ const PendCountToCurrency = (count) => {
 // Initial Load
 document.addEventListener('DOMContentLoaded', initWithdrawalModule);
 
-export { refreshWithdrawalHistory, submitWithdrawal };
+export { refreshWithdrawalHistory };
