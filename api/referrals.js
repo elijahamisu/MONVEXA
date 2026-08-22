@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Referral Management API
+ * MONVEXA - Referral Management API
  * Handles referral link detection, relationship mapping, 
  * automated reward processing, and leaderboard analytics.
  */
