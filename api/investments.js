@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Investment Management API
+ * MONVEXA - Investment Management API
  * Handles creation, validation, daily earnings distribution, 
  * lifecycle updates, and real-time synchronization.
  */
