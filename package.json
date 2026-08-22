@@ -1,9 +1,9 @@
 {
-  "name": "easypie",
+  "name": "monvexa",
   "version": "1.0.0",
   "private": true,
   "description": "Premium Nigerian Naira Investment Platform",
-  "author": "EASYPIE Development Team",
+  "author": "Monvexa Development Team",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -37,12 +37,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/easypie.git"
+    "url": "https://github.com/username/monvexa.git"
   },
   "bugs": {
-    "url": "https://github.com/username/easypie/issues"
+    "url": "https://github.com/username/monvexa/issues"
   },
-  "homepage": "https://easypie.vercel.app",
+  "homepage": "https://monvexa.vercel.app",
   "browserslist": [
     ">0.5%",
     "last 2 versions",
