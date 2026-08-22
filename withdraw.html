@@ -268,10 +268,10 @@
         <section class="withdraw-section">
             <form id="withdrawForm">
                 <div class="form-group">
-                    <label>Withdrawal Amount (Min ₦1,000)</label>
+                    <label>Withdrawal Amount (Min ₦450)</label>
                     <div class="input-box">
                         <i>₦</i>
-                        <input type="number" id="withdrawAmount" placeholder="1000" min="1000" required>
+                        <input type="number" id="withdrawAmount" placeholder="450" min="450" required>
                     </div>
                     <div class="balance-info">Withdrawable: <span id="withdrawableText">₦0.00</span></div>
                 </div>
@@ -597,7 +597,7 @@
             const accName = document.getElementById('accountName').value.trim();
 
             // Validations
-            if (amount < 1000) { alert('Minimum withdrawal is ₦1,000'); return; }
+            if (amount < 450) { alert('Minimum withdrawal is ₦450'); return; }
 
             if (withdrawableBalance <= 0) {
                 alert('You already have a pending withdrawal covering your full balance. Please wait for it to be processed, or add more funds before requesting another withdrawal.');
