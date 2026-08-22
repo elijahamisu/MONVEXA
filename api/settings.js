@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Platform Settings API
+ * MONVEXA - Platform Settings API
  * Manages global configurations, maintenance mode, financial limits,
  * and system-wide security policies.
  */
@@ -107,7 +107,7 @@ export const isMaintenanceMode = async () => {
  */
 export const resetPlatformSettings = async () => {
     const defaults = {
-        app_name: "EASYPIE",
+        app_name: "MONVEXA",
         welcome_bonus_amount: 500,
         referral_percent: 20,
         min_withdrawal_amount: 1000,
