@@ -237,6 +237,22 @@
             </div>
 
             <div class="form-group">
+                <label>Name on Your Bank Account</label>
+                <div class="input-box">
+                    <i class="fas fa-user" style="color: var(--accent-color);"></i>
+                    <input type="text" id="senderAccountName" placeholder="Enter the name on your bank account" autocomplete="name">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Your Bank Name</label>
+                <div class="input-box">
+                    <i class="fas fa-building-columns" style="color: var(--accent-color);"></i>
+                    <input type="text" id="senderBankName" placeholder="Enter your bank name" autocomplete="organization">
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label>Payment Method</label>
                 <div class="method-box">
                     <div style="display:flex; align-items:center; gap:10px;">
@@ -386,7 +402,13 @@
 
         window.submitDeposit = async () => {
             const amt = parseFloat(document.getElementById('depositAmount').value);
+            const senderAccountName = document.getElementById('senderAccountName').value.trim();
+            const senderBankName = document.getElementById('senderBankName').value.trim();
             if (!amt || amt < 1000) { alert('Minimum deposit is ₦1,000'); return; }
+            if (!senderAccountName || !senderBankName) {
+                alert('Please enter the name on your bank account and your bank name.');
+                return;
+            }
 
             const btn = document.getElementById('paidBtn');
             const txt = document.getElementById('btnText');
@@ -402,6 +424,8 @@
                     user_id: currentUser.id,
                     amount: amt,
                     payment_method: 'PalmPay',
+                    sender_account_name: senderAccountName,
+                    sender_bank_name: senderBankName,
                     status: 'pending'
                 }]);
                 if (depErr) throw depErr;
@@ -411,7 +435,7 @@
                     user_id: currentUser.id,
                     amount: amt,
                     type: 'deposit',
-                    description: 'Deposit via PalmPay'
+                    description: `Deposit via PalmPay from ${senderBankName}`
                 }]);
 
                 // 3. Create Notification
