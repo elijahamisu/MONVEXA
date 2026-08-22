@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Investment Module
+ * MONVEXA - Investment Module
  * Manages plan selection, investment creation, real-time progress tracking,
  * and automated earnings countdowns.
  */
@@ -251,4 +251,4 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 // Load on DOM ready
 document.addEventListener('DOMContentLoaded', initInvestmentModule);
 
-export { loadUserInvestments, initiatePlanSelection };
+export { loadUserInvestments };
