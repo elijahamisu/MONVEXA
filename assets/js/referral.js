@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Referral Module
+ * MONVEXA - Referral Module
  * Handles dynamic link generation, referral tracking, leaderboard analytics,
  * and social sharing integration with real-time Supabase sync.
  */
