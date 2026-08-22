@@ -40,7 +40,7 @@ export const ENV = {
     // Financial Configuration
     CURRENCY_CODE: import.meta.env.VITE_APP_CURRENCY || 'NGN',
     CURRENCY_SYMBOL: '₦',
-    WELCOME_BONUS: parseFloat(import.meta.env.VITE_WELCOME_BONUS) || 500,
+    WELCOME_BONUS: parseFloat(import.meta.env.VITE_WELCOME_BONUS) || 450,
 
     // Timezone Configuration
     TIMEZONE: import.meta.env.VITE_APP_TIMEZONE || 'Africa/Lagos',
