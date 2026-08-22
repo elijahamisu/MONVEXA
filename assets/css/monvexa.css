@@ -1,0 +1,93 @@
+/* MONVEXA visual system: midnight finance terminal with a red signal accent */
+:root {
+  --primary-bg: #071327 !important;
+  --secondary-bg: #0b1d3a !important;
+  --sidebar-bg: #081a35 !important;
+  --card-bg: rgba(15, 39, 79, 0.72) !important;
+  --glass-bg: rgba(29, 76, 145, 0.14) !important;
+  --accent-color: #f43f4f !important;
+  --accent-hover: #ff6670 !important;
+  --gold: #f43f4f !important;
+  --gold-hover: #d92b3c !important;
+  --text-main: #f8fbff !important;
+  --text-muted: #a8b8d4 !important;
+  --text-dim: #6f83a5 !important;
+  --success: #49d8ae !important;
+  --warning: #ffc857 !important;
+  --danger: #ff5463 !important;
+  --info: #6aa9ff !important;
+  --glass-border: rgba(147, 183, 235, 0.18) !important;
+  --accent-glow: rgba(244, 63, 79, 0.34) !important;
+  --radius-sm: 12px !important;
+  --radius-md: 18px !important;
+  --radius-lg: 28px !important;
+  --transition: 180ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+
+html { background: #071327; }
+body {
+  background: #071327 !important;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+    radial-gradient(circle at 83% 0%, rgba(43, 100, 202, .28), transparent 34%),
+    radial-gradient(circle at 10% 85%, rgba(244, 63, 79, .10), transparent 28%) !important;
+  background-size: 34px 34px, 34px 34px, auto, auto !important;
+  color: #f8fbff !important;
+}
+body::before { content: ''; position: fixed; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 0 70%, rgba(244,63,79,.04) 70% 70.3%, transparent 70.3%); z-index: -1; }
+header { background: rgba(7,19,39,.9) !important; border-bottom: 1px solid rgba(244,63,79,.25) !important; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+.sidebar { background: linear-gradient(180deg, #081a35 0%, #061126 100%) !important; border-right: 1px solid rgba(244,63,79,.22) !important; box-shadow: 12px 0 40px rgba(0,0,0,.18); }
+.bottom-nav { background: rgba(8,26,53,.96) !important; border-top: 1px solid rgba(244,63,79,.24) !important; }
+.glass-card, .card, .stat-card, .info-card, .form-container, .auth-card, .plan-card, .feature-card, .table-container {
+  background: linear-gradient(145deg, rgba(19,53,106,.82), rgba(8,26,53,.84)) !important;
+  border: 1px solid rgba(130,169,228,.18) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 55px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+.glass-card:hover, .card:hover, .plan-card:hover, .feature-card:hover { border-color: rgba(244,63,79,.6) !important; box-shadow: 0 18px 42px rgba(244,63,79,.12) !important; transform: translateY(-4px); }
+.btn-primary, .btn-gold, button[type="submit"], .btn-submit { background: linear-gradient(135deg, #f43f4f, #c9253a) !important; color: white !important; box-shadow: 0 10px 24px rgba(244,63,79,.23); }
+.btn-primary:hover, .btn-gold:hover, button[type="submit"]:hover, .btn-submit:hover { background: linear-gradient(135deg, #ff6470, #e13749) !important; }
+.btn-outline { border-color: rgba(244,63,79,.55) !important; color: #fff !important; }
+.btn-outline:hover { background: rgba(244,63,79,.14) !important; border-color: #f43f4f !important; }
+.form-control, select, textarea, input { background: rgba(3,12,29,.56) !important; border-color: rgba(130,169,228,.25) !important; color: #fff !important; border-radius: 12px !important; }
+.form-control:focus, select:focus, textarea:focus, input:focus { border-color: #f43f4f !important; box-shadow: 0 0 0 4px rgba(244,63,79,.15) !important; }
+.nav-item.active, .text-gold, .text-gradient, .accent, .logo, .brand, .page-title span { color: #f43f4f !important; -webkit-text-fill-color: #f43f4f !important; background: none !important; }
+.nav-item.active i, .nav-item:hover, .sidebar .nav-item:hover { color: #ff6670 !important; }
+th { color: #a8b8d4 !important; background: rgba(3,12,29,.28); }
+td { border-bottom-color: rgba(130,169,228,.12) !important; }
+.badge-success { background: rgba(73,216,174,.14) !important; }
+.badge-danger, .badge-warning { background: rgba(244,63,79,.15) !important; color: #ff7b84 !important; }
+.progress-fill { background: linear-gradient(90deg, #f43f4f, #ff7b84) !important; }
+.spinner { border-top-color: #f43f4f !important; }
+.toast { background: #0b1d3a !important; border-color: rgba(244,63,79,.35) !important; }
+.hero, .auth-wrapper { position: relative; overflow: hidden; }
+.hero::after, .auth-wrapper::after { content: 'MONVEXA'; position: absolute; right: -18px; bottom: -30px; color: rgba(255,255,255,.035); font-size: clamp(80px, 15vw, 190px); font-weight: 900; letter-spacing: -.08em; pointer-events: none; }
+.logo, .brand, .sidebar .logo { letter-spacing: .12em !important; font-weight: 900 !important; }
+.logo::before, .brand::before { content: '◆'; color: #f43f4f; margin-right: 8px; font-size: .72em; }
+@media (max-width: 768px) { body { background-size: 26px 26px, 26px 26px, auto, auto !important; } .glass-card, .card, .stat-card { border-radius: 16px !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* Brand and investment number emphasis */
+.logo, .brand, .sidebar .logo, .site-logo, .navbar-brand { color: #f43f4f !important; }
+.logo::before, .brand::before, .site-logo::before, .navbar-brand::before { color: #f43f4f !important; }
+.plan-price, .plan-price span, .plan-card h3, .plan-card .plan-price, .plan-card .price, .plan-card .amount, .plan-card .investment-amount, .plan-card .spec-item h5, .plan-badge { color: #ff4655 !important; }
+.plan-price span, .plan-card .plan-price, .plan-card .price, .plan-card .amount, .plan-card .investment-amount { text-shadow: 0 0 22px rgba(244, 63, 79, .25); font-weight: 900 !important; }
+.plan-badge { background: rgba(244, 63, 79, .15) !important; border: 1px solid rgba(244, 63, 79, .28); }
+
+/* Explicit red brand lockup and investment plan title treatment */
+:root { --monvexa-red: #ff3048; --monvexa-red-deep: #d71935; }
+.logo, .brand, .site-logo, .navbar-brand, .footer-logo, .admin-logo, .sidebar .logo {
+  color: var(--monvexa-red) !important;
+  -webkit-text-fill-color: var(--monvexa-red) !important;
+  text-shadow: 0 0 18px rgba(255, 48, 72, .22);
+}
+.logo::before, .brand::before, .site-logo::before, .navbar-brand::before, .footer-logo::before, .admin-logo::before, .sidebar .logo::before {
+  color: var(--monvexa-red) !important;
+  -webkit-text-fill-color: var(--monvexa-red) !important;
+}
+.plan-card h3, .plan-card h4, .plan-card .plan-title, .plan-card .plan-price, .plan-card .plan-price span, .plan-price, .plan-price span {
+  color: var(--monvexa-red) !important;
+  -webkit-text-fill-color: var(--monvexa-red) !important;
+  text-shadow: 0 0 18px rgba(255, 48, 72, .26);
+}
