@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Global Utility Library
+ * MONVEXA - Global Utility Library
  * Reusable helper functions for Validation, Formatting, UI, and Security.
  */
 
@@ -188,12 +188,12 @@ export const isOnline = () => navigator.onLine;
  */
 
 export const storage = {
-    set: (key, val) => localStorage.setItem(`easypie_${key}`, JSON.stringify(val)),
+    set: (key, val) => localStorage.setItem(`monvexa_${key}`, JSON.stringify(val)),
     get: (key) => {
-        const val = localStorage.getItem(`easypie_${key}`);
+        const val = localStorage.getItem(`monvexa_${key}`);
         try { return val ? JSON.parse(val) : null; } catch { return null; }
     },
-    remove: (key) => localStorage.removeItem(`easypie_${key}`),
+    remove: (key) => localStorage.removeItem(`monvexa_${key}`),
     clear: () => localStorage.clear()
 };
 
