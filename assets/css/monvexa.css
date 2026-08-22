@@ -91,3 +91,36 @@ td { border-bottom-color: rgba(130,169,228,.12) !important; }
   -webkit-text-fill-color: var(--monvexa-red) !important;
   text-shadow: 0 0 18px rgba(255, 48, 72, .26);
 }
+
+/* Dashboard and wallet cards: red theme */
+.main-balance-card,
+.wallet-card {
+  background: linear-gradient(135deg, #b5122b 0%, #ef233c 48%, #8f1026 100%) !important;
+  border: 1px solid #ff6b78 !important;
+  color: #ffffff !important;
+  box-shadow: 0 20px 45px rgba(190, 18, 52, 0.38), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.main-balance-card::before,
+.wallet-card::before {
+  background: rgba(255, 190, 198, .28) !important;
+}
+.main-balance-card .card-label,
+.wallet-card p {
+  color: rgba(255,255,255,.82) !important;
+}
+.main-balance-card .card-amount,
+.wallet-card h1 {
+  color: #ffffff !important;
+  text-shadow: 0 3px 18px rgba(84, 0, 17, .34);
+}
+.main-balance-card .card-footer-stats {
+  border-top-color: rgba(255,255,255,.25) !important;
+}
+.wallet-card .w-icon {
+  background: rgba(91, 0, 16, .28) !important;
+  border: 1px solid rgba(255,255,255,.22);
+}
+.wallet-card .w-action:hover .w-icon {
+  background: #ffffff !important;
+  color: #c51632 !important;
+}
