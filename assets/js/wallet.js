@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Wallet Module
+ * MONVEXA - Wallet Module
  * Manages real-time balances, financial aggregations, and transaction filtering.
  */
 
