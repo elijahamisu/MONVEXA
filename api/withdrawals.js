@@ -37,7 +37,7 @@ export const createWithdrawalRequest = async (amount, bankDetails) => {
 
         // 2. Validate Amount
         const withdrawAmount = parseFloat(amount);
-        if (withdrawAmount < 1000) throw new Error("Minimum withdrawal is ₦1,000.");
+        if (withdrawAmount < 450) throw new Error("Minimum withdrawal is ₦450.");
 
         // 3. Check for existing pending requests (Limit to 1 pending to prevent spam)
         const { count: pendingCount } = await supabase
