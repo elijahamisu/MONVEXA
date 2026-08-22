@@ -108,9 +108,9 @@ export const isMaintenanceMode = async () => {
 export const resetPlatformSettings = async () => {
     const defaults = {
         app_name: "MONVEXA",
-        welcome_bonus_amount: 500,
+        welcome_bonus_amount: 450,
         referral_percent: 20,
-        min_withdrawal_amount: 1000,
+        min_withdrawal_amount: 450,
         min_investment_amount: 5000,
         daily_earnings_time: "00:00:00", // Africa/Lagos Midnight
         maintenance_mode: false,
