@@ -124,3 +124,31 @@ td { border-bottom-color: rgba(130,169,228,.12) !important; }
   background: #ffffff !important;
   color: #c51632 !important;
 }
+
+/* Profile page: red header card theme */
+.profile-card {
+  background: linear-gradient(135deg, #b5122b 0%, #ef233c 48%, #8f1026 100%) !important;
+  border: 1px solid #ff6b78 !important;
+  color: #ffffff !important;
+  box-shadow: 0 20px 45px rgba(190, 18, 52, 0.38), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.profile-card h2,
+.profile-card p {
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(84, 0, 17, .24);
+}
+.profile-card p { opacity: .86; }
+.profile-card .profile-img {
+  border-color: rgba(255,255,255,.82) !important;
+  box-shadow: 0 0 0 5px rgba(111, 0, 18, .28), 0 10px 25px rgba(84, 0, 17, .28);
+}
+.profile-card .edit-avatar-btn {
+  background: #ffffff !important;
+  color: #c51632 !important;
+  border-color: #a7122b !important;
+}
+.profile-card .status-badge {
+  background: rgba(91, 0, 16, .3) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,.22);
+}
