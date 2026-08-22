@@ -1,5 +1,5 @@
 /**
- * EASYPIE - Notifications API
+ * MONVEXA - Notifications API
  * Manages user alerts, administrative broadcasts, real-time synchronization,
  * and delivery statistics.
  */
