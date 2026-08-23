@@ -570,14 +570,27 @@
             }
             currentUser = session.user;
 
-            await Promise.all([
-                loadProfile(),
-                loadWallet(),
-                loadInvestments(),
-                loadTransactions(),
-                loadReferralStats(),
-                checkNotifications()
-            ]);
+            const loaders = {
+                loadProfile, loadWallet, loadInvestments,
+                loadTransactions, loadReferralStats, checkNotifications
+            };
+            const errors = [];
+
+            await Promise.all(
+                Object.entries(loaders).map(async ([name, fn]) => {
+                    try {
+                        await fn();
+                    } catch (e) {
+                        console.error(`${name} failed:`, e);
+                        errors.push(`${name}: ${e?.message || JSON.stringify(e)}`);
+                    }
+                })
+            );
+
+            if (errors.length > 0) {
+                alert('Dashboard load errors:\n\n' + errors.join('\n'));
+            }
+
         }
 
         async function loadProfile() {
@@ -586,7 +599,9 @@
                 .select('*')
                 .eq('id', currentUser.id)
                 .single();
-            
+
+            if (error) throw error;
+
             if (data) {
                 document.getElementById('userName').innerText = data.full_name;
                 document.getElementById('userAvatar').innerText = data.full_name.charAt(0);
@@ -596,24 +611,28 @@
         }
 
         async function loadWallet() {
-            const { data } = await supabase
+            const { data, error } = await supabase
                 .from('wallets')
                 .select('*')
                 .eq('user_id', currentUser.id)
                 .single();
-            
+
+            if (error) throw error;
+
             if (data) {
                 const bal = parseFloat(data.balance);
                 document.getElementById('walletBalance').innerText = `₦${bal.toLocaleString()}`;
                 document.getElementById('availBalance').innerText = `₦${bal.toLocaleString()}`;
             }
 
-            const { data: eData } = await supabase
+            const { data: eData, error: eError } = await supabase
                 .from('transactions')
                 .select('amount')
                 .eq('user_id', currentUser.id)
                 .eq('type', 'earning');
-            
+
+            if (eError) throw eError;
+
             let totalE = 0;
             if (eData) {
                 totalE = eData.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
