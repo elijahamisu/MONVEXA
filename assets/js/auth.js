@@ -5,7 +5,7 @@
  */
 
 import { ENV } from '../config/env.js';
-import { supabase, getCurrentUser, signOut } from '../config/supabase.js';
+import { supabase, getCurrentUser, getCurrentSession, signOut } from '../config/supabase.js';
 import { registerUser as apiRegister, loginUser as apiLogin, loginAdmin as apiAdminLogin } from '../api/auth.js';
 import { notify, toggleLoader } from './app.js';
 
@@ -204,23 +204,24 @@ export const getPasswordStrength = (password) => {
  * Used at the top of protected script modules.
  */
 export const protectPage = async () => {
-    const user = await getCurrentUser();
-    if (!user) {
+    const session = await getCurrentSession();
+    if (!session) {
         window.location.href = 'login.html';
         return null;
     }
-    return user;
+    return session.user;
 };
 
 /**
  * Protects Admin pages specifically.
  */
 export const protectAdminPage = async () => {
-    const user = await getCurrentUser();
-    if (!user) {
+    const session = await getCurrentSession();
+    if (!session) {
         window.location.href = 'login.html';
         return null;
     }
+    const user = session.user;
 
     const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
     if (!profile?.is_admin) {
