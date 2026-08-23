@@ -492,6 +492,7 @@
         let usersData = [];
         let filteredUsers = [];
         let currentPage = 1;
+        let plansData = []; // NEW: available investment plans, for admin plan assignment
         const perPage = 15;
         let currentAdminId = null; // NEW: needed to log who made a balance adjustment
 
@@ -507,8 +508,18 @@
             document.getElementById('loader').style.display = 'none';
 
             await fetchUsers();
+            await fetchPlans();
             setupEventListeners();
             setupRealtime();
+        }
+
+        // NEW: load available investment plans so the admin can assign one directly to a user
+        async function fetchPlans() {
+            const { data, error } = await supabase
+                .from('investment_plans')
+                .select('id, name, min_amount, max_amount, daily_profit_percent, duration_days, is_available')
+                .order('min_amount', { ascending: true });
+            if (!error && data) plansData = data;
         }
 
         async function fetchUsers() {
@@ -702,6 +713,18 @@
                     </div>
                 </div>
 
+                <!-- NEW: Assign investment plan panel -->
+                <div class="modal-plan-list">
+                    <h4>Assign Investment Plan</h4>
+                    <select id="assignPlanSelect" class="balance-adjust-input">
+                        <option value="">Select a plan…</option>
+                        ${plansData.map(p => `<option value="${p.id}" ${!p.is_available ? 'style="color:#888"' : ''}>${p.name} (₦${parseFloat(p.min_amount).toLocaleString()} - ₦${parseFloat(p.max_amount).toLocaleString()}, ${p.daily_profit_percent}%/day)${!p.is_available ? ' — inactive' : ''}</option>`).join('')}
+                    </select>
+                    <input type="number" id="assignPlanAmount" class="balance-adjust-input" placeholder="Investment amount (₦)" min="0" style="margin-top:8px;">
+                    <p style="font-size:11px; color:var(--text-muted); margin:6px 0;">This creates the investment directly — it does not deduct from the user's wallet.</p>
+                    <button class="btn-add-funds" style="width:100%" onclick="assignPlanToUser('${u.id}')">Assign Plan</button>
+                </div>
+
                 <div class="modal-actions">
                     <button class="btn-export" style="flex:1" onclick="sendDirectNotification('${u.id}')">Send Notification</button>
                     <button class="btn-export" style="flex:1; background:var(--warning)" onclick="resetUserWallet('${u.id}')">Reset Wallet</button>
@@ -765,6 +788,73 @@
                 }]);
 
                 alert('Balance updated successfully.');
+                closeModal();
+                fetchUsers();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        };
+
+        // NEW: Admin-assign an investment plan directly to a user, bypassing wallet balance.
+        // Creates the investment record with the same math create_investment() uses
+        // (daily_rate = plan.daily_profit_percent, expected_return over duration_days),
+        // logs a transaction so it shows in the user's history, notifies them, and
+        // records the action in admin_logs. Requires the "investments admin insert" RLS policy.
+        window.assignPlanToUser = async (userId) => {
+            const planId = document.getElementById('assignPlanSelect').value;
+            const amount = parseFloat(document.getElementById('assignPlanAmount').value);
+
+            if (!planId) { alert('Select a plan first.'); return; }
+            if (!amount || amount <= 0) { alert('Enter a valid amount.'); return; }
+
+            const plan = plansData.find(p => p.id === planId);
+            if (!plan) { alert('Plan not found.'); return; }
+            if (amount < plan.min_amount || amount > plan.max_amount) {
+                alert(`Amount must be between ₦${parseFloat(plan.min_amount).toLocaleString()} and ₦${parseFloat(plan.max_amount).toLocaleString()} for this plan.`);
+                return;
+            }
+            if (!confirm(`Assign "${plan.name}" (₦${amount.toLocaleString()}) to this user? This does not touch their wallet balance.`)) return;
+
+            try {
+                const dailyRate = parseFloat(plan.daily_profit_percent);
+                const durationDays = parseInt(plan.duration_days);
+                const expectedReturn = amount + (amount * dailyRate * durationDays / 100);
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + durationDays);
+
+                const { data: inv, error: invErr } = await supabase.from('investments').insert([{
+                    user_id: userId,
+                    plan_id: plan.id,
+                    plan_name: plan.name,
+                    amount: amount,
+                    daily_rate: dailyRate,
+                    expected_return: expectedReturn,
+                    end_date: endDate.toISOString().split('T')[0],
+                    status: 'active'
+                }]).select().single();
+                if (invErr) throw invErr;
+
+                await supabase.from('transactions').insert([{
+                    user_id: userId,
+                    amount: amount,
+                    type: 'investment',
+                    description: `Admin-assigned investment: ${plan.name}`
+                }]);
+
+                await supabase.from('notifications').insert([{
+                    user_id: userId,
+                    title: 'Investment Plan Assigned',
+                    message: `An administrator has activated the "${plan.name}" plan (₦${amount.toLocaleString()}) on your account.`,
+                    type: 'investment'
+                }]);
+
+                await supabase.from('admin_logs').insert([{
+                    admin_id: currentAdminId,
+                    action: `Assigned plan "${plan.name}" (₦${amount.toLocaleString()}) to user #${userId.slice(0,8)}`,
+                    target_id: userId
+                }]);
+
+                alert('Plan assigned successfully.');
                 closeModal();
                 fetchUsers();
             } catch (err) {
