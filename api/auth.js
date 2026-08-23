@@ -164,7 +164,7 @@ export const verifySession = async () => {
         authenticated: true, 
         user: session.user, 
         profile,
-        wallet: profile?.wallets[0] || null 
+        wallet: profile?.wallets || null 
     };
 };
 
