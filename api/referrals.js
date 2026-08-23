@@ -175,8 +175,11 @@ export const processReferralReward = async (referredUserId, depositAmount) => {
  */
 export const getReferralStats = async (userId) => {
     try {
+        const { data: profile } = await supabase.from('profiles').select('username').eq('id', userId).single();
+        if (!profile) throw new Error('Profile not found');
+
         const [referrals, earnings] = await Promise.all([
-            supabase.from('profiles').select('id', { count: 'exact' }).eq('referral_by', userId), // Needs logic mapping ID to code
+            supabase.from('profiles').select('id', { count: 'exact' }).ilike('referral_by', profile.username),
             supabase.from('transactions').select('amount').eq('user_id', userId).eq('type', 'referral')
         ]);
 
@@ -191,29 +194,30 @@ export const getReferralStats = async (userId) => {
 
 /**
  * Get Global Leaderboard (Top 10)
+ * Built from referral-type transactions, since that's what actually records
+ * commission payouts (see admin/deposits.html's creditReferralCommission).
  */
 export const getReferralLeaderboard = async () => {
     try {
-        // Complex query: Group by referrer, count referred users, sum rewards
         const { data, error } = await supabase
-            .from('referrals')
-            .select('referrer_id, reward_amount, profiles:referrer_id(full_name, username)')
-            .eq('reward_status', 'paid');
+            .from('transactions')
+            .select('user_id, amount, profiles:user_id(full_name, username)')
+            .eq('type', 'referral');
 
         if (error) throw error;
 
         const leaderboard = data.reduce((acc, curr) => {
-            const id = curr.referrer_id;
+            const id = curr.user_id;
             if (!acc[id]) {
-                acc[id] = { 
-                    name: curr.profiles.full_name, 
-                    username: curr.profiles.username, 
-                    count: 0, 
-                    totalEarned: 0 
+                acc[id] = {
+                    name: curr.profiles.full_name,
+                    username: curr.profiles.username,
+                    count: 0,
+                    totalEarned: 0
                 };
             }
             acc[id].count += 1;
-            acc[id].totalEarned += parseFloat(curr.reward_amount);
+            acc[id].totalEarned += parseFloat(curr.amount);
             return acc;
         }, {});
 
