@@ -593,7 +593,7 @@
             }
 
             paginated.forEach(u => {
-                const balance = u.wallets?.[0]?.balance || 0;
+                const balance = u.wallets?.balance || 0;
                 const investmentsHtml = formatInvestments(u.investments, { compact: true });
                 const statusClass = u.status === 'suspended' ? 'suspended' : 'active';
                 const statusLabel = u.status || 'active';
@@ -659,7 +659,7 @@
 
         window.viewUser = (id) => {
             const u = usersData.find(user => user.id === id);
-            const balance = u.wallets?.[0]?.balance || 0;
+            const balance = u.wallets?.balance || 0;
             const investments = u.investments || [];
             const activeInvs = investments.filter(i => i.status === 'active').length;
 
@@ -726,7 +726,7 @@
             }
 
             const u = usersData.find(user => user.id === userId);
-            const currentBalance = parseFloat(u.wallets?.[0]?.balance || 0);
+            const currentBalance = parseFloat(u.wallets?.balance || 0);
             const delta = mode === 'add' ? amount : -amount;
             const newBalance = currentBalance + delta;
 
@@ -791,7 +791,7 @@
         window.exportUsers = () => {
             let csv = 'ID,Name,Username,Status,Balance,Joined\n';
             filteredUsers.forEach(u => {
-                csv += `${u.id},${u.full_name},${u.username},${u.status || 'active'},${u.wallets?.[0]?.balance || 0},${u.created_at}\n`;
+                csv += `${u.id},${u.full_name},${u.username},${u.status || 'active'},${u.wallets?.balance || 0},${u.created_at}\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
