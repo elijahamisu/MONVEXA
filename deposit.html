@@ -257,23 +257,23 @@
                 <div class="method-box">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <i class="fas fa-university" style="color: var(--accent-color);"></i>
-                        <span style="font-weight:600; font-size:14px;">PalmPay</span>
+                        <span style="font-weight:600; font-size:14px;">OPay</span>
                     </div>
                     <i class="fas fa-check-circle" style="color: var(--success);"></i>
                 </div>
             </div>
 
-            <!-- PalmPay Details -->
+            <!-- OPay Details -->
             <div class="bank-details">
                 <div class="detail-item">
-                    <div><span>Account Name</span><h5 id="kudaName">Michael Isong Ukpong</h5></div>
+                    <div><span>Account Name</span><h5 id="kudaName">GLORY MICHAEL</h5></div>
                 </div>
                 <div class="detail-item">
-                    <div><span>Account Number</span><h5 id="kudaNumber">8968729514</h5></div>
+                    <div><span>Account Number</span><h5 id="kudaNumber">6578299180</h5></div>
                     <button class="copy-btn" onclick="copyNumber()">Copy</button>
                 </div>
                 <div class="detail-item">
-                    <div><span>Bank Name</span><h5 id="kudaBank">PalmPay</h5></div>
+                    <div><span>Bank Name</span><h5 id="kudaBank">OPay</h5></div>
                 </div>
             </div>
 
@@ -338,10 +338,10 @@
             if (!session) { window.location.href = 'login.html'; return; }
             currentUser = session.user;
 
-            // Load PalmPay deposit details from environment variables
-            document.getElementById('kudaName').innerText = import.meta.env.VITE_KUDA_ACCOUNT_NAME || 'Michael Isong Ukpong';
-            document.getElementById('kudaNumber').innerText = import.meta.env.VITE_KUDA_ACCOUNT_NUMBER || '8968729514';
-            document.getElementById('kudaBank').innerText = import.meta.env.VITE_KUDA_BANK_NAME || 'PalmPay';
+            // Load OPay deposit details from environment variables
+            document.getElementById('kudaName').innerText = import.meta.env.VITE_KUDA_ACCOUNT_NAME || 'GLORY MICHAEL';
+            document.getElementById('kudaNumber').innerText = import.meta.env.VITE_KUDA_ACCOUNT_NUMBER || '6578299180';
+            document.getElementById('kudaBank').innerText = import.meta.env.VITE_KUDA_BANK_NAME || 'OPay';
 
             await loadWalletData();
             await loadDepositHistory();
@@ -382,7 +382,7 @@
                 item.innerHTML = `
                     <div class="hist-info">
                         <h5>₦${parseFloat(d.amount).toLocaleString()}</h5>
-                        <p>${date.toLocaleDateString()} • PalmPay</p>
+                        <p>${date.toLocaleDateString()} • OPay</p>
                     </div>
                     <div class="hist-status">
                         <span class="badge ${d.status}">${d.status}</span>
@@ -423,7 +423,7 @@
                 const { error: depErr } = await supabase.from('deposits').insert([{
                     user_id: currentUser.id,
                     amount: amt,
-                    payment_method: 'PalmPay',
+                    payment_method: 'OPay',
                     sender_account_name: senderAccountName,
                     sender_bank_name: senderBankName,
                     status: 'pending'
@@ -435,7 +435,7 @@
                     user_id: currentUser.id,
                     amount: amt,
                     type: 'deposit',
-                    description: `Deposit via PalmPay from ${senderBankName}`
+                    description: `Deposit via OPay from ${senderBankName}`
                 }]);
 
                 // 3. Create Notification
